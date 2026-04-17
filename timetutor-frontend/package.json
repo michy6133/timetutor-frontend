@@ -1,0 +1,51 @@
+{
+  "name": "timetutor-frontend",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "serve:ssr:timetutor-frontend": "node dist/timetutor-frontend/server/server.mjs"
+  },
+  "private": true,
+  "packageManager": "npm@11.12.1",
+  "dependencies": {
+    "@angular/common": "^21.2.0",
+    "@angular/compiler": "^21.2.0",
+    "@angular/core": "^21.2.0",
+    "@angular/forms": "^21.2.0",
+    "@angular/platform-browser": "^21.2.0",
+    "@angular/platform-server": "^21.2.0",
+    "@angular/router": "^21.2.0",
+    "@angular/service-worker": "^21.2.0",
+    "@angular/ssr": "^21.2.7",
+    "@fullcalendar/angular": "^6.1.20",
+    "@fullcalendar/core": "^6.1.20",
+    "@fullcalendar/daygrid": "^6.1.20",
+    "@fullcalendar/interaction": "^6.1.20",
+    "@fullcalendar/timegrid": "^6.1.20",
+    "express": "^5.1.0",
+    "rxjs": "~7.8.0",
+    "socket.io-client": "^4.8.3",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^21.2.7",
+    "@angular/cli": "^21.2.7",
+    "@angular/compiler-cli": "^21.2.0",
+    "@types/express": "^5.0.1",
+    "@types/node": "^20.17.19",
+    "@typescript-eslint/eslint-plugin": "^8.58.2",
+    "@typescript-eslint/parser": "^8.58.2",
+    "autoprefixer": "^10.5.0",
+    "eslint": "^10.2.0",
+    "jsdom": "^28.0.0",
+    "postcss": "^8.5.10",
+    "prettier": "^3.8.3",
+    "tailwindcss": "^4.2.2",
+    "typescript": "~5.9.2",
+    "vitest": "^4.0.8"
+  }
+}
