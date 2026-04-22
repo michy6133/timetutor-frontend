@@ -1,0 +1,64 @@
+<div class="max-w-5xl mx-auto px-6 py-8">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-950">Sessions</h1>
+      <p class="text-gray-500 text-sm mt-1">{{ sessions().length }} session(s) au total</p>
+    </div>
+    <a routerLink="/director/sessions/new"
+       class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-all">
+      + Nouvelle session
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <div class="flex gap-2 mb-6">
+    @for (f of [['all','Toutes'],['draft','Brouillon'],['open','Ouvertes'],['closed','Fermées'],['published','Publiées']]; track f[0]) {
+      <button (click)="filter.set(f[0])"
+        [class]="filter() === f[0] ? 'bg-blue-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:border-blue-300'"
+        class="px-4 py-2 rounded-xl text-xs font-medium transition-all">
+        {{ f[1] }}
+      </button>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="text-center py-16 text-gray-400">Chargement...</div>
+  } @else if (filtered().length === 0) {
+    <div class="border-2 border-dashed border-gray-200 rounded-2xl p-12 text-center">
+      <div class="text-4xl mb-4">📅</div>
+      <p class="text-gray-500 mb-4">Aucune session pour ce filtre</p>
+      <a routerLink="/director/sessions/new" class="text-blue-600 font-medium text-sm hover:underline">Créer une session →</a>
+    </div>
+  } @else {
+    <div class="space-y-3">
+      @for (session of filtered(); track session.id) {
+        <a [routerLink]="['/director/sessions', session.id]"
+           class="block bg-white border border-gray-200 rounded-2xl p-6 hover:border-blue-300 hover:shadow-sm transition-all">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <div class="font-semibold text-gray-900 text-base">{{ session.name }}</div>
+              <div class="text-gray-400 text-sm mt-0.5">{{ session.academicYear }}</div>
+            </div>
+            <span class="text-xs font-semibold px-3 py-1.5 rounded-full {{ statusClass(session.status) }}">
+              {{ { draft: 'Brouillon', open: 'Ouvert', closed: 'Fermé', published: 'Publié' }[session.status] }}
+            </span>
+          </div>
+          <div class="flex items-center gap-8 text-sm text-gray-500 mb-4">
+            <span><strong class="text-gray-900">{{ session.totalSlots ?? 0 }}</strong> créneaux</span>
+            <span><strong class="text-gray-900">{{ session.totalTeachers ?? 0 }}</strong> enseignants</span>
+            @if (session.deadline) {
+              <span>Deadline : <strong class="text-gray-900">{{ session.deadline | date:'dd/MM/yyyy' }}</strong></span>
+            }
+          </div>
+          <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full rounded-full transition-all duration-500"
+              [style.width.%]="coveragePct(session)"
+              [class]="coveragePct(session) === 100 ? 'bg-green-500' : 'bg-blue-500'">
+            </div>
+          </div>
+          <div class="text-xs text-gray-400 mt-1.5">{{ coveragePct(session) }}% des créneaux couverts</div>
+        </a>
+      }
+    </div>
+  }
+</div>

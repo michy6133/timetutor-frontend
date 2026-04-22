@@ -1,0 +1,118 @@
+<!-- Navbar -->
+<nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+  <div class="max-w-6xl mx-auto px-6 flex items-center justify-between h-14">
+    <div class="text-lg font-bold text-gray-950">Time<span class="text-blue-600">Tutor</span></div>
+    <div class="flex items-center gap-6">
+      <a routerLink="/director/sessions" class="text-sm text-gray-600 hover:text-gray-900">Sessions</a>
+      <div class="relative">
+        <button class="text-sm text-gray-600 hover:text-gray-900">
+          🔔 <span *ngIf="unreadCount() > 0" class="ml-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">{{ unreadCount() }}</span>
+        </button>
+      </div>
+      <div class="text-sm font-medium text-gray-700">{{ auth.currentUser()?.fullName }}</div>
+      <button (click)="auth.logout()" class="text-sm text-red-500 hover:text-red-700">Déconnexion</button>
+    </div>
+  </div>
+</nav>
+
+<div class="max-w-6xl mx-auto px-6 py-8">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-950">Tableau de bord</h1>
+      <p class="text-gray-500 text-sm mt-1">Bonjour, {{ auth.currentUser()?.fullName }}</p>
+    </div>
+    <a routerLink="/director/sessions/new"
+       class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-all">
+      + Nouvelle session
+    </a>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid grid-cols-4 gap-4 mb-8">
+    <div class="bg-gray-950 text-white rounded-2xl p-6">
+      <div class="text-3xl font-bold">{{ sessions().length }}</div>
+      <div class="text-gray-400 text-sm mt-1">Sessions totales</div>
+    </div>
+    <div class="bg-gray-950 text-white rounded-2xl p-6">
+      <div class="text-3xl font-bold text-green-400">{{ activeSessions }}</div>
+      <div class="text-gray-400 text-sm mt-1">Sessions ouvertes</div>
+    </div>
+    <div class="bg-gray-950 text-white rounded-2xl p-6">
+      <div class="text-3xl font-bold">{{ totalTeachers }}</div>
+      <div class="text-gray-400 text-sm mt-1">Enseignants invités</div>
+    </div>
+    <div class="bg-gray-950 text-white rounded-2xl p-6">
+      <div class="text-3xl font-bold text-blue-400">{{ totalSlots }}</div>
+      <div class="text-gray-400 text-sm mt-1">Créneaux configurés</div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-3 gap-6">
+    <!-- Sessions list -->
+    <div class="col-span-2">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-semibold text-gray-900">Sessions récentes</h2>
+        <a routerLink="/director/sessions" class="text-blue-600 text-sm hover:underline">Voir tout</a>
+      </div>
+      @if (loading()) {
+        <div class="text-center py-10 text-gray-400">Chargement...</div>
+      } @else if (sessions().length === 0) {
+        <div class="border-2 border-dashed border-gray-200 rounded-2xl p-10 text-center">
+          <div class="text-3xl mb-3">📅</div>
+          <p class="text-gray-500 mb-4">Aucune session créée</p>
+          <a routerLink="/director/sessions/new" class="text-blue-600 text-sm font-medium hover:underline">
+            Créer ma première session →
+          </a>
+        </div>
+      } @else {
+        <div class="space-y-3">
+          @for (session of sessions().slice(0, 5); track session.id) {
+            <a [routerLink]="['/director/sessions', session.id]"
+               class="block bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-300 transition-all">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <div class="font-semibold text-gray-900">{{ session.name }}</div>
+                  <div class="text-gray-500 text-xs mt-0.5">{{ session.academicYear }}</div>
+                </div>
+                <span class="text-xs font-medium px-2.5 py-1 rounded-full {{ statusClass(session.status) }}">
+                  {{ statusLabel(session.status) }}
+                </span>
+              </div>
+              <div class="flex items-center gap-6 text-xs text-gray-500">
+                <span>{{ session.totalSlots ?? 0 }} créneaux</span>
+                <span>{{ session.totalTeachers ?? 0 }} enseignants</span>
+                @if (session.deadline) {
+                  <span>Deadline: {{ session.deadline | date:'dd/MM/yyyy' }}</span>
+                }
+              </div>
+              <!-- Progress bar -->
+              <div class="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full bg-blue-600 rounded-full transition-all" [style.width.%]="coverage(session)"></div>
+              </div>
+              <div class="text-xs text-gray-400 mt-1">{{ coverage(session) }}% couvert</div>
+            </a>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Notifications -->
+    <div>
+      <h2 class="font-semibold text-gray-900 mb-4">Notifications récentes</h2>
+      <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        @if (notifications().length === 0) {
+          <div class="p-6 text-center text-gray-400 text-sm">Aucune notification</div>
+        } @else {
+          @for (notif of notifications(); track notif.id) {
+            <div class="p-4 border-b border-gray-100 last:border-0" [class.bg-blue-50]="!notif.isRead">
+              <div class="font-medium text-sm text-gray-900 mb-1">{{ notif.title }}</div>
+              <div class="text-xs text-gray-500">{{ notif.body }}</div>
+              <div class="text-xs text-gray-400 mt-1">{{ notif.createdAt | date:'dd/MM HH:mm' }}</div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+</div>

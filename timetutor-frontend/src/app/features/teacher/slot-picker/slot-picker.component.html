@@ -1,0 +1,143 @@
+@if (error()) {
+  <div class="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div class="text-center max-w-sm">
+      <div class="text-5xl mb-4">🔒</div>
+      <h1 class="text-xl font-bold text-gray-900 mb-2">Lien invalide</h1>
+      <p class="text-gray-500">{{ error() }}</p>
+    </div>
+  </div>
+} @else if (loading()) {
+  <div class="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div class="text-gray-400">Chargement de vos créneaux...</div>
+  </div>
+} @else {
+
+  <!-- Top bar -->
+  <div class="bg-gray-950 text-white px-6 py-5">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <div>
+        <div class="text-xs text-gray-400 mb-0.5">Time<span class="text-blue-400">Tutor</span></div>
+        <h1 class="text-lg font-bold">Bonjour, {{ teacher()?.fullName }}</h1>
+        <p class="text-gray-400 text-sm">{{ session()?.name }} · {{ session()?.academicYear }}</p>
+      </div>
+      <div class="text-right">
+        <div class="text-2xl font-bold text-blue-400">{{ myCount() }}</div>
+        <div class="text-xs text-gray-400">créneau(x) choisi(s)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="bg-white border-b border-gray-200 px-6 py-2.5">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center gap-5 text-xs text-gray-600">
+      <div class="flex items-center gap-1.5">
+        <div class="w-3.5 h-3.5 rounded border-2 border-gray-300 bg-white"></div>
+        <span>Libre — cliquez pour choisir</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <div class="w-3.5 h-3.5 rounded border-2 border-green-400 bg-green-50"></div>
+        <span>Sélectionné par vous</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <div class="w-3.5 h-3.5 rounded border-2 border-amber-300 bg-amber-50"></div>
+        <span>Pris — demander un échange</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <div class="w-3.5 h-3.5 rounded border border-gray-300 bg-gray-100"></div>
+        <span>Validé — définitif</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendar -->
+  <div class="max-w-6xl mx-auto px-4 py-6">
+    @if (slots().length === 0) {
+      <div class="text-center py-20 text-gray-400">
+        <div class="text-4xl mb-3">📅</div>
+        <p>Aucun créneau disponible dans cette session.</p>
+      </div>
+    } @else {
+
+      <div class="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
+        <div class="grid"
+             [style.grid-template-columns]="'80px repeat(' + days().length + ', minmax(110px, 1fr))'">
+
+          <!-- Header row -->
+          <div class="bg-gray-900 px-3 py-3 border-b border-gray-700"></div>
+          @for (day of days(); track day) {
+            <div class="bg-gray-900 text-white text-center text-xs font-semibold tracking-widest uppercase py-3 px-2 border-b border-l border-gray-700">
+              {{ day }}
+            </div>
+          }
+
+          <!-- Time rows -->
+          @for (time of uniqueTimes(); track time.start) {
+            <!-- Time label -->
+            <div class="bg-gray-50 border-b border-r border-gray-200 flex flex-col items-center justify-center py-3 px-1">
+              <span class="font-mono text-xs font-semibold text-gray-700">{{ time.start }}</span>
+              <span class="font-mono text-xs text-gray-400">{{ time.end }}</span>
+            </div>
+
+            <!-- Slot cells for this row -->
+            @for (day of days(); track day) {
+              @let slot = getSlot(day, time.start);
+              <div class="border-b border-l border-gray-200 p-1.5 flex items-stretch min-h-[72px]">
+                @if (slot) {
+                  <button
+                    (click)="toggleSlot(slot)"
+                    [disabled]="slot.status === 'validated' || (actionLoading() !== '' && actionLoading() !== slot.id)"
+                    class="relative w-full rounded-xl border text-left px-2.5 py-2 text-xs font-medium transition-all {{ cardClass(slot) }}">
+
+                    @if (actionLoading() === slot.id) {
+                      <div class="absolute inset-0 flex items-center justify-center rounded-xl bg-white/70">
+                        <svg class="w-4 h-4 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                        </svg>
+                      </div>
+                    }
+
+                    <div class="font-mono font-semibold text-[11px] leading-tight">
+                      {{ slot.startTime }}–{{ slot.endTime }}
+                    </div>
+
+                    @if (slot.room) {
+                      <div class="text-[10px] mt-0.5 opacity-70">Salle {{ slot.room }}</div>
+                    }
+
+                    <div class="mt-1.5 flex items-center gap-1">
+                      @if (slot.status === 'validated') {
+                        <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                      } @else if (selectedSlotIds().has(slot.id)) {
+                        <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                      } @else if (slot.status === 'taken') {
+                        <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                      }
+                      <span class="text-[10px]">{{ slotLabel(slot) }}</span>
+                    </div>
+                  </button>
+                } @else {
+                  <div class="w-full rounded-xl bg-gray-50"></div>
+                }
+              </div>
+            }
+          }
+
+        </div>
+      </div>
+
+      <!-- Footer note -->
+      <div class="mt-6 bg-blue-50 border border-blue-200 rounded-2xl p-4 text-center">
+        <p class="text-blue-700 text-sm font-medium">Vos sélections sont enregistrées en temps réel.</p>
+        <p class="text-blue-500 text-xs mt-0.5">Revenez sur ce lien à tout moment pour modifier vos choix.</p>
+      </div>
+
+    }
+  </div>
+}
