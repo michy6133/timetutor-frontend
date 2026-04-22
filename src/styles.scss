@@ -1,0 +1,43 @@
+// @import "tailwindcss";
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background-color: #f9fafb;
+  color: #111827;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+:root {
+  --tt-primary: #2563eb;
+  --tt-primary-dark: #1d4ed8;
+  --tt-surface: #ffffff;
+  --tt-border: #e5e7eb;
+  --tt-muted: #6b7280;
+  --tt-radius: 0.75rem;
+}
+
+.tt-card {
+  background: var(--tt-surface);
+  border: 1px solid var(--tt-border);
+  border-radius: var(--tt-radius);
+}
+
+.tt-btn-primary {
+  background: var(--tt-primary);
+  color: #fff;
+  border-radius: 0.75rem;
+}
+
+.tt-btn-primary:hover {
+  background: var(--tt-primary-dark);
+}
