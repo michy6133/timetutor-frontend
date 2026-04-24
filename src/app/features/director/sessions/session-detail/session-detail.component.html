@@ -255,6 +255,10 @@
     <div class="flex items-center justify-between mb-4">
       <h2 class="font-display font-bold text-navy">Enseignants de la session</h2>
       <div class="flex items-center gap-2">
+        <button (click)="inviteAllTeachers()" [disabled]="invitingAll() || teachers().length === 0"
+          class="text-sm px-4 py-2 rounded-xl border border-brick/25 text-brick font-semibold hover:bg-brick/5 disabled:opacity-40 disabled:cursor-not-allowed">
+          {{ invitingAll() ? 'Invitation en cours...' : 'Inviter tous' }}
+        </button>
         <label class="cursor-pointer">
           <span class="btn-ghost-navy px-4 py-2 text-sm inline-block select-none">
             {{ csvImporting() ? 'Import...' : '↑ CSV' }}
@@ -345,18 +349,28 @@
                   <div class="flex items-center justify-end gap-2">
                     @if (!teacher.invitationSentAt) {
                       <button (click)="inviteTeacher(teacher.id)"
-                        class="text-xs bg-brick text-white px-3 py-1.5 rounded-lg hover:bg-brick/80 font-semibold transition-all">
-                        Inviter
+                        [disabled]="teacherAction(teacher.id) !== null"
+                        class="text-xs bg-brick text-white px-3 py-1.5 rounded-lg hover:bg-brick/80 font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                        {{ inviteButtonLabel(teacher) }}
                       </button>
                     } @else if (teacher.status === 'pending') {
                       <button (click)="remindTeacher(teacher.id)"
-                        class="text-xs border border-cream text-navy/55 px-3 py-1.5 rounded-lg hover:border-brick/25 transition-all">
-                        Relancer
+                        [disabled]="teacherAction(teacher.id) !== null"
+                        [ngClass]="teacherAction(teacher.id) === 'reminding' ? 'border-dashed' : ''"
+                        class="text-xs border border-cream text-navy/55 px-3 py-1.5 rounded-lg hover:border-brick/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                        {{ remindButtonLabel(teacher) }}
                       </button>
                     }
+                    <button (click)="openEditTeacher(teacher)"
+                      [disabled]="teacherAction(teacher.id) !== null"
+                      class="text-xs border border-navy/20 text-navy/65 px-3 py-1.5 rounded-lg hover:bg-navy/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                      Modifier
+                    </button>
                     <button (click)="removeTeacher(teacher.id)"
-                      class="text-xs border border-brick/20 text-brick/60 px-3 py-1.5 rounded-lg hover:bg-brick/5 hover:border-brick/40 transition-all">
-                      Retirer
+                      [disabled]="teacherAction(teacher.id) !== null"
+                      [ngClass]="teacherAction(teacher.id) === 'removing' ? 'border-dashed' : ''"
+                      class="text-xs border border-brick/20 text-brick/60 px-3 py-1.5 rounded-lg hover:bg-brick/5 hover:border-brick/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                      {{ teacherAction(teacher.id) === 'removing' ? 'Suppression...' : 'Retirer' }}
                     </button>
                   </div>
                 </td>
@@ -369,4 +383,36 @@
   }
 
 </div>
+
+@if (showEditTeacher()) {
+  <div class="fixed inset-0 bg-black/30 backdrop-blur-[1px] flex items-center justify-center z-50 p-4">
+    <div class="bg-white w-full max-w-lg rounded-2xl border border-cream/60 shadow-xl p-6">
+      <h3 class="font-display text-lg font-bold text-navy mb-4">Modifier les informations du professeur</h3>
+      @if (editingTeacherError()) {
+        <div class="bg-brick/8 border border-brick/22 text-brick rounded-xl px-4 py-2 text-sm mb-3">{{ editingTeacherError() }}</div>
+      }
+      <form [formGroup]="editTeacherForm" (ngSubmit)="saveTeacher()" class="space-y-3">
+        <div>
+          <label class="tt-label">Nom complet *</label>
+          <input formControlName="fullName" type="text" class="tt-input">
+        </div>
+        <div>
+          <label class="tt-label">Email *</label>
+          <input formControlName="email" type="email" class="tt-input">
+        </div>
+        <div>
+          <label class="tt-label">Téléphone</label>
+          <input formControlName="phone" type="tel" class="tt-input">
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" (click)="closeEditTeacher()" class="btn-ghost-navy px-4 py-2 text-sm">Annuler</button>
+          <button type="submit" [disabled]="editTeacherForm.invalid || !editingTeacherId()"
+            class="btn-brick px-4 py-2 text-sm disabled:opacity-40">
+            Enregistrer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
 }

@@ -2,12 +2,11 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../../../core/services/api.service';
-import { SvgIconComponent } from '../../../../shared/svg-icon.component';
 
 @Component({
   selector: 'app-session-create',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, SvgIconComponent],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './session-create.component.html',
 })
 export class SessionCreateComponent {

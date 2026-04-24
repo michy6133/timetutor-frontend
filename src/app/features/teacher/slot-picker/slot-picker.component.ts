@@ -27,6 +27,9 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
   readonly slots = signal<TimeSlot[]>([]);
   readonly selectedSlotIds = signal<Set<string>>(new Set());
   readonly actionLoading = signal<string>('');
+  readonly contactModalOpen = signal(false);
+  readonly contactTargetSlot = signal<TimeSlot | null>(null);
+  readonly contactMessage = signal('');
 
   private token = '';
   private sessionId = '';
@@ -103,17 +106,39 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
         error: (e) => { alert(e.error?.error ?? 'Erreur'); this.actionLoading.set(''); },
       });
     } else if (slot.status === 'taken') {
-      // Contact request
-      if (confirm(`Envoyer une demande de contact à l'enseignant qui a ce créneau ?`)) {
-        const msg = `Bonjour, je serais intéressé(e) par votre créneau ${slot.dayOfWeek} ${slot.startTime}-${slot.endTime}. Pouvez-vous me le céder ?`;
-        this.api.post(`/sessions/${slot.sessionId}/slots/${slot.id}/contact/${this.token}`, { message: msg }).subscribe({
-          next: () => { alert('Demande envoyée !'); this.actionLoading.set(''); },
-          error: (e) => { alert(e.error?.error ?? 'Erreur'); this.actionLoading.set(''); },
-        });
-      } else {
-        this.actionLoading.set('');
-      }
+      this.actionLoading.set('');
+      this.openContactModal(slot);
     }
+  }
+
+  openContactModal(slot: TimeSlot): void {
+    this.contactTargetSlot.set(slot);
+    this.contactMessage.set(
+      `Bonjour,\n\nJe suis intéressé(e) par votre créneau ${slot.dayOfWeek} ${slot.startTime}-${slot.endTime}. Si possible, pouvez-vous le libérer pour une permutation ?\n\nMerci d'avance.`
+    );
+    this.contactModalOpen.set(true);
+  }
+
+  closeContactModal(): void {
+    this.contactModalOpen.set(false);
+    this.contactTargetSlot.set(null);
+  }
+
+  submitContactRequest(): void {
+    const slot = this.contactTargetSlot();
+    if (!slot) return;
+    this.actionLoading.set(slot.id);
+    this.api.post(`/sessions/${slot.sessionId}/slots/${slot.id}/contact/${this.token}`, { message: this.contactMessage() }).subscribe({
+      next: () => {
+        this.actionLoading.set('');
+        this.closeContactModal();
+        alert('Votre demande a ete envoyee par email.');
+      },
+      error: (e) => {
+        this.actionLoading.set('');
+        alert(e.error?.error ?? 'Erreur');
+      },
+    });
   }
 
   days(): string[] {

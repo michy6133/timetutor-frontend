@@ -31,6 +31,11 @@ export class SessionDetailComponent implements OnInit {
   readonly csvImporting = signal(false);
   readonly addTeacherError = signal('');
   readonly addSlotError = signal('');
+  readonly invitingAll = signal(false);
+  readonly actionByTeacherId = signal<Record<string, 'inviting' | 'reminding' | 'updating' | 'removing'>>({});
+  readonly showEditTeacher = signal(false);
+  readonly editingTeacherId = signal<string | null>(null);
+  readonly editingTeacherError = signal('');
 
   readonly teacherForm = this.fb.group({
     fullName: ['', [Validators.required, Validators.minLength(2)]],
@@ -50,6 +55,11 @@ export class SessionDetailComponent implements OnInit {
   }});
 
   readonly weekDays = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+  readonly editTeacherForm = this.fb.group({
+    fullName: ['', [Validators.required, Validators.minLength(2)]],
+    email: ['', [Validators.required, Validators.email]],
+    phone: [''],
+  });
 
   private sessionId = '';
 
@@ -162,22 +172,98 @@ export class SessionDetailComponent implements OnInit {
   }
 
   inviteTeacher(teacherId: string): void {
+    this.startTeacherAction(teacherId, 'inviting');
     this.api.post(`/sessions/${this.sessionId}/teachers/${teacherId}/invite`, {}).subscribe({
-      next: () => this.loadAll(),
-      error: (e) => alert(e.error?.error ?? 'Erreur envoi invitation'),
+      next: () => {
+        this.stopTeacherAction(teacherId);
+        this.loadAll();
+      },
+      error: (e) => {
+        this.stopTeacherAction(teacherId);
+        alert(e.error?.error ?? 'Erreur envoi invitation');
+      },
     });
   }
 
   remindTeacher(teacherId: string): void {
+    this.startTeacherAction(teacherId, 'reminding');
     this.api.post(`/sessions/${this.sessionId}/teachers/${teacherId}/remind`, {}).subscribe({
-      next: () => alert('Relance envoyée !'),
+      next: () => {
+        this.stopTeacherAction(teacherId);
+        alert('Relance envoyée !');
+      },
+      error: (e) => {
+        this.stopTeacherAction(teacherId);
+        alert(e.error?.error ?? 'Erreur relance');
+      }
     });
   }
 
   removeTeacher(teacherId: string): void {
     if (!confirm('Supprimer cet enseignant de la session ?')) return;
+    this.startTeacherAction(teacherId, 'removing');
     this.api.delete(`/sessions/${this.sessionId}/teachers/${teacherId}`).subscribe({
-      next: () => this.loadAll(),
+      next: () => {
+        this.stopTeacherAction(teacherId);
+        this.loadAll();
+      },
+      error: () => this.stopTeacherAction(teacherId),
+    });
+  }
+
+  inviteAllTeachers(): void {
+    if (this.invitingAll()) return;
+    this.invitingAll.set(true);
+    this.api.post<{ invited: number; failed: number; total: number }>(`/sessions/${this.sessionId}/teachers/invite-all`, {}).subscribe({
+      next: (result) => {
+        this.invitingAll.set(false);
+        this.loadAll();
+        alert(`Invitations envoyées: ${result.invited}/${result.total}${result.failed ? ` (échecs: ${result.failed})` : ''}`);
+      },
+      error: (e) => {
+        this.invitingAll.set(false);
+        alert(e.error?.error ?? 'Erreur invitation groupée');
+      },
+    });
+  }
+
+  openEditTeacher(teacher: Teacher): void {
+    this.editingTeacherId.set(teacher.id);
+    this.editingTeacherError.set('');
+    this.editTeacherForm.reset({
+      fullName: teacher.fullName,
+      email: teacher.email,
+      phone: teacher.phone ?? '',
+    });
+    this.showEditTeacher.set(true);
+  }
+
+  closeEditTeacher(): void {
+    this.showEditTeacher.set(false);
+    this.editingTeacherId.set(null);
+    this.editingTeacherError.set('');
+  }
+
+  saveTeacher(): void {
+    const teacherId = this.editingTeacherId();
+    if (!teacherId || this.editTeacherForm.invalid) return;
+    this.startTeacherAction(teacherId, 'updating');
+    this.editingTeacherError.set('');
+    const value = this.editTeacherForm.value;
+    this.api.put(`/sessions/${this.sessionId}/teachers/${teacherId}`, {
+      fullName: value.fullName,
+      email: value.email,
+      phone: value.phone || null,
+    }).subscribe({
+      next: () => {
+        this.stopTeacherAction(teacherId);
+        this.closeEditTeacher();
+        this.loadAll();
+      },
+      error: (e) => {
+        this.stopTeacherAction(teacherId);
+        this.editingTeacherError.set(e.error?.error ?? 'Erreur de modification');
+      },
     });
   }
 
@@ -187,9 +273,26 @@ export class SessionDetailComponent implements OnInit {
     });
   }
 
-  exportPdf(): void {
-    const url = `http://localhost:3000/api/v1/sessions/${this.sessionId}/export/pdf?includeTeacherName=true&includeContact=true&includeEmail=true&includeSubject=true`;
-    window.open(url, '_blank');
+  async exportPdf(): Promise<void> {
+    const url = `http://localhost:3000/api/v1/sessions/${this.sessionId}/export/pdf?includeTeacherName=true&includeContact=true&includeEmail=true&includeSubject=true&includeRoom=true`;
+    const token = localStorage.getItem('tt_token');
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        credentials: 'include',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!response.ok) throw new Error('Erreur export');
+      const blob = await response.blob();
+      const fileUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = fileUrl;
+      a.download = `session-${this.sessionId}.pdf`;
+      a.click();
+      URL.revokeObjectURL(fileUrl);
+    } catch {
+      alert("Impossible d'exporter le PDF");
+    }
   }
 
   shareWhatsApp(): void {
@@ -249,5 +352,33 @@ export class SessionDetailComponent implements OnInit {
       taken: 'bg-amber-100 text-amber-700',
       validated: 'bg-blue-100 text-blue-700',
     }[status] ?? '';
+  }
+
+  private startTeacherAction(teacherId: string, action: 'inviting' | 'reminding' | 'updating' | 'removing'): void {
+    this.actionByTeacherId.update(actions => ({ ...actions, [teacherId]: action }));
+  }
+
+  private stopTeacherAction(teacherId: string): void {
+    this.actionByTeacherId.update(actions => {
+      const next = { ...actions };
+      delete next[teacherId];
+      return next;
+    });
+  }
+
+  teacherAction(teacherId: string): 'inviting' | 'reminding' | 'updating' | 'removing' | null {
+    return this.actionByTeacherId()[teacherId] ?? null;
+  }
+
+  inviteButtonLabel(teacher: Teacher): string {
+    const action = this.teacherAction(teacher.id);
+    if (action === 'inviting') return 'Invitation...';
+    return !teacher.invitationSentAt ? 'Inviter' : 'Invité';
+  }
+
+  remindButtonLabel(teacher: Teacher): string {
+    const action = this.teacherAction(teacher.id);
+    if (action === 'reminding') return 'Relance...';
+    return teacher.status === 'pending' ? 'Relancer' : 'En attente retour';
   }
 }

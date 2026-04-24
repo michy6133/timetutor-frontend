@@ -138,3 +138,27 @@
     }
   </div>
 }
+
+@if (contactModalOpen()) {
+  <div class="fixed inset-0 z-50 bg-black/30 backdrop-blur-[1px] flex items-center justify-center p-4">
+    <div class="w-full max-w-xl bg-white rounded-2xl border border-cream/60 shadow-xl p-6">
+      <h3 class="font-display text-lg font-bold text-navy mb-2">Demande de négociation</h3>
+      @if (contactTargetSlot()) {
+        <p class="text-sm text-navy/55 mb-4">
+          Ce créneau est déjà pris ({{ contactTargetSlot()!.dayOfWeek }} {{ contactTargetSlot()!.startTime }}-{{ contactTargetSlot()!.endTime }}).
+          Vous pouvez envoyer un message à l'enseignant concerné.
+        </p>
+      }
+      <label class="tt-label">Message envoyé par email</label>
+      <textarea
+        class="tt-input min-h-36"
+        [value]="contactMessage()"
+        (input)="contactMessage.set($any($event.target).value)"
+      ></textarea>
+      <div class="flex justify-end gap-2 mt-4">
+        <button class="btn-ghost-navy px-4 py-2 text-sm" type="button" (click)="closeContactModal()">Annuler</button>
+        <button class="btn-brick px-4 py-2 text-sm" type="button" (click)="submitContactRequest()">Envoyer l'email</button>
+      </div>
+    </div>
+  </div>
+}

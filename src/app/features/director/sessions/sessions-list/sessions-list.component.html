@@ -1,14 +1,92 @@
-<div class="max-w-5xl mx-auto px-6 py-8">
+<div class="max-w-6xl mx-auto px-6 py-8">
 
-  <div class="flex items-center justify-between mb-8">
+  <div class="flex items-center justify-between mb-6">
     <div>
-      <h1 class="font-display text-2xl font-extrabold text-navy">Sessions</h1>
-      <p class="text-navy/40 text-sm mt-1">{{ sessions().length }} session(s) au total</p>
+      <h1 class="font-display text-2xl font-extrabold text-navy">Gestion des sessions</h1>
+      <p class="text-navy/40 text-sm mt-1">{{ sessions().length }} session(s) · {{ totalTeachers() }} enseignant(s) · {{ totalSlots() }} créneau(x)</p>
     </div>
     <a routerLink="/director/sessions/new"
        class="btn-brick text-sm px-5 py-2.5">
       + Nouvelle session
     </a>
+  </div>
+
+  <!-- KPI mini -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+    <div class="bg-white border border-cream/50 rounded-2xl p-4">
+      <div class="text-[10px] text-navy/35 uppercase tracking-widest font-bold mb-1">Sessions</div>
+      <div class="font-display text-xl font-extrabold text-navy">{{ sessions().length }}</div>
+    </div>
+    <div class="bg-white border border-cream/50 rounded-2xl p-4">
+      <div class="text-[10px] text-navy/35 uppercase tracking-widest font-bold mb-1">Ouvertes</div>
+      <div class="font-display text-xl font-extrabold text-brick">{{ openSessions() }}</div>
+    </div>
+    <div class="bg-white border border-cream/50 rounded-2xl p-4">
+      <div class="text-[10px] text-navy/35 uppercase tracking-widest font-bold mb-1">Enseignants</div>
+      <div class="font-display text-xl font-extrabold text-navy">{{ totalTeachers() }}</div>
+    </div>
+    <div class="bg-white border border-cream/50 rounded-2xl p-4">
+      <div class="text-[10px] text-navy/35 uppercase tracking-widest font-bold mb-1">Créneaux</div>
+      <div class="font-display text-xl font-extrabold text-navy">{{ totalSlots() }}</div>
+    </div>
+  </div>
+
+  <!-- Teacher search across the school -->
+  <div class="bg-white border border-cream/50 rounded-2xl p-4 mb-6">
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="flex-1 min-w-64">
+        <label class="tt-label">Rechercher un professeur de l'école</label>
+        <div class="flex gap-2">
+          <input
+            [value]="teacherQuery()"
+            (input)="teacherQuery.set($any($event.target).value)"
+            (keydown)="onSearchKeydown($event)"
+            type="text"
+            class="tt-input flex-1"
+            placeholder="Nom, email ou téléphone (toutes sessions confondues)">
+          <button (click)="searchTeachers()" [disabled]="searchingTeachers()"
+            class="btn-navy px-4 text-sm disabled:opacity-40">
+            {{ searchingTeachers() ? '...' : 'Rechercher' }}
+          </button>
+          @if (searchPerformed()) {
+            <button (click)="clearSearch()" type="button"
+              class="btn-ghost-navy px-4 text-sm">
+              Effacer
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    @if (searchPerformed() && !searchingTeachers()) {
+      @if (teacherResults().length === 0) {
+        <div class="mt-4 text-sm text-navy/40 text-center py-4">Aucun enseignant correspondant dans votre école.</div>
+      } @else {
+        <div class="mt-4 border-t border-cream/50 pt-4">
+          <div class="text-xs text-navy/50 mb-2 font-medium">
+            {{ teacherResults().length }} résultat(s)
+          </div>
+          <div class="space-y-2">
+            @for (t of teacherResults(); track t.id) {
+              <a [routerLink]="['/director/sessions', t.session_id]"
+                 class="flex items-center gap-3 bg-cream/15 hover:bg-cream/30 border border-cream/40 rounded-xl px-4 py-3 transition-all">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-steel to-brick flex items-center justify-center text-white text-xs font-bold shrink-0">
+                  {{ t.full_name.charAt(0) }}{{ t.full_name.split(' ').slice(-1)[0].charAt(0) }}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="font-semibold text-navy truncate">{{ t.full_name }}</div>
+                  <div class="text-xs text-navy/45 truncate">{{ t.email }}<span *ngIf="t.phone"> · {{ t.phone }}</span></div>
+                </div>
+                <div class="flex flex-col items-end gap-1 text-right shrink-0">
+                  <span class="badge" [ngClass]="teacherStatusClass(t.status)">{{ teacherStatusLabel(t.status) }}</span>
+                  <span class="text-[11px] text-navy/40 font-mono">{{ t.session_name }} · {{ t.academic_year }}</span>
+                </div>
+              </a>
+            }
+          </div>
+        </div>
+      }
+    }
   </div>
 
   <!-- Filters -->
@@ -41,32 +119,45 @@
   } @else {
     <div class="space-y-3">
       @for (session of filtered(); track session.id) {
-        <a [routerLink]="['/director/sessions', session.id]"
-           class="block bg-white border border-cream/50 rounded-2xl p-6 hover:border-brick/25 hover:shadow-md transition-all group">
-          <div class="flex items-center justify-between mb-4">
-            <div>
+        <div class="bg-white border border-cream/50 rounded-2xl p-6 hover:border-brick/25 hover:shadow-md transition-all group">
+          <div class="flex items-center justify-between mb-4 gap-3">
+            <a [routerLink]="['/director/sessions', session.id]" class="flex-1 min-w-0">
               <div class="font-display font-bold text-navy text-base group-hover:text-brick transition-colors">{{ session.name }}</div>
               <div class="text-navy/35 text-xs mt-0.5 font-mono">{{ session.academicYear }}</div>
+            </a>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="badge" [ngClass]="statusClass(session.status)">
+                {{ statusLabel(session.status) }}
+              </span>
+              <button (click)="inviteAll(session.id, $event)"
+                [disabled]="isInvitingSession(session.id) || (session.totalTeachers ?? 0) === 0"
+                [class.border-dashed]="isInvitingSession(session.id)"
+                class="text-xs px-3 py-1.5 rounded-lg border border-brick/25 text-brick font-semibold hover:bg-brick/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                {{ isInvitingSession(session.id) ? 'Invitation...' : 'Inviter tous' }}
+              </button>
+              <a [routerLink]="['/director/sessions', session.id]"
+                 class="text-xs px-3 py-1.5 rounded-lg border border-navy/20 text-navy/65 font-semibold hover:bg-navy/5 transition-all">
+                Gérer →
+              </a>
             </div>
-            <span class="badge {{ statusClass(session.status) }}">
-              {{ { draft: 'Brouillon', open: 'Ouvert', closed: 'Fermé', published: 'Publié' }[session.status] }}
-            </span>
           </div>
-          <div class="flex items-center gap-8 text-sm text-navy/40 mb-4">
-            <span><strong class="text-navy/70">{{ session.totalSlots ?? 0 }}</strong> créneaux</span>
-            <span><strong class="text-navy/70">{{ session.totalTeachers ?? 0 }}</strong> enseignants</span>
-            @if (session.deadline) {
-              <span>Deadline : <strong class="text-navy/70">{{ session.deadline | date:'dd/MM/yyyy' }}</strong></span>
-            }
-          </div>
-          <div class="h-1 bg-cream/50 rounded-full overflow-hidden">
-            <div class="h-full rounded-full transition-all duration-700"
-              [style.width.%]="coveragePct(session)"
-              [style.background]="coveragePct(session) === 100 ? '#0d5462' : '#dd2d4a'">
+          <a [routerLink]="['/director/sessions', session.id]" class="block">
+            <div class="flex items-center gap-8 text-sm text-navy/40 mb-4">
+              <span><strong class="text-navy/70">{{ session.totalSlots ?? 0 }}</strong> créneaux</span>
+              <span><strong class="text-navy/70">{{ session.totalTeachers ?? 0 }}</strong> enseignants</span>
+              @if (session.deadline) {
+                <span>Deadline : <strong class="text-navy/70">{{ session.deadline | date:'dd/MM/yyyy' }}</strong></span>
+              }
             </div>
-          </div>
-          <div class="text-[11px] text-navy/30 mt-1.5 font-mono">{{ coveragePct(session) }}% des créneaux couverts</div>
-        </a>
+            <div class="h-1 bg-cream/50 rounded-full overflow-hidden">
+              <div class="h-full rounded-full transition-all duration-700"
+                [style.width.%]="coveragePct(session)"
+                [style.background]="coveragePct(session) === 100 ? '#0d5462' : '#dd2d4a'">
+              </div>
+            </div>
+            <div class="text-[11px] text-navy/30 mt-1.5 font-mono">{{ coveragePct(session) }}% des créneaux couverts</div>
+          </a>
+        </div>
       }
     </div>
   }

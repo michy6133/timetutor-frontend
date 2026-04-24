@@ -49,9 +49,9 @@ import { AuthService } from '../../core/services/auth.service';
       animation: gradient-x 4s ease infinite;
     }
     .hero-bg {
-      background: radial-gradient(ellipse at 70% 50%, #1e3a8a22 0%, transparent 60%),
-                  radial-gradient(ellipse at 20% 80%, #7c3aed18 0%, transparent 50%),
-                  #030712;
+      background: radial-gradient(ellipse at 70% 50%, rgba(203, 238, 243, 0.35) 0%, transparent 60%),
+                  radial-gradient(ellipse at 20% 80%, rgba(244, 156, 187, 0.2) 0%, transparent 50%),
+                  #ffffff;
     }
     .card-hover {
       transition: transform 0.25s ease, box-shadow 0.25s ease;
@@ -61,7 +61,8 @@ import { AuthService } from '../../core/services/auth.service';
       box-shadow: 0 20px 40px rgba(0,0,0,0.12);
     }
     .pricing-popular {
-      background: linear-gradient(135deg, #1d4ed8, #4f46e5);
+      background: linear-gradient(145deg, rgba(221,45,74,.07) 0%, #ffffff 100%);
+      border: 2px solid rgba(221,45,74,.3);
     }
   `],
 })
