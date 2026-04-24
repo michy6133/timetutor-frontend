@@ -1,72 +1,78 @@
 <!-- Navbar -->
-<nav class="bg-gray-950 text-white sticky top-0 z-50">
+<nav class="bg-white sticky top-0 z-50 border-b border-steel/25 shadow-sm">
   <div class="max-w-6xl mx-auto px-6 flex items-center justify-between h-14">
-    <div class="text-lg font-bold">Time<span class="text-blue-400">Tutor</span>
-      <span class="ml-2 text-xs font-normal text-gray-400 uppercase tracking-widest">Super Admin</span>
+    <div class="font-display font-extrabold text-lg text-navy">
+      Time<span class="text-brick">Tutor</span>
+      <span class="ml-2.5 text-[10px] font-bold text-navy/35 uppercase tracking-widest border border-navy/15 px-2 py-0.5 rounded-full">Super Admin</span>
     </div>
-    <button (click)="auth.logout()" class="text-sm text-gray-400 hover:text-red-400 transition-colors">Déconnexion</button>
+    <button (click)="auth.logout()"
+      class="text-xs text-brick/55 hover:text-brick font-semibold border border-brick/15 hover:border-brick/35 px-3 py-1.5 rounded-lg transition-all">
+      Déconnexion
+    </button>
   </div>
 </nav>
 
 <div class="max-w-6xl mx-auto px-6 py-8">
   <div class="mb-8">
-    <div class="text-xs font-semibold text-green-500 uppercase tracking-widest font-mono mb-1">Back-office</div>
-    <h1 class="text-2xl font-bold text-gray-950">Tableau de bord global</h1>
-    <p class="text-gray-500 text-sm mt-1">Vue d'ensemble de toutes les écoles sur la plateforme.</p>
+    <div class="text-xs font-bold uppercase tracking-widest text-brick font-mono mb-2">Back-office</div>
+    <h1 class="font-display text-2xl font-extrabold text-navy">Tableau de bord global</h1>
+    <p class="text-navy/40 text-sm mt-1">Vue d'ensemble de toutes les écoles sur la plateforme.</p>
   </div>
 
   <!-- KPIs -->
   @if (stats()) {
     <div class="grid grid-cols-2 gap-4 mb-8 sm:grid-cols-4">
-      <div class="bg-gray-950 text-white rounded-2xl p-6">
-        <div class="text-3xl font-bold">{{ stats()!.activeSchools }}</div>
-        <div class="text-gray-400 text-sm mt-1">Écoles actives</div>
+      <div class="bg-gradient-to-br from-brick/8 to-cream/20 border border-brick/15 rounded-2xl p-6 slide-up">
+        <div class="font-display text-3xl font-extrabold text-navy mb-1">{{ stats()!.activeSchools }}</div>
+        <div class="text-navy/45 text-xs font-medium uppercase tracking-wide">Écoles actives</div>
+        <div class="w-5 h-0.5 bg-brick/40 rounded-full mt-2"></div>
       </div>
-      <div class="bg-gray-950 text-white rounded-2xl p-6">
-        <div class="text-3xl font-bold text-green-400">{{ stats()!.openSessions }}</div>
-        <div class="text-gray-400 text-sm mt-1">Sessions ouvertes</div>
+      <div class="bg-white border border-cream/50 rounded-2xl p-6 slide-up-1">
+        <div class="font-display text-3xl font-extrabold text-navy mb-1">{{ stats()!.openSessions }}</div>
+        <div class="text-navy/40 text-xs font-medium uppercase tracking-wide">Sessions ouvertes</div>
+        <div class="w-5 h-0.5 bg-brick rounded-full mt-2"></div>
       </div>
-      <div class="bg-gray-950 text-white rounded-2xl p-6">
-        <div class="text-3xl font-bold text-blue-400">{{ stats()!.totalTeachers }}</div>
-        <div class="text-gray-400 text-sm mt-1">Enseignants inscrits</div>
+      <div class="bg-white border border-cream/50 rounded-2xl p-6 slide-up-2">
+        <div class="font-display text-3xl font-extrabold text-navy mb-1">{{ stats()!.totalTeachers }}</div>
+        <div class="text-navy/40 text-xs font-medium uppercase tracking-wide">Enseignants inscrits</div>
+        <div class="w-5 h-0.5 bg-steel rounded-full mt-2"></div>
       </div>
-      <div class="bg-gray-950 text-white rounded-2xl p-6">
-        <div class="text-3xl font-bold text-orange-400">{{ stats()!.validatedSlots }}</div>
-        <div class="text-gray-400 text-sm mt-1">Créneaux validés</div>
+      <div class="bg-white border border-cream/50 rounded-2xl p-6 slide-up-3">
+        <div class="font-display text-3xl font-extrabold text-navy mb-1">{{ stats()!.validatedSlots }}</div>
+        <div class="text-navy/40 text-xs font-medium uppercase tracking-wide">Créneaux validés</div>
+        <div class="w-5 h-0.5 bg-navy/25 rounded-full mt-2"></div>
       </div>
     </div>
   }
 
   <!-- Schools table -->
   <div class="flex items-center justify-between mb-4">
-    <h2 class="font-semibold text-gray-900">Écoles inscrites</h2>
-    <button (click)="loadData()" class="text-sm text-blue-600 hover:underline">Actualiser</button>
+    <h2 class="font-display font-bold text-navy">Écoles inscrites</h2>
+    <button (click)="loadData()" class="text-sm text-brick font-semibold hover:text-molten transition-colors">Actualiser</button>
   </div>
 
-  <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+  <div class="bg-white border border-cream/50 rounded-2xl overflow-hidden shadow-sm">
     <table class="w-full text-sm">
-      <thead class="bg-gray-50 border-b border-gray-200">
+      <thead class="bg-cream/30 border-b border-cream/50">
         <tr>
-          <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">École</th>
-          <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Plan</th>
-          <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Sessions</th>
-          <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Statut</th>
-          <th class="text-right px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+          <th class="text-left px-5 py-3 text-[11px] font-bold text-navy/45 uppercase tracking-wider">École</th>
+          <th class="text-left px-5 py-3 text-[11px] font-bold text-navy/45 uppercase tracking-wider">Plan</th>
+          <th class="text-left px-5 py-3 text-[11px] font-bold text-navy/45 uppercase tracking-wider">Sessions</th>
+          <th class="text-left px-5 py-3 text-[11px] font-bold text-navy/45 uppercase tracking-wider">Statut</th>
+          <th class="text-right px-5 py-3 text-[11px] font-bold text-navy/45 uppercase tracking-wider">Actions</th>
         </tr>
       </thead>
       <tbody>
         @for (school of schools(); track school.id) {
-          <tr class="border-b border-gray-100 last:border-0 hover:bg-gray-50">
+          <tr class="border-b border-cream/35 last:border-0 hover:bg-cream/15 transition-colors">
             <td class="px-5 py-4">
-              <div class="font-medium text-gray-900">{{ school.name }}</div>
-              <div class="text-gray-400 text-xs">{{ school.directors_count }} directeur(s)</div>
+              <div class="font-semibold text-navy font-display">{{ school.name }}</div>
+              <div class="text-navy/30 text-xs mt-0.5">{{ school.directors_count }} directeur(s)</div>
             </td>
             <td class="px-5 py-4">
               <div class="flex items-center gap-2">
-                <span class="text-xs font-medium px-2.5 py-1 rounded-full capitalize" [class]="planClass(school.subscription_plan)">
-                  {{ school.subscription_plan }}
-                </span>
-                <select #planSel class="text-xs border border-gray-300 rounded px-2 py-1"
+                <span class="badge badge-active capitalize">{{ school.subscription_plan }}</span>
+                <select #planSel class="text-xs border border-cream text-navy/55 rounded-lg px-2 py-1 bg-white focus:outline-none focus:border-brick transition-colors"
                         (change)="updateSubscription(school.id, planSel.value)">
                   <option value="">Changer...</option>
                   @for (plan of plans(); track plan.code) {
@@ -75,20 +81,20 @@
                 </select>
               </div>
             </td>
-            <td class="px-5 py-4 text-gray-600">{{ school.sessions_count }}</td>
+            <td class="px-5 py-4 text-navy/55 font-mono">{{ school.sessions_count }}</td>
             <td class="px-5 py-4">
-              <span class="text-xs font-medium px-2 py-1 rounded-full"
-                [class]="school.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
+              <span class="badge"
+                [class]="school.is_active ? 'badge-open' : 'badge-closed'">
                 {{ school.is_active ? 'Active' : 'Inactive' }}
               </span>
             </td>
             <td class="px-5 py-4 text-right">
               <button (click)="toggleSchool(school)"
                 [disabled]="togglingId() === school.id"
-                class="text-xs border px-3 py-1.5 rounded-lg transition-all disabled:opacity-50"
+                class="text-xs border px-3 py-1.5 rounded-lg transition-all disabled:opacity-40"
                 [class]="school.is_active
-                  ? 'border-red-200 text-red-500 hover:bg-red-50'
-                  : 'border-green-200 text-green-600 hover:bg-green-50'">
+                  ? 'border-brick/22 text-brick/65 hover:bg-brick/5 hover:border-brick/38'
+                  : 'border-navy/20 text-navy/55 hover:bg-navy/5 hover:border-navy/35'">
                 {{ togglingId() === school.id ? '...' : (school.is_active ? 'Désactiver' : 'Activer') }}
               </button>
             </td>
@@ -96,7 +102,10 @@
         }
         @empty {
           <tr>
-            <td colspan="5" class="text-center py-10 text-gray-400">Aucune école enregistrée</td>
+            <td colspan="5" class="text-center py-12 text-navy/30">
+              <div class="text-2xl mb-2">🏫</div>
+              Aucune école enregistrée
+            </td>
           </tr>
         }
       </tbody>

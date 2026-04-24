@@ -1,47 +1,84 @@
-<div class="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-  <div class="w-full max-w-sm">
-    <!-- Logo -->
-    <div class="text-center mb-8">
-      <div class="text-3xl font-bold text-gray-950 mb-1">Time<span class="text-blue-600">Tutor</span></div>
-      <p class="text-gray-500 text-sm">Espace directeur</p>
+<div class="min-h-screen flex">
+
+  <!-- Left panel — branding -->
+  <div class="hidden lg:flex w-[46%] bg-gradient-to-br from-cream/25 via-white to-steel/12 flex-col justify-between p-12 relative overflow-hidden border-r border-cream/60">
+    <div class="orb1 absolute top-1/3 right-0 w-80 h-80 rounded-full bg-brick/8 blur-3xl pointer-events-none"></div>
+    <div class="orb2 absolute bottom-1/4 left-0 w-64 h-64 rounded-full bg-steel/12 blur-3xl pointer-events-none"></div>
+
+    <a routerLink="/" class="font-display font-extrabold text-2xl text-navy tracking-tight relative z-10">
+      Time<span class="text-brick">Tutor</span>
+    </a>
+
+    <div class="relative z-10">
+      <blockquote class="text-navy/60 text-lg leading-relaxed italic mb-6 font-light">
+        "Avant, je passais 3 jours à appeler tous les profs. Avec TimeTutor, la session est couverte en 48h."
+      </blockquote>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-steel to-brick border border-steel/25 flex items-center justify-center text-white text-sm font-bold shrink-0">AM</div>
+        <div>
+          <div class="text-navy font-semibold text-sm font-display">Adjovi Mensah</div>
+          <div class="text-navy/35 text-xs">Directrice, Lycée Sainte-Thérèse · Cotonou</div>
+        </div>
+      </div>
     </div>
-<!-- <div class="bg-red-500 text-white p-4">
-  TEST TAILWIND
-</div> -->
-    <div class="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-      <h1 class="text-xl font-semibold text-gray-900 mb-6">Connexion</h1>
+
+    <div class="flex gap-8 relative z-10">
+      <div><div class="font-display text-xl font-extrabold text-navy">72h</div><div class="text-navy/30 text-[11px] uppercase tracking-wide mt-0.5">Session couverte</div></div>
+      <div><div class="font-display text-xl font-extrabold text-navy">0</div><div class="text-navy/30 text-[11px] uppercase tracking-wide mt-0.5">Conflit</div></div>
+      <div><div class="font-display text-xl font-extrabold text-navy">95%</div><div class="text-navy/30 text-[11px] uppercase tracking-wide mt-0.5">Taux d'ouverture</div></div>
+    </div>
+  </div>
+
+  <!-- Right panel — form -->
+  <div class="flex-1 bg-warm-soft flex items-center justify-center px-6 py-12">
+    <div class="w-full max-w-sm slide-up">
+
+      <div class="lg:hidden text-center mb-8">
+        <div class="font-display font-extrabold text-2xl text-navy">Time<span class="text-brick">Tutor</span></div>
+      </div>
+
+      <div class="mb-8">
+        <h1 class="font-display text-3xl font-extrabold text-navy mb-2">Connexion</h1>
+        <p class="text-navy/45 text-sm">Espace directeur d'établissement</p>
+      </div>
 
       @if (error()) {
-        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm mb-5">
+        <div class="bg-brick/8 border border-brick/22 text-brick px-4 py-3.5 rounded-xl text-sm mb-6 flex items-start gap-2.5 fade-in">
+          <span class="shrink-0 mt-0.5">⚠</span>
           {{ error() }}
         </div>
       }
 
-      <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
+      <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
-          <input formControlName="email" type="email" placeholder="directeur@ecole.com"
-            class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" />
+          <label class="tt-label">Email</label>
+          <input formControlName="email" type="email" placeholder="directeur@ecole.com" class="tt-input" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Mot de passe</label>
-          <input formControlName="password" type="password" placeholder="••••••••"
-            class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" />
+          <label class="tt-label">Mot de passe</label>
+          <input formControlName="password" type="password" placeholder="••••••••" class="tt-input" />
         </div>
         <button type="submit" [disabled]="form.invalid || loading()"
-          class="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-blue-300 text-white font-semibold py-3 rounded-xl transition-all duration-200 text-sm">
-          @if (loading()) { Connexion en cours... } @else { Se connecter }
+          class="btn-brick w-full py-3.5 text-sm mt-2">
+          @if (loading()) {
+            <span class="flex items-center justify-center gap-2">
+              <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+              </svg>
+              Connexion en cours...
+            </span>
+          } @else {
+            Se connecter →
+          }
         </button>
       </form>
-    </div>
 
-    <div class="mt-5 space-y-2 text-center text-sm text-gray-500">
-      <p>Directeur ?
-        <a routerLink="/register" class="text-blue-600 font-medium hover:underline">Inscrire mon école</a>
-      </p>
-      <p>Enseignant ?
-        <a routerLink="/register-teacher" class="text-blue-600 font-medium hover:underline">Créer mon compte enseignant</a>
-      </p>
+      <div class="mt-8 space-y-2.5 text-center text-sm text-navy/45">
+        <p>Mot de passe oublié ? <a routerLink="/forgot-password" class="text-brick font-semibold hover:text-molten">Réinitialiser</a></p>
+        <p>Pas encore inscrit ? <a routerLink="/register" class="text-brick font-semibold hover:text-molten">Inscrire mon école</a></p>
+        <p>Enseignant ? <a routerLink="/register-teacher" class="text-navy/60 font-semibold hover:text-navy">Créer mon compte</a></p>
+      </div>
     </div>
   </div>
 </div>

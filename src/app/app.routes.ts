@@ -10,6 +10,8 @@ import { SessionCreateComponent } from './features/director/sessions/session-cre
 import { SessionDetailComponent } from './features/director/sessions/session-detail/session-detail.component';
 import { SlotPickerComponent } from './features/teacher/slot-picker/slot-picker.component';
 import { TeacherRegisterComponent } from './features/teacher/teacher-register/teacher-register.component';
+import { ForgotPasswordComponent } from './features/auth/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './features/auth/reset-password/reset-password.component';
 import { TeacherPortalComponent } from './features/teacher/teacher-portal/teacher-portal.component';
 import { AdminDashboardComponent } from './features/admin/admin-dashboard/admin-dashboard.component';
 import { DirectorLayoutComponent } from './features/director/director-layout/director-layout.component';
@@ -21,6 +23,8 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'register-teacher', component: TeacherRegisterComponent },
+  { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'reset-password', component: ResetPasswordComponent },
   {
     path: 'director',
     component: DirectorLayoutComponent,

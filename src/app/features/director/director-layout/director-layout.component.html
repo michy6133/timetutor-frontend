@@ -1,61 +1,71 @@
-<div class="min-h-screen flex bg-gray-50">
-  <aside class="w-56 shrink-0 border-r border-gray-200 bg-white flex flex-col sticky top-0 h-screen">
-    <div class="p-5 border-b border-gray-100">
-      <a routerLink="/director/dashboard" class="text-lg font-bold text-gray-950 tracking-tight block">
-        Time<span class="text-blue-600">Tutor</span>
+<div class="min-h-screen flex" style="background:#f5f9ff">
+
+  <!-- Sidebar -->
+  <aside class="w-[220px] shrink-0 bg-white border-r border-steel/25 flex flex-col sticky top-0 h-screen shadow-sm">
+    <div class="px-5 py-5 border-b border-steel/20">
+      <a routerLink="/director/dashboard" class="font-display font-extrabold text-lg text-navy tracking-tight block">
+        Time<span class="text-brick">Tutor</span>
       </a>
-      <p class="text-xs text-gray-500 mt-1">Espace direction</p>
+      <p class="text-[11px] text-navy/35 mt-0.5 font-medium uppercase tracking-widest">Espace direction</p>
     </div>
-    <nav class="p-3 flex flex-col gap-0.5 flex-1">
+
+    <nav class="p-3 flex flex-col gap-1 flex-1">
       <a
         routerLink="/director/dashboard"
-        routerLinkActive="bg-blue-50 text-blue-700 border-blue-200"
+        routerLinkActive="tt-active"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 border border-transparent transition-colors"
+        class="sidebar-link"
       >
-        <app-svg-icon name="layout-dashboard" [size]="20" iconClass="text-gray-400" />
+        <app-svg-icon name="layout-dashboard" [size]="18" iconClass="shrink-0 opacity-60" />
         Tableau de bord
       </a>
       <a
         routerLink="/director/sessions"
-        routerLinkActive="bg-blue-50 text-blue-700 border-blue-200"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 border border-transparent transition-colors"
+        routerLinkActive="tt-active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="sidebar-link"
       >
-        <app-svg-icon name="calendar" [size]="20" iconClass="text-gray-400" />
+        <app-svg-icon name="calendar" [size]="18" iconClass="shrink-0 opacity-60" />
         Sessions
       </a>
       <a
         routerLink="/director/sessions/new"
-        routerLinkActive="bg-blue-50 text-blue-700 border-blue-200"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 border border-transparent transition-colors"
+        routerLinkActive="tt-active"
+        class="sidebar-link"
       >
-        <app-svg-icon name="plus-circle" [size]="20" iconClass="text-gray-400" />
+        <app-svg-icon name="plus-circle" [size]="18" iconClass="shrink-0 opacity-60" />
         Nouvelle session
       </a>
       <a
         routerLink="/director/billing"
-        routerLinkActive="bg-blue-50 text-blue-700 border-blue-200"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 border border-transparent transition-colors"
+        routerLinkActive="tt-active"
+        class="sidebar-link"
       >
-        <app-svg-icon name="credit-card" [size]="20" iconClass="text-gray-400" />
+        <app-svg-icon name="credit-card" [size]="18" iconClass="shrink-0 opacity-60" />
         Abonnement
       </a>
     </nav>
-    <div class="p-3 border-t border-gray-100">
-      <a routerLink="/" class="text-xs text-gray-500 hover:text-gray-800 transition-colors">← Retour au site</a>
+
+    <div class="p-4 border-t border-steel/20">
+      <a routerLink="/" class="text-xs text-navy/35 hover:text-navy/65 transition-colors flex items-center gap-1.5">
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        Retour au site
+      </a>
     </div>
   </aside>
 
+  <!-- Main content -->
   <div class="flex-1 flex flex-col min-w-0 min-h-screen">
-    <header class="h-14 shrink-0 border-b border-gray-200 bg-white flex items-center justify-between px-6 sticky top-0 z-40">
-      <div class="text-sm text-gray-500 hidden sm:block">Pilotage des sessions et des créneaux</div>
-      <div class="flex items-center gap-4 ml-auto">
-        <a routerLink="/director/dashboard" class="text-sm text-gray-600 hover:text-gray-900 hidden sm:inline-flex items-center gap-1.5">
-          <app-svg-icon name="bell" [size]="18" iconClass="text-gray-400" />
+    <header class="h-14 shrink-0 bg-white border-b border-steel/20 flex items-center justify-between px-6 sticky top-0 z-40 shadow-sm">
+      <div class="text-sm text-navy/40 hidden sm:block font-medium">Pilotage des sessions et des créneaux</div>
+      <div class="flex items-center gap-5 ml-auto">
+        <a routerLink="/director/dashboard" class="text-sm text-navy/45 hover:text-navy hidden sm:inline-flex items-center gap-1.5 transition-colors">
+          <app-svg-icon name="bell" [size]="17" iconClass="text-navy/35" />
           Notifications
         </a>
-        <span class="text-sm font-medium text-gray-700 max-w-[10rem] truncate">{{ auth.currentUser()?.fullName }}</span>
-        <button type="button" (click)="auth.logout()" class="text-sm text-red-600 hover:text-red-700 font-medium">
+        <span class="text-sm font-semibold text-navy max-w-[10rem] truncate">{{ auth.currentUser()?.fullName }}</span>
+        <button type="button" (click)="auth.logout()"
+          class="text-xs text-brick/70 hover:text-brick font-semibold border border-brick/20 hover:border-brick/40 px-3 py-1.5 rounded-lg transition-all">
           Déconnexion
         </button>
       </div>

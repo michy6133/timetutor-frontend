@@ -1,54 +1,74 @@
-<div class="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-  <div class="w-full max-w-md">
-    <!-- Logo -->
-    <div class="text-center mb-8">
-      <div class="text-2xl font-bold text-gray-950">Time<span class="text-blue-600">Tutor</span></div>
-      <div class="text-sm text-gray-500 mt-1">Espace Enseignant</div>
-    </div>
+<div class="min-h-screen flex">
 
-    <div class="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-      <h1 class="text-xl font-bold text-gray-950 mb-1">Créer mon compte enseignant</h1>
-      <p class="text-sm text-gray-500 mb-6">Accédez à toutes vos invitations de sessions en un seul endroit.</p>
+  <!-- Left panel -->
+  <div class="hidden lg:flex w-[44%] bg-gradient-to-br from-cream/30 via-white to-steel/15 flex-col justify-between p-12 relative overflow-hidden border-r border-cream/60">
+    <div class="orb1 absolute top-1/3 right-0 w-72 h-72 rounded-full bg-brick/8 blur-3xl pointer-events-none"></div>
+    <div class="orb2 absolute bottom-1/4 left-0 w-52 h-52 rounded-full bg-steel/15 blur-3xl pointer-events-none"></div>
+    <a routerLink="/" class="font-display font-extrabold text-2xl text-navy tracking-tight relative z-10">
+      Time<span class="text-brick">Tutor</span>
+    </a>
+    <div class="relative z-10">
+      <div class="text-xs font-bold uppercase tracking-widest text-brick/60 mb-3">Espace Enseignant</div>
+      <h2 class="font-display text-2xl font-extrabold text-navy mb-4">Vos invitations,<br>au même endroit.</h2>
+      <p class="text-navy/55 text-sm leading-relaxed">Créez votre compte pour accéder à toutes vos sessions depuis un seul tableau de bord.</p>
+      <div class="mt-6 bg-cream/30 border border-cream/60 rounded-xl p-4 text-sm text-navy/60">
+        <strong class="text-navy/80">💡 Vous avez un lien d'invitation ?</strong><br>
+        <span class="text-xs">Utilisez-le directement — aucun compte n'est nécessaire.</span>
+      </div>
+    </div>
+    <a routerLink="/" class="text-navy/30 hover:text-navy/55 text-xs transition-colors relative z-10">← Retour à l'accueil</a>
+  </div>
+
+  <!-- Right panel -->
+  <div class="flex-1 bg-warm-soft flex items-center justify-center px-6 py-12">
+    <div class="w-full max-w-sm slide-up">
+
+      <div class="lg:hidden text-center mb-8">
+        <div class="font-display font-extrabold text-2xl text-navy">Time<span class="text-brick">Tutor</span></div>
+        <div class="text-navy/40 text-sm mt-1">Espace Enseignant</div>
+      </div>
+
+      <div class="mb-8">
+        <h1 class="font-display text-3xl font-extrabold text-navy mb-2">Créer mon compte</h1>
+        <p class="text-navy/45 text-sm">Retrouvez toutes vos invitations en un seul endroit.</p>
+      </div>
 
       @if (error()) {
-        <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm mb-4">{{ error() }}</div>
+        <div class="bg-brick/8 border border-brick/22 text-brick rounded-xl px-4 py-3.5 text-sm mb-5 fade-in">{{ error() }}</div>
       }
 
-      <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
+      <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
         <div>
-          <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1.5">Nom complet</label>
-          <input formControlName="fullName" type="text" placeholder="Jean Dupont"
-            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <label class="tt-label">Nom complet</label>
+          <input formControlName="fullName" type="text" placeholder="Jean Dupont" class="tt-input" />
         </div>
         <div>
-          <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1.5">Email</label>
-          <input formControlName="email" type="email" placeholder="jean@ecole.fr"
-            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <label class="tt-label">Email</label>
+          <input formControlName="email" type="email" placeholder="jean@ecole.fr" class="tt-input" />
         </div>
         <div>
-          <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1.5">Mot de passe</label>
-          <input formControlName="password" type="password" placeholder="8 caractères minimum"
-            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <label class="tt-label">Mot de passe <span class="normal-case font-normal text-navy/35">(8 car. min.)</span></label>
+          <input formControlName="password" type="password" placeholder="••••••••" class="tt-input" />
         </div>
-
         <button type="submit" [disabled]="form.invalid || loading()"
-          class="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-semibold px-5 py-3 rounded-xl text-sm transition-all">
-          {{ loading() ? 'Création...' : 'Créer mon compte' }}
+          class="btn-brick w-full py-3.5 text-sm">
+          @if (loading()) {
+            <span class="flex items-center justify-center gap-2">
+              <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+              </svg>
+              Création...
+            </span>
+          } @else {
+            Créer mon compte →
+          }
         </button>
       </form>
 
-      <div class="mt-5 text-center text-sm text-gray-500">
-        Déjà un compte ?
-        <a routerLink="/login" class="text-blue-600 font-medium hover:underline">Se connecter</a>
+      <div class="mt-7 text-center space-y-2 text-sm text-navy/40">
+        <p>Déjà un compte ? <a routerLink="/login" class="text-brick font-semibold hover:text-molten">Se connecter</a></p>
       </div>
-      <div class="mt-2 text-center text-sm text-gray-500">
-        Vous avez un lien d'invitation ?
-        <span class="text-gray-400">Utilisez-le directement — pas besoin de compte.</span>
-      </div>
-    </div>
-
-    <div class="mt-6 text-center">
-      <a routerLink="/" class="text-sm text-gray-400 hover:text-gray-600">← Retour à l'accueil</a>
     </div>
   </div>
 </div>

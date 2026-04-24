@@ -1,16 +1,23 @@
 @if (loading()) {
-  <div class="flex items-center justify-center min-h-screen text-gray-400">Chargement...</div>
+  <div class="flex items-center justify-center min-h-screen">
+    <div class="space-y-4 w-full max-w-3xl px-6">
+      <div class="skeleton h-12 rounded-xl"></div>
+      <div class="skeleton h-20 rounded-xl"></div>
+      <div class="skeleton h-64 rounded-2xl"></div>
+    </div>
+  </div>
 } @else if (session()) {
 
-<!-- Navbar locale -->
-<nav class="bg-white border-b border-gray-200 sticky top-0 z-40">
+<!-- Sub-navbar -->
+<nav class="bg-white border-b border-cream/50 sticky top-0 z-40 shadow-sm">
   <div class="max-w-7xl mx-auto px-5 flex items-center gap-3 h-12">
-    <a routerLink="/director/sessions" class="text-gray-400 text-sm hover:text-gray-700 flex items-center gap-1">
-      ← Sessions
+    <a routerLink="/director/sessions" class="text-navy/35 text-sm hover:text-navy flex items-center gap-1 transition-colors">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+      Sessions
     </a>
-    <span class="text-gray-300">/</span>
-    <span class="text-sm font-semibold text-gray-800 truncate">{{ session()!.name }}</span>
-    <span class="ml-auto text-xs text-gray-500">{{ session()!.academicYear }}</span>
+    <span class="text-navy/18">/</span>
+    <span class="text-sm font-semibold text-navy truncate font-display">{{ session()!.name }}</span>
+    <span class="ml-auto text-xs text-navy/30 font-mono">{{ session()!.academicYear }}</span>
   </div>
 </nav>
 
@@ -19,237 +26,219 @@
   <!-- Header + actions -->
   <div class="flex items-start justify-between mb-5">
     <div>
-      <h1 class="text-xl font-bold text-gray-950">{{ session()!.name }}</h1>
-      <p class="text-gray-500 text-sm mt-0.5">{{ session()!.academicYear }}</p>
+      <h1 class="font-display text-xl font-extrabold text-navy">{{ session()!.name }}</h1>
+      <p class="text-navy/38 text-sm mt-0.5 font-mono">{{ session()!.academicYear }}</p>
     </div>
     <div class="flex items-center gap-2 flex-shrink-0">
       <button (click)="exportPdf()"
-        class="border border-gray-300 text-gray-700 font-medium px-4 py-2 rounded-xl text-sm hover:bg-gray-50">
+        class="border border-cream text-navy/60 hover:border-brick/25 hover:text-navy font-medium px-4 py-2 rounded-xl text-sm transition-all">
         Export PDF
       </button>
       <button (click)="shareWhatsApp()"
-        class="border border-green-300 text-green-700 font-medium px-4 py-2 rounded-xl text-sm hover:bg-green-50">
-        Partager WhatsApp
+        class="border border-green-200 text-green-700 hover:bg-green-50 font-medium px-4 py-2 rounded-xl text-sm transition-all">
+        WhatsApp
       </button>
       @if (session()!.status === 'draft') {
         <button (click)="setStatus('open')"
-          class="bg-green-600 hover:bg-green-500 text-white font-semibold px-4 py-2 rounded-xl text-sm transition-all">
-          Ouvrir
+          class="btn-navy px-4 py-2 text-sm">
+          Ouvrir la session
         </button>
       }
       @if (session()!.status === 'open') {
         <button (click)="setStatus('closed')"
-          class="border border-gray-300 text-gray-700 font-medium px-4 py-2 rounded-xl text-sm hover:bg-gray-50">
+          class="border border-cream text-navy/60 hover:border-navy/25 font-medium px-4 py-2 rounded-xl text-sm">
           Fermer
         </button>
         <button (click)="setStatus('published')"
-          class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-4 py-2 rounded-xl text-sm transition-all">
+          class="btn-brick px-4 py-2 text-sm">
           Publier →
         </button>
       }
     </div>
   </div>
 
-  <!-- Progress bar -->
-  <div class="bg-white border border-gray-200 rounded-xl px-5 py-4 mb-5 flex items-center gap-6">
-    <div class="flex-1">
-      <div class="flex justify-between text-xs text-gray-500 mb-1.5">
-        <span>Couverture</span>
-        <span class="font-bold text-gray-900">{{ coveragePct() }}%</span>
+  <!-- Progress -->
+  <div class="bg-white border border-cream/50 rounded-2xl px-6 py-5 mb-5 shadow-sm">
+    <div class="flex items-center gap-8 flex-wrap">
+      <div class="flex-1 min-w-48">
+        <div class="flex justify-between text-xs text-navy/45 mb-2">
+          <span class="font-medium uppercase tracking-wide">Couverture</span>
+          <span class="font-bold text-navy font-display text-sm">{{ coveragePct() }}%</span>
+        </div>
+        <div class="h-2 bg-cream/50 rounded-full overflow-hidden">
+          <div class="h-full rounded-full transition-all duration-700"
+            [style.background]="coveragePct() === 100 ? '#0d5462' : '#dd2d4a'"
+            [style.width.%]="coveragePct()">
+          </div>
+        </div>
       </div>
-      <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-        <div class="h-full rounded-full transition-all duration-500"
-          [class]="coveragePct() === 100 ? 'bg-green-500' : 'bg-blue-600'"
-          [style.width.%]="coveragePct()"></div>
-      </div>
-    </div>
-    <div class="flex gap-5 text-xs text-gray-500 flex-shrink-0">
-      <div class="text-center">
-        <div class="font-bold text-gray-900 text-base">{{ slots().length }}</div>
-        <div>créneaux</div>
-      </div>
-      <div class="text-center">
-        <div class="font-bold text-amber-600 text-base">{{ countSlots('taken') }}</div>
-        <div>réservés</div>
-      </div>
-      <div class="text-center">
-        <div class="font-bold text-blue-600 text-base">{{ countSlots('validated') }}</div>
-        <div>validés</div>
-      </div>
-      <div class="text-center">
-        <div class="font-bold text-gray-900 text-base">{{ teachers().length }}</div>
-        <div>enseignants</div>
+      <div class="flex gap-6 text-xs text-navy/40 flex-shrink-0">
+        <div class="text-center">
+          <div class="font-display font-bold text-navy text-lg">{{ slots().length }}</div>
+          <div class="uppercase tracking-wide text-[10px]">créneaux</div>
+        </div>
+        <div class="text-center">
+          <div class="font-display font-bold text-brick text-lg">{{ countSlots('taken') }}</div>
+          <div class="uppercase tracking-wide text-[10px]">réservés</div>
+        </div>
+        <div class="text-center">
+          <div class="font-display font-bold text-navy text-lg">{{ countSlots('validated') }}</div>
+          <div class="uppercase tracking-wide text-[10px]">validés</div>
+        </div>
+        <div class="text-center">
+          <div class="font-display font-bold text-navy text-lg">{{ teachers().length }}</div>
+          <div class="uppercase tracking-wide text-[10px]">enseignants</div>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Tabs -->
-  <div class="flex gap-1 bg-gray-100 p-1 rounded-xl w-fit mb-5">
+  <div class="flex gap-1 bg-cream/40 p-1 rounded-xl w-fit mb-5 border border-cream/60">
     <button (click)="activeTab.set('slots')"
-      [class]="activeTab() === 'slots' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'"
+      [class]="activeTab() === 'slots' ? 'bg-white shadow-sm text-navy font-bold' : 'text-navy/45 hover:text-navy'"
       class="px-5 py-2 rounded-lg text-sm font-medium transition-all">
       Grille horaire ({{ slots().length }})
     </button>
     <button (click)="activeTab.set('teachers')"
-      [class]="activeTab() === 'teachers' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'"
+      [class]="activeTab() === 'teachers' ? 'bg-white shadow-sm text-navy font-bold' : 'text-navy/45 hover:text-navy'"
       class="px-5 py-2 rounded-lg text-sm font-medium transition-all">
       Enseignants ({{ teachers().length }})
     </button>
   </div>
 
-  <!-- ═══════════════ SLOTS TAB ═══════════════ -->
+  <!-- ═══ SLOTS TAB ═══ -->
   @if (activeTab() === 'slots') {
 
-    <!-- Toolbar -->
     <div class="flex items-center justify-between mb-4">
-      <!-- Legend -->
-      <div class="flex items-center gap-4 text-xs text-gray-500">
+      <div class="flex items-center gap-5 text-xs text-navy/45">
         <div class="flex items-center gap-1.5">
-          <div class="w-3 h-3 rounded bg-white border border-gray-300"></div> Libre
+          <div class="w-3 h-3 rounded bg-white border-[1.5px]" style="border-color:rgba(244,156,187,.5)"></div> Libre
         </div>
         <div class="flex items-center gap-1.5">
-          <div class="w-3 h-3 rounded bg-amber-100 border border-amber-300"></div> Réservé
+          <div class="w-3 h-3 rounded" style="background:rgba(244,156,187,.2);border:1.5px solid rgba(244,156,187,.55)"></div> Réservé
         </div>
         <div class="flex items-center gap-1.5">
-          <div class="w-3 h-3 rounded bg-blue-100 border border-blue-300"></div> Validé
+          <div class="w-3 h-3 rounded" style="background:rgba(203,238,243,.4);border:1.5px solid rgba(203,238,243,.8)"></div> Validé
         </div>
       </div>
       <button (click)="showAddSlot.set(!showAddSlot())"
-        class="bg-gray-950 hover:bg-gray-800 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all flex items-center gap-2">
-        <span class="text-lg leading-none">+</span> Créneau
+        class="btn-navy text-sm px-4 py-2 flex items-center gap-2">
+        <span class="text-base leading-none">+</span> Créneau
       </button>
     </div>
 
-    <!-- Add Slot Form -->
     @if (showAddSlot()) {
-      <div class="bg-blue-50 border border-blue-200 rounded-2xl p-5 mb-5">
-        <h3 class="font-semibold text-gray-900 mb-4 text-sm">Nouveau créneau</h3>
+      <div class="bg-cream/20 border border-cream/50 rounded-2xl p-5 mb-5 fade-in">
+        <h3 class="font-display font-bold text-navy mb-4 text-sm">Nouveau créneau</h3>
         @if (addSlotError()) {
-          <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-2 text-sm mb-3">{{ addSlotError() }}</div>
+          <div class="bg-brick/8 border border-brick/22 text-brick rounded-xl px-4 py-2 text-sm mb-3">{{ addSlotError() }}</div>
         }
         <form [formGroup]="slotForm" (ngSubmit)="addSlot()" class="flex flex-wrap gap-3 items-end">
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1">Jour</label>
-            <select formControlName="dayOfWeek"
-              class="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+            <label class="tt-label">Jour</label>
+            <select formControlName="dayOfWeek" class="tt-input w-auto">
               @for (d of weekDays; track d) { <option [value]="d">{{ d }}</option> }
             </select>
           </div>
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1">Début</label>
-            <input formControlName="startTime" type="time"
-              class="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+            <label class="tt-label">Début</label>
+            <input formControlName="startTime" type="time" class="tt-input w-auto">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1">Fin</label>
-            <input formControlName="endTime" type="time"
-              class="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+            <label class="tt-label">Fin</label>
+            <input formControlName="endTime" type="time" class="tt-input w-auto">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1">Salle</label>
-            <input formControlName="room" type="text" placeholder="A12"
-              class="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white w-24">
+            <label class="tt-label">Salle</label>
+            <input formControlName="room" type="text" placeholder="A12" class="tt-input w-20">
           </div>
           <div class="flex gap-2 items-center">
             <button type="submit" [disabled]="slotForm.invalid || addingSlot()"
-              class="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-semibold px-5 py-2 rounded-xl text-sm">
+              class="btn-brick px-5 py-2 text-sm disabled:opacity-40">
               {{ addingSlot() ? '...' : 'Ajouter' }}
             </button>
             <button type="button" (click)="showAddSlot.set(false)"
-              class="border border-gray-300 text-gray-600 px-4 py-2 rounded-xl text-sm hover:bg-white">
+              class="btn-ghost-navy px-4 py-2 text-sm">
               Fermer
             </button>
-            @if (slotForm.hasError('timeInvalid') && (slotForm.get('startTime')?.touched || slotForm.get('endTime')?.touched)) {
-              <span class="text-xs text-red-500 font-medium ml-2">La fin doit être après le début.</span>
-            }
           </div>
         </form>
       </div>
     }
 
-    <!-- Empty state -->
     @if (slots().length === 0) {
-      <div class="border-2 border-dashed border-gray-200 rounded-2xl p-12 text-center text-gray-400">
-        <div class="text-4xl mb-3">[]</div>
-        <p class="font-medium mb-1">Aucun créneau configuré</p>
-        <p class="text-sm">Cliquez sur "+ Créneau" pour commencer à construire la grille.</p>
+      <div class="border-2 border-dashed border-steel/30 rounded-2xl p-14 text-center bg-white">
+        <div class="text-3xl mb-3 text-navy/15">⊞</div>
+        <p class="font-medium text-navy/45 mb-1">Aucun créneau configuré</p>
+        <p class="text-sm text-navy/30">Cliquez sur "+ Créneau" pour construire la grille.</p>
       </div>
-
     } @else {
-      <!-- ══ CALENDAR GRID ══ -->
-      <div class="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
+      <div class="overflow-x-auto rounded-2xl border border-cream/50 shadow-sm bg-white">
         <div [style.min-width]="(76 + slotDays().length * 140) + 'px'">
 
-          <!-- Day headers -->
           <div class="grid" [style.grid-template-columns]="'76px repeat(' + slotDays().length + ', 1fr)'">
-            <div class="bg-gray-950 h-11 rounded-tl-2xl"></div>
+            <div class="bg-cream/25 h-11 rounded-tl-2xl border-b border-cream/50"></div>
             @for (day of slotDays(); track day) {
-              <div class="bg-gray-950 border-l border-white/10 flex flex-col items-center justify-center py-2">
-                <span class="text-xs font-bold uppercase tracking-widest text-gray-400 sm:hidden">{{ day.slice(0,3) }}</span>
-                <span class="text-sm font-semibold text-white hidden sm:block">{{ day }}</span>
+              <div class="bg-cream/25 border-l border-cream/40 border-b border-cream/50 flex flex-col items-center justify-center py-2">
+                <span class="text-xs font-bold uppercase tracking-widest text-navy/50 sm:hidden">{{ day.slice(0,3) }}</span>
+                <span class="text-sm font-semibold text-navy hidden sm:block font-display">{{ day }}</span>
               </div>
             }
           </div>
 
-          <!-- Time rows -->
           @for (time of uniqueTimes(); track time.start) {
-            <div class="grid border-t border-gray-100"
+            <div class="grid border-t border-cream/40"
                  [style.grid-template-columns]="'76px repeat(' + slotDays().length + ', 1fr)'">
 
-              <!-- Hour label -->
-              <div class="bg-gray-50 border-r border-gray-100 flex flex-col items-center justify-center py-3 last:rounded-bl-2xl">
-                <span class="text-xs font-mono font-bold text-gray-700">{{ time.start }}</span>
-                <span class="text-[10px] font-mono text-gray-400 leading-tight mt-0.5">{{ time.end }}</span>
+              <div class="bg-cream/15 border-r border-cream/40 flex flex-col items-center justify-center py-3 last:rounded-bl-2xl">
+                <span class="text-xs font-mono font-bold text-navy/60">{{ time.start }}</span>
+                <span class="text-[10px] font-mono text-navy/30 mt-0.5">{{ time.end }}</span>
               </div>
 
-              <!-- Cells -->
               @for (day of slotDays(); track day) {
                 @let slot = getSlot(day, time.start);
-                <div class="border-l border-gray-100 p-1.5 min-h-[88px]">
+                <div class="border-l border-cream/35 p-1.5 min-h-[88px]">
                   @if (slot) {
-                    <div class="h-full min-h-[72px] rounded-xl p-2.5 flex flex-col gap-1 cursor-default transition-all hover:shadow-sm"
+                    <div class="h-full min-h-[72px] rounded-xl p-2.5 flex flex-col gap-1 transition-all hover:shadow-sm cursor-default"
                          [class]="slotCardClass(slot.status)">
 
-                      <!-- Time badge -->
                       <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-mono font-bold opacity-60">{{ slot.startTime }}–{{ slot.endTime }}</span>
-                        @if (slot.status === 'validated') { <span class="text-xs">LOCK</span> }
-                        @if (slot.status === 'taken') { <span class="text-xs opacity-60">PENDING</span> }
+                        <span class="text-[10px] font-mono font-bold opacity-55">{{ slot.startTime }}–{{ slot.endTime }}</span>
+                        @if (slot.status === 'validated') { <span class="text-[9px] opacity-50 font-bold tracking-wide">LOCK</span> }
+                        @if (slot.status === 'taken') { <span class="text-[9px] opacity-45 font-bold tracking-wide">PENDING</span> }
                       </div>
 
-                      <!-- Teacher -->
                       @if (slot.teacherName) {
-                        <div class="text-xs font-semibold truncate">{{ slot.teacherName }}</div>
+                        <div class="text-xs font-bold truncate">{{ slot.teacherName }}</div>
                       } @else {
-                        <div class="text-xs opacity-30 italic">Libre</div>
+                        <div class="text-xs opacity-25 italic">Libre</div>
                       }
 
-                      <!-- Meta -->
                       @if (slot.subjectName) {
-                        <div class="text-[10px] opacity-60 truncate">{{ slot.subjectName }}</div>
+                        <div class="text-[10px] opacity-55 truncate">{{ slot.subjectName }}</div>
                       }
                       @if (slot.room) {
-                        <div class="text-[10px] opacity-50">Salle {{ slot.room }}</div>
+                        <div class="text-[10px] opacity-45 font-mono">{{ slot.room }}</div>
                       }
 
-                      <!-- Actions -->
                       <div class="mt-auto pt-1">
                         @if (slot.status === 'taken') {
                           <button (click)="validateSlot(slot.id)"
-                            class="w-full text-[11px] bg-blue-600 text-white py-1 rounded-lg hover:bg-blue-500 font-semibold transition-all">
+                            class="w-full text-[11px] bg-brick text-white py-1 rounded-lg hover:bg-brick/80 font-bold transition-all">
                             Valider
                           </button>
                         }
                         @if (slot.status === 'validated') {
                           <button (click)="unvalidateSlot(slot.id)"
-                            class="w-full text-[11px] border border-blue-300 text-blue-700 py-1 rounded-lg hover:bg-blue-100 font-medium transition-all">
+                            class="w-full text-[11px] border border-navy/25 text-navy/60 py-1 rounded-lg hover:bg-navy/5 font-medium transition-all">
                             Retirer
                           </button>
                         }
                       </div>
                     </div>
                   } @else {
-                    <div class="min-h-[72px] rounded-xl border border-dashed border-gray-100"></div>
+                    <div class="min-h-[72px] rounded-xl border border-dashed border-cream/50"></div>
                   }
                 </div>
               }
@@ -260,117 +249,113 @@
     }
   }
 
-  <!-- ═══════════════ TEACHERS TAB ═══════════════ -->
+  <!-- ═══ TEACHERS TAB ═══ -->
   @if (activeTab() === 'teachers') {
 
     <div class="flex items-center justify-between mb-4">
-      <h2 class="font-semibold text-gray-900">Enseignants de la session</h2>
+      <h2 class="font-display font-bold text-navy">Enseignants de la session</h2>
       <div class="flex items-center gap-2">
         <label class="cursor-pointer">
-          <span class="border border-gray-300 text-gray-600 text-sm font-medium px-4 py-2 rounded-xl hover:bg-gray-50 inline-block transition-all select-none">
+          <span class="btn-ghost-navy px-4 py-2 text-sm inline-block select-none">
             {{ csvImporting() ? 'Import...' : '↑ CSV' }}
           </span>
           <input type="file" accept=".csv" class="hidden" (change)="importCsv($event)" [disabled]="csvImporting()">
         </label>
         <button (click)="showAddTeacher.set(!showAddTeacher())"
-          class="bg-gray-950 hover:bg-gray-800 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all">
+          class="btn-navy text-sm px-4 py-2">
           + Ajouter
         </button>
       </div>
     </div>
 
-    <!-- Add Teacher Form -->
     @if (showAddTeacher()) {
-      <div class="bg-blue-50 border border-blue-200 rounded-2xl p-5 mb-5">
-        <h3 class="font-semibold text-gray-900 mb-4 text-sm">Nouvel enseignant</h3>
+      <div class="bg-cream/20 border border-cream/50 rounded-2xl p-5 mb-5 fade-in">
+        <h3 class="font-display font-bold text-navy mb-4 text-sm">Nouvel enseignant</h3>
         @if (addTeacherError()) {
-          <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-2 text-sm mb-3">{{ addTeacherError() }}</div>
+          <div class="bg-brick/8 border border-brick/22 text-brick rounded-xl px-4 py-2 text-sm mb-3">{{ addTeacherError() }}</div>
         }
         <form [formGroup]="teacherForm" (ngSubmit)="addTeacher()" class="flex flex-wrap gap-3 items-end">
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1">Nom complet *</label>
-            <input formControlName="fullName" type="text" placeholder="Jean Dupont"
-              class="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white w-44">
+            <label class="tt-label">Nom complet *</label>
+            <input formControlName="fullName" type="text" placeholder="Jean Dupont" class="tt-input w-44">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1">Email *</label>
-            <input formControlName="email" type="email" placeholder="jean@ecole.fr"
-              class="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white w-48">
+            <label class="tt-label">Email *</label>
+            <input formControlName="email" type="email" placeholder="jean@ecole.fr" class="tt-input w-48">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-gray-600 mb-1">Téléphone</label>
-            <input formControlName="phone" type="tel" placeholder="+229 xx xx"
-              class="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white w-36">
+            <label class="tt-label">Téléphone</label>
+            <input formControlName="phone" type="tel" placeholder="+229 xx xx" class="tt-input w-36">
           </div>
           <div class="flex gap-2">
             <button type="submit" [disabled]="teacherForm.invalid || addingTeacher()"
-              class="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-semibold px-5 py-2 rounded-xl text-sm">
+              class="btn-brick px-5 py-2 text-sm disabled:opacity-40">
               {{ addingTeacher() ? '...' : 'Ajouter' }}
             </button>
             <button type="button" (click)="showAddTeacher.set(false)"
-              class="border border-gray-300 text-gray-600 px-4 py-2 rounded-xl text-sm hover:bg-white">
+              class="btn-ghost-navy px-4 py-2 text-sm">
               Fermer
             </button>
           </div>
         </form>
-        <p class="text-xs text-gray-400 mt-3">CSV attendu : colonnes <code class="bg-white border border-gray-200 px-1 rounded font-mono">full_name</code>, <code class="bg-white border border-gray-200 px-1 rounded font-mono">email</code>, <code class="bg-white border border-gray-200 px-1 rounded font-mono">phone</code></p>
+        <p class="text-xs text-navy/30 mt-3">CSV : colonnes <code class="bg-cream/60 px-1.5 py-0.5 rounded font-mono">full_name</code>, <code class="bg-cream/60 px-1.5 py-0.5 rounded font-mono">email</code>, <code class="bg-cream/60 px-1.5 py-0.5 rounded font-mono">phone</code></p>
       </div>
     }
 
     @if (teachers().length === 0) {
-      <div class="border-2 border-dashed border-gray-200 rounded-2xl p-12 text-center text-gray-400">
-        <div class="text-4xl mb-3">USR</div>
-        <p>Aucun enseignant. Cliquez sur "+ Ajouter" ou importez un CSV.</p>
+      <div class="border-2 border-dashed border-steel/30 rounded-2xl p-14 text-center bg-white text-navy/30">
+        <div class="text-3xl mb-3">👤</div>
+        <p class="font-medium">Aucun enseignant. Cliquez sur "+ Ajouter" ou importez un CSV.</p>
       </div>
     } @else {
-      <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+      <div class="bg-white border border-cream/50 rounded-2xl overflow-hidden shadow-sm">
         <table class="w-full text-sm">
-          <thead class="bg-gray-50 border-b border-gray-200">
+          <thead class="bg-cream/30 border-b border-cream/50">
             <tr>
-              <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Enseignant</th>
-              <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Statut</th>
-              <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Invitation</th>
-              <th class="text-right px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+              <th class="text-left px-5 py-3 text-[11px] font-bold text-navy/45 uppercase tracking-wider">Enseignant</th>
+              <th class="text-left px-5 py-3 text-[11px] font-bold text-navy/45 uppercase tracking-wider">Statut</th>
+              <th class="text-left px-5 py-3 text-[11px] font-bold text-navy/45 uppercase tracking-wider">Invitation</th>
+              <th class="text-right px-5 py-3 text-[11px] font-bold text-navy/45 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody>
             @for (teacher of teachers(); track teacher.id) {
-              <tr class="border-b border-gray-100 last:border-0 hover:bg-gray-50">
+              <tr class="border-b border-cream/35 last:border-0 hover:bg-cream/15 transition-colors">
                 <td class="px-5 py-4">
-                  <div class="font-medium text-gray-900">{{ teacher.fullName }}</div>
-                  <div class="text-gray-400 text-xs">{{ teacher.email }}</div>
+                  <div class="font-semibold text-navy font-display">{{ teacher.fullName }}</div>
+                  <div class="text-navy/35 text-xs mt-0.5">{{ teacher.email }}</div>
                 </td>
                 <td class="px-5 py-4">
-                  <span class="text-xs font-medium px-2.5 py-1 rounded-full"
+                  <span class="badge"
                     [ngClass]="{
-                      'bg-gray-100 text-gray-600': teacher.status === 'pending',
-                      'bg-blue-100 text-blue-700': teacher.status === 'active',
-                      'bg-green-100 text-green-700': teacher.status === 'done'
+                      'badge-pending': teacher.status === 'pending',
+                      'badge-active': teacher.status === 'active',
+                      'badge-done': teacher.status === 'done'
                     }">
                     {{ { pending: 'En attente', active: 'Actif', done: 'Terminé' }[teacher.status] }}
                   </span>
                   @if ((teacher.slotsSelected ?? 0) > 0) {
-                    <div class="text-xs text-green-600 mt-1">{{ teacher.slotsSelected }} créneau(x)</div>
+                    <div class="text-xs text-navy/50 mt-1">{{ teacher.slotsSelected }} créneau(x)</div>
                   }
                 </td>
-                <td class="px-5 py-4 text-gray-400 text-xs">
+                <td class="px-5 py-4 text-navy/35 text-xs font-mono">
                   {{ teacher.invitationSentAt ? (teacher.invitationSentAt | date:'dd/MM HH:mm') : '—' }}
                 </td>
                 <td class="px-5 py-4 text-right">
                   <div class="flex items-center justify-end gap-2">
                     @if (!teacher.invitationSentAt) {
                       <button (click)="inviteTeacher(teacher.id)"
-                        class="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-500">
+                        class="text-xs bg-brick text-white px-3 py-1.5 rounded-lg hover:bg-brick/80 font-semibold transition-all">
                         Inviter
                       </button>
                     } @else if (teacher.status === 'pending') {
                       <button (click)="remindTeacher(teacher.id)"
-                        class="text-xs border border-gray-300 text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-50">
+                        class="text-xs border border-cream text-navy/55 px-3 py-1.5 rounded-lg hover:border-brick/25 transition-all">
                         Relancer
                       </button>
                     }
                     <button (click)="removeTeacher(teacher.id)"
-                      class="text-xs border border-red-200 text-red-500 px-3 py-1.5 rounded-lg hover:bg-red-50">
+                      class="text-xs border border-brick/20 text-brick/60 px-3 py-1.5 rounded-lg hover:bg-brick/5 hover:border-brick/40 transition-all">
                       Retirer
                     </button>
                   </div>

@@ -1,13 +1,36 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="utf-8" />
-    <title>TimetutorFrontend</title>
+    <title>TimeTutor — Planification scolaire intelligente</title>
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              navy:   { DEFAULT: '#880d1e', 100: '#1a0204', 200: '#350408', 300: '#4f060c', 400: '#6a0810', 500: '#880d1e', 600: '#c4122a', 700: '#e9374d', 800: '#f27e8c', 900: '#f9bec6' },
+              brick:  { DEFAULT: '#dd2d4a', 100: '#2c0610', 200: '#580c1f', 300: '#84122f', 400: '#b0183e', 500: '#dd2d4a', 600: '#e6566e', 700: '#ed7f92', 800: '#f4a9b6', 900: '#f9d3db' },
+              cream:  { DEFAULT: '#cbeef3', 100: '#0d3b42', 200: '#1a7684', 300: '#27b2c6', 400: '#6ed1de', 500: '#cbeef3', 600: '#d5f1f6', 700: '#e0f5f8', 800: '#eaf8fb', 900: '#f5fcfd' },
+              steel:  { DEFAULT: '#f49cbb', 100: '#3d0521', 200: '#7a0a43', 300: '#b81064', 400: '#e42a87', 500: '#f49cbb', 600: '#f7b0ca', 700: '#f9c4d9', 800: '#fbd8e7', 900: '#fdecf3' },
+              molten: { DEFAULT: '#880d1e', 100: '#1a0204', 200: '#350408', 300: '#4f060c', 400: '#6a0810', 500: '#880d1e', 600: '#c4122a', 700: '#e9374d', 800: '#f27e8c', 900: '#f9bec6' },
+            },
+            fontFamily: {
+              sans: ['Inter', 'system-ui', 'sans-serif'],
+              display: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+              mono: ['"JetBrains Mono"', 'monospace'],
+            },
+          }
+        }
+      }
+    </script>
   </head>
   <body>
     <app-root></app-root>

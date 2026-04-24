@@ -1,62 +1,98 @@
-<div class="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
-  <div class="w-full max-w-md">
-    <div class="text-center mb-8">
-      <div class="text-3xl font-bold text-gray-950 mb-1">Time<span class="text-blue-600">Tutor</span></div>
-      <p class="text-gray-500 text-sm">Créez votre espace école</p>
+<div class="min-h-screen flex">
+
+  <!-- Left panel -->
+  <div class="hidden lg:flex w-[46%] bg-gradient-to-br from-cream/25 via-white to-steel/12 flex-col justify-between p-12 relative overflow-hidden border-r border-cream/60">
+    <div class="orb1 absolute top-1/4 right-0 w-72 h-72 rounded-full bg-brick/8 blur-3xl pointer-events-none"></div>
+    <div class="orb2 absolute bottom-1/3 left-0 w-64 h-64 rounded-full bg-steel/12 blur-3xl pointer-events-none"></div>
+
+    <a routerLink="/" class="font-display font-extrabold text-2xl text-navy tracking-tight relative z-10">
+      Time<span class="text-brick">Tutor</span>
+    </a>
+
+    <div class="relative z-10 space-y-6">
+      <div class="flex items-start gap-3">
+        <div class="w-8 h-8 rounded-xl bg-brick/15 border border-brick/25 flex items-center justify-center text-navy text-sm font-bold shrink-0">1</div>
+        <div><div class="text-navy font-semibold text-sm font-display mb-0.5">Créez votre espace</div><div class="text-navy/45 text-xs leading-relaxed">Inscrivez votre établissement en moins de 2 minutes</div></div>
+      </div>
+      <div class="flex items-start gap-3">
+        <div class="w-8 h-8 rounded-xl bg-cream/50 border border-cream/70 flex items-center justify-center text-navy text-sm font-bold shrink-0">2</div>
+        <div><div class="text-navy font-semibold text-sm font-display mb-0.5">Configurez vos sessions</div><div class="text-navy/45 text-xs leading-relaxed">Créneaux, règles, enseignants — tout en quelques clics</div></div>
+      </div>
+      <div class="flex items-start gap-3">
+        <div class="w-8 h-8 rounded-xl bg-cream/40 border border-cream/60 flex items-center justify-center text-navy text-sm font-bold shrink-0">3</div>
+        <div><div class="text-navy font-semibold text-sm font-display mb-0.5">Résultats en 72h</div><div class="text-navy/45 text-xs leading-relaxed">Emploi du temps complet, sans conflit, sans tableur</div></div>
+      </div>
     </div>
 
-    <div class="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-      <h1 class="text-xl font-semibold text-gray-900 mb-6">Inscrire mon établissement</h1>
+    <div class="text-navy/30 text-xs relative z-10 font-mono">Gratuit · Sans carte bancaire · Annulation à tout moment</div>
+  </div>
+
+  <!-- Right panel — form -->
+  <div class="flex-1 bg-warm-soft flex items-center justify-center px-6 py-10">
+    <div class="w-full max-w-md slide-up">
+
+      <div class="lg:hidden text-center mb-8">
+        <div class="font-display font-extrabold text-2xl text-navy">Time<span class="text-brick">Tutor</span></div>
+      </div>
+
+      <div class="mb-8">
+        <h1 class="font-display text-3xl font-extrabold text-navy mb-2">Inscrire mon établissement</h1>
+        <p class="text-navy/45 text-sm">Créez votre espace école — c'est gratuit</p>
+      </div>
 
       @if (error()) {
-        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm mb-5">
+        <div class="bg-brick/8 border border-brick/22 text-brick px-4 py-3.5 rounded-xl text-sm mb-6 fade-in">
           {{ error() }}
         </div>
       }
 
       <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Nom de l'établissement</label>
-          <input formControlName="schoolName" type="text" placeholder="Lycée Victor Hugo"
-            (input)="autoSlug()"
-            class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" />
+          <label class="tt-label">Nom de l'établissement</label>
+          <input formControlName="schoolName" type="text" placeholder="Lycée Victor Hugo" (input)="autoSlug()" class="tt-input" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">
-            Identifiant unique
-            <span class="text-gray-400 font-normal">(lettres, chiffres, tirets)</span>
-          </label>
-          <div class="flex items-center border border-gray-300 rounded-xl overflow-hidden focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20">
-            <span class="bg-gray-50 px-3 py-3 text-gray-400 text-sm border-r border-gray-300">timetutor.app/</span>
+          <label class="tt-label">Identifiant unique <span class="normal-case font-normal text-navy/35">(lettres, chiffres, tirets)</span></label>
+          <div class="flex items-center border-[1.5px] rounded-xl overflow-hidden focus-within:shadow-[0_0_0_3.5px_rgba(221,45,74,.12)] transition-all bg-white"
+               style="border-color:rgba(244,156,187,.45)">
+            <span class="bg-cream/30 px-3 py-3 text-navy/40 text-xs border-r font-mono" style="border-color:rgba(244,156,187,.35)">timetutor.app/</span>
             <input formControlName="schoolSlug" type="text" placeholder="lycee-victor-hugo"
-              class="flex-1 px-3 py-3 text-sm outline-none" />
+              class="flex-1 px-3 py-3 text-sm outline-none bg-transparent text-navy/80" />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="tt-label">Votre nom complet</label>
+            <input formControlName="fullName" type="text" placeholder="Marie Dupont" class="tt-input" />
+          </div>
+          <div>
+            <label class="tt-label">Email directeur</label>
+            <input formControlName="email" type="email" placeholder="directeur@ecole.com" class="tt-input" />
           </div>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Votre nom complet</label>
-          <input formControlName="fullName" type="text" placeholder="Marie Dupont"
-            class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Email directeur</label>
-          <input formControlName="email" type="email" placeholder="directeur@ecole.com"
-            class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Mot de passe <span class="text-gray-400 font-normal">(min. 8 caractères)</span></label>
-          <input formControlName="password" type="password" placeholder="••••••••"
-            class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" />
+          <label class="tt-label">Mot de passe <span class="normal-case font-normal text-navy/35">(min. 8 caractères)</span></label>
+          <input formControlName="password" type="password" placeholder="••••••••" class="tt-input" />
         </div>
         <button type="submit" [disabled]="form.invalid || loading()"
-          class="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-blue-300 text-white font-semibold py-3 rounded-xl transition-all text-sm mt-2">
-          @if (loading()) { Création en cours... } @else { Créer mon espace école }
+          class="btn-brick w-full py-3.5 text-sm mt-1">
+          @if (loading()) {
+            <span class="flex items-center justify-center gap-2">
+              <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+              </svg>
+              Création en cours...
+            </span>
+          } @else {
+            Créer mon espace école →
+          }
         </button>
       </form>
-    </div>
 
-    <p class="text-center text-sm text-gray-500 mt-5">
-      Déjà inscrit ?
-      <a routerLink="/login" class="text-blue-600 font-medium hover:underline">Se connecter</a>
-    </p>
+      <p class="text-center text-sm text-navy/38 mt-6">
+        Déjà inscrit ? <a routerLink="/login" class="text-brick font-semibold hover:text-molten">Se connecter</a>
+      </p>
+    </div>
   </div>
 </div>
