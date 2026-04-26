@@ -1,0 +1,67 @@
+<div class="max-w-5xl mx-auto px-6 py-8">
+  <div class="mb-6">
+    <h1 class="font-display text-2xl font-extrabold text-navy">Matières</h1>
+    <p class="text-sm text-navy/45 mt-1">Gérez les matières génériques de votre établissement.</p>
+  </div>
+
+  <div class="bg-white border border-cream/60 rounded-2xl p-5 shadow-sm mb-6">
+    <h2 class="font-display font-bold text-navy mb-4">Ajouter une matière</h2>
+    <form [formGroup]="form" (ngSubmit)="createSubject()" class="flex flex-wrap items-end gap-3">
+      <div class="min-w-60">
+        <label class="tt-label">Nom *</label>
+        <input formControlName="name" type="text" class="tt-input" placeholder="Mathématiques">
+      </div>
+      <div>
+        <label class="tt-label">Couleur</label>
+        <input formControlName="color" type="color" class="h-11 w-16 rounded-xl border border-cream/60 bg-white px-1">
+      </div>
+      <button type="submit" [disabled]="form.invalid || saving()" class="btn-brick px-5 py-2.5 text-sm disabled:opacity-40">
+        Ajouter
+      </button>
+    </form>
+  </div>
+
+  @if (loading()) {
+    <div class="space-y-3">
+      @for (i of [1,2,3,4]; track i) {
+        <div class="skeleton h-16 rounded-2xl"></div>
+      }
+    </div>
+  } @else if (subjects().length === 0) {
+    <div class="bg-white border border-dashed border-cream/80 rounded-2xl p-10 text-center text-navy/45">
+      Aucune matière enregistrée pour le moment.
+    </div>
+  } @else {
+    <div class="bg-white border border-cream/60 rounded-2xl overflow-hidden shadow-sm">
+      @for (subject of subjects(); track subject.id) {
+        <div class="border-b border-cream/40 last:border-b-0 px-5 py-4">
+          @if (editingId() === subject.id) {
+            <form [formGroup]="editForm" class="flex flex-wrap items-end gap-3">
+              <div class="min-w-60">
+                <label class="tt-label">Nom</label>
+                <input formControlName="name" type="text" class="tt-input">
+              </div>
+              <div>
+                <label class="tt-label">Couleur</label>
+                <input formControlName="color" type="color" class="h-11 w-16 rounded-xl border border-cream/60 bg-white px-1">
+              </div>
+              <button type="button" (click)="saveEdit()" [disabled]="editForm.invalid || saving()" class="btn-brick px-4 py-2 text-sm">Enregistrer</button>
+              <button type="button" (click)="cancelEdit()" class="btn-ghost-navy px-4 py-2 text-sm">Annuler</button>
+            </form>
+          } @else {
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-3 min-w-0">
+                <span class="w-4 h-4 rounded-full border border-cream/70" [style.background]="subject.color"></span>
+                <span class="font-semibold text-navy">{{ subject.name }}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <button type="button" (click)="startEdit(subject)" class="text-xs border border-cream text-navy/65 px-3 py-1.5 rounded-lg">Modifier</button>
+                <button type="button" (click)="deleteSubject(subject.id)" class="text-xs border border-brick/20 text-brick/70 px-3 py-1.5 rounded-lg">Supprimer</button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

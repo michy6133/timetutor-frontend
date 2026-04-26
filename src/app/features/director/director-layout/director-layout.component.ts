@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { SvgIconComponent } from '../../../shared/svg-icon.component';
@@ -11,4 +12,5 @@ import { SvgIconComponent } from '../../../shared/svg-icon.component';
 })
 export class DirectorLayoutComponent {
   readonly auth = inject(AuthService);
+  readonly mobileMenuOpen = signal(false);
 }

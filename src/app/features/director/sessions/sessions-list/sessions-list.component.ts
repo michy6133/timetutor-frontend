@@ -39,6 +39,8 @@ export class SessionsListComponent implements OnInit {
   readonly searchPerformed = signal(false);
 
   readonly invitingSessionId = signal<string>('');
+  readonly schoolClasses = signal<{ id: string; name: string }[]>([]);
+  readonly schoolClassFilter = signal('');
 
   readonly totalTeachers = computed(() =>
     this.sessions().reduce((acc, s) => acc + (s.totalTeachers ?? 0), 0)
@@ -51,10 +53,28 @@ export class SessionsListComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.api.get<Session[]>('/sessions').subscribe({
-      next: (s) => { this.sessions.set(s); this.loading.set(false); },
+    this.api.get<Array<{ id: string; name: string; is_active: boolean }>>('/school-classes').subscribe((rows) => {
+      this.schoolClasses.set(rows.filter((r) => r.is_active).map((r) => ({ id: r.id, name: r.name })));
+    });
+    this.reloadSessions();
+  }
+
+  reloadSessions(): void {
+    this.loading.set(true);
+    const cid = this.schoolClassFilter();
+    const q = cid ? `?schoolClassId=${encodeURIComponent(cid)}` : '';
+    this.api.get<Session[]>(`/sessions${q}`).subscribe({
+      next: (s) => {
+        this.sessions.set(s);
+        this.loading.set(false);
+      },
       error: () => this.loading.set(false),
     });
+  }
+
+  setClassFilter(id: string): void {
+    this.schoolClassFilter.set(id);
+    this.reloadSessions();
   }
 
   filtered(): Session[] {

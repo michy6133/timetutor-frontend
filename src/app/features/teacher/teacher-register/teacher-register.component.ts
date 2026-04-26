@@ -21,6 +21,7 @@ export class TeacherRegisterComponent {
     fullName: ['', [Validators.required, Validators.minLength(2)]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]],
+    gdprAccepted: [false, Validators.requiredTrue],
   });
 
   submit(): void {
@@ -32,6 +33,7 @@ export class TeacherRegisterComponent {
       fullName: v.fullName!,
       email: v.email!,
       password: v.password!,
+      gdprAccepted: true,
     }).subscribe({
       next: () => this.router.navigate(['/teacher/portal']),
       error: (e) => {

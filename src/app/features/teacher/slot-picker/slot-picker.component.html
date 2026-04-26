@@ -129,6 +129,52 @@
         <p class="text-navy/40 text-xs mt-1">Revenez sur ce lien à tout moment pour modifier vos choix avant la deadline.</p>
       </div>
 
+      <div class="mt-6 grid gap-4 md:grid-cols-2">
+        <div class="bg-white border border-cream/60 rounded-2xl p-4">
+          <h3 class="font-display font-bold text-navy mb-3">Demandes reçues</h3>
+          @if (incomingRequests().length === 0) {
+            <p class="text-xs text-navy/40">Aucune demande reçue.</p>
+          } @else {
+            <div class="space-y-3">
+              @for (request of incomingRequests(); track request.id) {
+                <div class="border border-cream/50 rounded-xl p-3">
+                  <p class="text-xs text-navy/65 font-semibold">{{ request.requesterName }} · {{ request.dayOfWeek }} {{ request.startTime.slice(0,5) }}-{{ request.endTime.slice(0,5) }}</p>
+                  @if (request.message) {
+                    <p class="text-xs text-navy/45 mt-1">{{ request.message }}</p>
+                  }
+                  <p class="text-[11px] text-navy/35 mt-1">Statut: {{ request.status }}</p>
+                  @if (request.status === 'pending') {
+                    <div class="flex gap-2 mt-2">
+                      <button class="btn-brick px-3 py-1.5 text-xs" (click)="acceptRequest(request.id)" [disabled]="actionLoading() === request.id">Accepter</button>
+                      <button class="btn-ghost-navy px-3 py-1.5 text-xs" (click)="rejectRequest(request.id)" [disabled]="actionLoading() === request.id">Refuser</button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="bg-white border border-cream/60 rounded-2xl p-4">
+          <h3 class="font-display font-bold text-navy mb-3">Demandes envoyées</h3>
+          @if (outgoingRequests().length === 0) {
+            <p class="text-xs text-navy/40">Aucune demande envoyée.</p>
+          } @else {
+            <div class="space-y-3">
+              @for (request of outgoingRequests(); track request.id) {
+                <div class="border border-cream/50 rounded-xl p-3">
+                  <p class="text-xs text-navy/65 font-semibold">{{ request.targetName }} · {{ request.dayOfWeek }} {{ request.startTime.slice(0,5) }}-{{ request.endTime.slice(0,5) }}</p>
+                  @if (request.message) {
+                    <p class="text-xs text-navy/45 mt-1">{{ request.message }}</p>
+                  }
+                  <p class="text-[11px] text-navy/35 mt-1">Statut: {{ request.status }}</p>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
     }
   </div>
 }
@@ -152,8 +198,8 @@
         </div>
       </div>
       <p class="text-sm text-navy/55 mb-4 leading-relaxed">
-        Votre demande sera envoyée par email au directeur, qui décidera de l'approuver ou non.
-        Ajoutez un message pour expliquer votre situation.
+        Votre demande sera envoyée directement au professeur concerné.
+        Ajoutez un message pour expliquer votre situation. Après validation du directeur, le créneau n'est plus négociable.
       </p>
       <label class="tt-label">Message (optionnel)</label>
       <textarea

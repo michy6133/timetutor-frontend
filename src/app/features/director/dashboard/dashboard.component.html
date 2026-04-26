@@ -36,6 +36,24 @@
     </div>
   }
 
+  @for (alert of subscription()?.usageAlerts ?? []; track alert) {
+    <div class="mb-4 rounded-xl border border-amber-400/45 bg-amber-50/95 text-amber-950 px-4 py-3 text-sm flex items-start gap-2">
+      <app-svg-icon name="exclamation-triangle" [size]="18" iconClass="text-amber-700 shrink-0 mt-0.5" />
+      <div class="flex-1">{{ alert }}</div>
+      <a routerLink="/director/billing" class="text-amber-900 font-semibold text-xs whitespace-nowrap underline">Abonnement</a>
+    </div>
+  }
+  @if (subscription()?.usage; as u) {
+    @if (u.sessionsLimit != null) {
+      <p class="text-xs text-navy/40 mb-4 -mt-1">
+        Utilisation : <strong class="text-navy/70">{{ u.sessionsCount }} / {{ u.sessionsLimit }}</strong> sessions
+        @if (u.teachersPerSessionLimit != null) {
+          · charge max. enseignants sur une session : <strong class="text-navy/70">{{ u.maxTeachersInSession }} / {{ u.teachersPerSessionLimit }}</strong>
+        }
+      </p>
+    }
+  }
+
   <!-- KPIs -->
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
     <div class="bg-gradient-to-br from-brick/8 to-cream/20 border border-brick/15 rounded-2xl p-6 slide-up">

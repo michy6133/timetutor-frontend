@@ -26,4 +26,9 @@ export class ApiService {
   patch<T>(path: string, body: unknown): Observable<T> {
     return this.http.patch<T>(`${this.base}${path}`, body, { withCredentials: true });
   }
+
+  /** Export JSON RGPD (réponse brute fichier). */
+  getBlob(path: string): Observable<Blob> {
+    return this.http.get(`${this.base}${path}`, { withCredentials: true, responseType: 'blob' });
+  }
 }

@@ -12,6 +12,7 @@ const PUBLIC_ROUTES = [
   '/auth/register-teacher',
   '/auth/refresh',
   '/auth/logout',
+  '/auth/policy-metadata',
 ];
 
 function isPublicRoute(url: string): boolean {

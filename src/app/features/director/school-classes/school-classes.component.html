@@ -1,0 +1,58 @@
+<div class="max-w-3xl mx-auto px-6 py-10">
+  <div class="flex items-center gap-3 mb-8">
+    <a routerLink="/director/dashboard" class="text-navy/38 hover:text-navy text-sm">Tableau de bord</a>
+    <span class="text-navy/20">/</span>
+    <span class="text-sm text-navy/60 font-medium">Classes</span>
+  </div>
+
+  <h1 class="font-display text-2xl font-extrabold text-navy mb-2">Classes de l'établissement</h1>
+  <p class="text-navy/45 text-sm mb-8">
+    Liste type secondaire (Bénin) préremplie. Désactivez les classes absentes de votre école et ajoutez les vôtres si besoin.
+  </p>
+
+  @if (loading()) {
+    <div class="text-navy/40 text-sm">Chargement…</div>
+  } @else {
+    <div class="bg-white border border-cream/50 rounded-2xl p-6 shadow-sm mb-8">
+      <h2 class="font-display font-bold text-navy mb-4">Ajouter une classe</h2>
+      <form [formGroup]="form" (ngSubmit)="addClass()" class="flex flex-wrap gap-3 items-end">
+        <div class="flex-1 min-w-[12rem]">
+          <label class="tt-label">Nom</label>
+          <input formControlName="name" class="tt-input" placeholder="Ex. Terminale H" />
+        </div>
+        <button type="submit" class="btn-brick px-5 py-2.5 text-sm" [disabled]="form.invalid || saving()">Ajouter</button>
+      </form>
+    </div>
+
+    <div class="bg-white border border-cream/50 rounded-2xl overflow-hidden shadow-sm">
+      <table class="w-full text-sm">
+        <thead class="bg-cream/30 text-navy/55 text-left">
+          <tr>
+            <th class="px-4 py-3 font-semibold">Classe</th>
+            <th class="px-4 py-3 font-semibold">Référentiel</th>
+            <th class="px-4 py-3 font-semibold">Visible</th>
+            <th class="px-4 py-3"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of classes(); track c.id) {
+            <tr class="border-t border-cream/40" [class.opacity-45]="!c.is_active">
+              <td class="px-4 py-3 font-medium text-navy">{{ c.name }}</td>
+              <td class="px-4 py-3 text-navy/45">{{ c.is_system_template ? 'Oui' : 'Personnalisée' }}</td>
+              <td class="px-4 py-3">
+                <button type="button" class="text-brick text-xs font-semibold underline" (click)="toggleActive(c)" [disabled]="saving()">
+                  {{ c.is_active ? 'Désactiver' : 'Réactiver' }}
+                </button>
+              </td>
+              <td class="px-4 py-3 text-right">
+                @if (!c.is_system_template) {
+                  <button type="button" class="text-navy/40 hover:text-brick text-xs" (click)="remove(c)" [disabled]="saving()">Supprimer</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

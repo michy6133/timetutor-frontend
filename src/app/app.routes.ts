@@ -17,6 +17,9 @@ import { AdminDashboardComponent } from './features/admin/admin-dashboard/admin-
 import { DirectorLayoutComponent } from './features/director/director-layout/director-layout.component';
 import { HelpComponent } from './features/help/help.component';
 import { RosterComponent } from './features/director/roster/roster.component';
+import { SubjectsComponent } from './features/director/subjects/subjects.component';
+import { SchoolClassesComponent } from './features/director/school-classes/school-classes.component';
+import { PolicyComponent } from './features/policy/policy.component';
 import { authGuard } from './core/guards/auth.guard';
 import { teacherGuard } from './core/guards/teacher.guard';
 
@@ -28,6 +31,7 @@ export const routes: Routes = [
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'help', component: HelpComponent },
+  { path: 'policy', component: PolicyComponent },
   {
     path: 'director',
     component: DirectorLayoutComponent,
@@ -41,6 +45,8 @@ export const routes: Routes = [
       { path: 'sessions/new', component: SessionCreateComponent },
       { path: 'sessions/:id', component: SessionDetailComponent },
       { path: 'roster', component: RosterComponent },
+      { path: 'subjects', component: SubjectsComponent },
+      { path: 'classes', component: SchoolClassesComponent },
     ],
   },
   { path: 'teacher/:token', component: SlotPickerComponent },

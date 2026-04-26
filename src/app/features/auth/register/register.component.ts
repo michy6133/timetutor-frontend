@@ -24,6 +24,7 @@ export class RegisterComponent {
     fullName: ['', [Validators.required, Validators.minLength(2)]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]],
+    gdprAccepted: [false, Validators.requiredTrue],
   });
 
   autoSlug(): void {
@@ -43,6 +44,7 @@ export class RegisterComponent {
       fullName: v.fullName!,
       email: v.email!,
       password: v.password!,
+      gdprAccepted: true,
     }).subscribe({
       next: () => {
         const returnUrl = this.route.snapshot.queryParams['returnUrl'];

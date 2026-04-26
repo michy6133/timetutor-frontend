@@ -4,7 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../../../core/services/api.service';
 import { SocketService } from '../../../../core/services/socket.service';
 import { ToastService } from '../../../../core/services/toast.service';
-import type { Session, TimeSlot, Teacher } from '../../../../core/models';
+import type { Session, TimeSlot, Teacher, Subject } from '../../../../core/models';
 import { DatePipe, CommonModule } from '@angular/common';
 
 @Component({
@@ -23,6 +23,9 @@ export class SessionDetailComponent implements OnInit {
   readonly session = signal<Session | null>(null);
   readonly slots = signal<TimeSlot[]>([]);
   readonly teachers = signal<Teacher[]>([]);
+  readonly subjects = signal<Subject[]>([]);
+  readonly teacherSubjectSuggestions = signal<Subject[]>([]);
+  readonly editSubjectSuggestions = signal<Subject[]>([]);
   readonly activeTab = signal<'slots' | 'teachers'>('slots');
   readonly loading = signal(true);
 
@@ -40,10 +43,20 @@ export class SessionDetailComponent implements OnInit {
   readonly confirmRemoveTeacherId = signal<string | null>(null);
   readonly editingTeacherError = signal('');
 
+  readonly otherSessionsForDuplicate = signal<{ id: string; name: string }[]>([]);
+  readonly showDuplicateModal = signal(false);
+  readonly duplicateSourceId = signal('');
+  readonly duplicating = signal(false);
+  readonly schoolClasses = signal<{ id: string; name: string }[]>([]);
+  readonly selectedClassId = signal('');
+  readonly savingClass = signal(false);
+
   readonly teacherForm = this.fb.group({
     fullName: ['', [Validators.required, Validators.minLength(2)]],
     email: ['', [Validators.required, Validators.email]],
     phone: [''],
+    subjectQuery: ['', Validators.required],
+    subjectId: ['', Validators.required],
   });
 
   readonly slotForm = this.fb.group({
@@ -62,6 +75,8 @@ export class SessionDetailComponent implements OnInit {
     fullName: ['', [Validators.required, Validators.minLength(2)]],
     email: ['', [Validators.required, Validators.email]],
     phone: [''],
+    subjectQuery: ['', Validators.required],
+    subjectId: ['', Validators.required],
   });
 
   private sessionId = '';
@@ -69,6 +84,9 @@ export class SessionDetailComponent implements OnInit {
   ngOnInit(): void {
     this.sessionId = this.route.snapshot.params['id'];
     this.loadAll();
+    this.api.get<Array<{ id: string; name: string }>>('/sessions').subscribe((rows) => {
+      this.otherSessionsForDuplicate.set(rows.filter((r) => r.id !== this.sessionId));
+    });
     this.socket.connect();
     this.socket.joinSession(this.sessionId);
     this.socket.onSlotSelected().subscribe(({ slotId }) => this.updateSlotStatus(slotId, 'taken'));
@@ -77,9 +95,26 @@ export class SessionDetailComponent implements OnInit {
   }
 
   loadAll(): void {
-    this.api.get<Session>(`/sessions/${this.sessionId}`).subscribe(s => this.session.set(s));
-    this.api.get<TimeSlot[]>(`/sessions/${this.sessionId}/slots`).subscribe(s => this.slots.set(s));
-    this.api.get<Teacher[]>(`/sessions/${this.sessionId}/teachers`).subscribe(t => {
+    this.api.get<Session>(`/sessions/${this.sessionId}`).subscribe((s) => {
+      this.session.set(s);
+      const raw = s as Session & { school_class_id?: string | null };
+      this.selectedClassId.set(raw.school_class_id ?? '');
+      this.api
+        .get<Array<{ id: string; name: string; is_active: boolean }>>('/school-classes?includeInactive=1')
+        .subscribe((rows) => {
+          const sid = raw.school_class_id;
+          const list = rows.filter((r) => r.is_active || r.id === sid);
+          this.schoolClasses.set(
+            list.map((r) => ({
+              id: r.id,
+              name: r.name + (!r.is_active && r.id === sid ? ' (masquée)' : ''),
+            }))
+          );
+        });
+    });
+    this.api.get<TimeSlot[]>(`/sessions/${this.sessionId}/slots`).subscribe((s) => this.slots.set(s));
+    this.api.get<Subject[]>('/subjects').subscribe((subjects) => this.subjects.set(subjects));
+    this.api.get<Teacher[]>(`/sessions/${this.sessionId}/teachers`).subscribe((t) => {
       this.teachers.set(t);
       this.loading.set(false);
     });
@@ -90,6 +125,10 @@ export class SessionDetailComponent implements OnInit {
   }
 
   addTeacher(): void {
+    if (!this.teacherForm.value.subjectId) {
+      this.addTeacherError.set('La matière est obligatoire.');
+      return;
+    }
     if (this.teacherForm.invalid || this.addingTeacher()) return;
     this.addingTeacher.set(true);
     this.addTeacherError.set('');
@@ -98,9 +137,11 @@ export class SessionDetailComponent implements OnInit {
       fullName: v.fullName,
       email: v.email,
       phone: v.phone || undefined,
+      subjectIds: [v.subjectId],
     }).subscribe({
       next: () => {
-        this.teacherForm.reset({ fullName: '', email: '', phone: '' });
+        this.teacherForm.reset({ fullName: '', email: '', phone: '', subjectQuery: '', subjectId: '' });
+        this.teacherSubjectSuggestions.set([]);
         this.showAddTeacher.set(false);
         this.addingTeacher.set(false);
         this.loadAll();
@@ -241,7 +282,10 @@ export class SessionDetailComponent implements OnInit {
       fullName: teacher.fullName,
       email: teacher.email,
       phone: teacher.phone ?? '',
+      subjectQuery: teacher.subjects?.[0]?.name ?? '',
+      subjectId: teacher.subjects?.[0]?.id ?? '',
     });
+    this.editSubjectSuggestions.set([]);
     this.showEditTeacher.set(true);
   }
 
@@ -249,6 +293,7 @@ export class SessionDetailComponent implements OnInit {
     this.showEditTeacher.set(false);
     this.editingTeacherId.set(null);
     this.editingTeacherError.set('');
+    this.editSubjectSuggestions.set([]);
   }
 
   saveTeacher(): void {
@@ -257,10 +302,16 @@ export class SessionDetailComponent implements OnInit {
     this.startTeacherAction(teacherId, 'updating');
     this.editingTeacherError.set('');
     const value = this.editTeacherForm.value;
+    if (!value.subjectId) {
+      this.editingTeacherError.set('La matière est obligatoire.');
+      this.stopTeacherAction(teacherId);
+      return;
+    }
     this.api.put(`/sessions/${this.sessionId}/teachers/${teacherId}`, {
       fullName: value.fullName,
       email: value.email,
       phone: value.phone || null,
+      subjectIds: [value.subjectId],
     }).subscribe({
       next: () => {
         this.stopTeacherAction(teacherId);
@@ -280,6 +331,58 @@ export class SessionDetailComponent implements OnInit {
     });
   }
 
+  openDuplicateModal(): void {
+    this.duplicateSourceId.set('');
+    this.showDuplicateModal.set(true);
+  }
+
+  closeDuplicateModal(): void {
+    this.showDuplicateModal.set(false);
+  }
+
+  runDuplicateGrid(): void {
+    const src = this.duplicateSourceId();
+    if (!src || this.duplicating()) return;
+    this.duplicating.set(true);
+    this.api
+      .post<{ duplicated: number }>(`/sessions/${this.sessionId}/slots/duplicate-from`, { sourceSessionId: src })
+      .subscribe({
+        next: (r) => {
+          this.duplicating.set(false);
+          this.showDuplicateModal.set(false);
+          this.toast.success(`${r.duplicated} créneau(x) copié(s).`);
+          this.loadAll();
+        },
+        error: (e) => {
+          this.duplicating.set(false);
+          this.toast.error(e.error?.error ?? 'Erreur');
+        },
+      });
+  }
+
+  saveSessionClass(): void {
+    if (this.savingClass()) return;
+    const uuid = this.selectedClassId();
+    this.savingClass.set(true);
+    this.api.put(`/sessions/${this.sessionId}`, { schoolClassId: uuid || null }).subscribe({
+      next: () => {
+        this.savingClass.set(false);
+        this.toast.success('Classe enregistrée.');
+        this.loadAll();
+      },
+      error: (e) => {
+        this.savingClass.set(false);
+        this.toast.error(e.error?.error ?? 'Erreur');
+      },
+    });
+  }
+
+  sessionYear(s: Session | null): string {
+    if (!s) return '';
+    const x = s as Session & { academic_year?: string };
+    return s.academicYear ?? x.academic_year ?? '';
+  }
+
   async exportPdf(): Promise<void> {
     const url = `http://localhost:3001/api/v1/sessions/${this.sessionId}/export/pdf?includeTeacherName=true&includeContact=true&includeEmail=true&includeSubject=true&includeRoom=true`;
     const token = localStorage.getItem('tt_token');
@@ -294,7 +397,8 @@ export class SessionDetailComponent implements OnInit {
       const fileUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = fileUrl;
-      a.download = `session-${this.sessionId}.pdf`;
+      const sessionName = (this.session()?.name ?? 'session').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      a.download = `emploi-du-temps-${sessionName}.pdf`;
       a.click();
       URL.revokeObjectURL(fileUrl);
     } catch {
@@ -306,7 +410,7 @@ export class SessionDetailComponent implements OnInit {
     const session = this.session();
     if (!session) return;
     const text = encodeURIComponent(
-      `TimeTutor - Session ${session.name} (${session.academicYear})\n` +
+      `TimeTutor - Session ${session.name} (${this.sessionYear(session)})\n` +
       `Suivi: ${window.location.href}`
     );
     window.open(`https://wa.me/?text=${text}`, '_blank');
@@ -387,5 +491,31 @@ export class SessionDetailComponent implements OnInit {
     const action = this.teacherAction(teacher.id);
     if (action === 'reminding') return 'Relance...';
     return teacher.status === 'pending' ? 'Relancer' : 'En attente retour';
+  }
+
+  onTeacherSubjectInput(query: string): void {
+    this.teacherForm.patchValue({ subjectQuery: query, subjectId: '' }, { emitEvent: false });
+    this.teacherSubjectSuggestions.set(this.filterSubjectSuggestions(query));
+  }
+
+  selectTeacherSubject(subject: Subject): void {
+    this.teacherForm.patchValue({ subjectQuery: subject.name, subjectId: subject.id }, { emitEvent: false });
+    this.teacherSubjectSuggestions.set([]);
+  }
+
+  onEditSubjectInput(query: string): void {
+    this.editTeacherForm.patchValue({ subjectQuery: query, subjectId: '' }, { emitEvent: false });
+    this.editSubjectSuggestions.set(this.filterSubjectSuggestions(query));
+  }
+
+  selectEditSubject(subject: Subject): void {
+    this.editTeacherForm.patchValue({ subjectQuery: subject.name, subjectId: subject.id }, { emitEvent: false });
+    this.editSubjectSuggestions.set([]);
+  }
+
+  private filterSubjectSuggestions(query: string): Subject[] {
+    const q = query.trim().toLowerCase();
+    if (!q) return this.subjects().slice(0, 8);
+    return this.subjects().filter((subject) => subject.name.toLowerCase().includes(q)).slice(0, 8);
   }
 }

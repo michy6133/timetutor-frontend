@@ -18,6 +18,7 @@ export interface TeacherSession {
   sessionStatus: string;
   deadline: string | null;
   schoolName: string;
+  schoolClassName?: string | null;
   magicToken: string | null;
 }
 
@@ -35,9 +36,13 @@ export interface Session {
   id: string;
   name: string;
   academicYear: string;
+  /** Alias API snake_case */
+  academic_year?: string;
   status: SessionStatus;
   deadline: string | null;
   schoolId: string;
+  school_class_id?: string | null;
+  school_class_name?: string | null;
   totalSlots?: number;
   takenSlots?: number;
   validatedSlots?: number;
@@ -81,6 +86,8 @@ export interface Teacher {
   fullName: string;
   email: string;
   phone?: string;
+  subjectIds?: string[];
+  subjects?: Subject[];
   status: 'pending' | 'active' | 'done';
   invitationSentAt?: string;
   lastSeenAt?: string;

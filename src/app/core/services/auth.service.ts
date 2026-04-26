@@ -60,7 +60,14 @@ export class AuthService {
     );
   }
 
-  register(data: { schoolName: string; schoolSlug: string; fullName: string; email: string; password: string }) {
+  register(data: {
+    schoolName: string;
+    schoolSlug: string;
+    fullName: string;
+    email: string;
+    password: string;
+    gdprAccepted: boolean;
+  }) {
     return this.api.post<AuthResponse>('/auth/register', data).pipe(
       tap((res) => {
         if (this.isBrowser) {
@@ -72,7 +79,7 @@ export class AuthService {
     );
   }
 
-  registerTeacher(data: { fullName: string; email: string; password: string }) {
+  registerTeacher(data: { fullName: string; email: string; password: string; gdprAccepted: boolean }) {
     return this.api.post<AuthResponse>('/auth/register-teacher', data).pipe(
       tap((res) => {
         if (this.isBrowser) {

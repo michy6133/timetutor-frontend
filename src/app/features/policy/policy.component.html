@@ -1,0 +1,48 @@
+<div class="min-h-screen bg-cream/40">
+  <div class="max-w-4xl mx-auto px-6 py-10">
+    <a routerLink="/" class="text-sm text-navy/50 hover:text-navy">← Retour</a>
+    <h1 class="font-display text-3xl font-extrabold text-navy mt-4">Politique du site</h1>
+    <p class="text-navy/55 mt-2">
+      Dernière mise à jour : {{ policyVersion() || 'Avril 2026' }}
+      @if (policyVersion()) {
+        <span class="text-navy/35 font-mono text-xs"> (version {{ policyVersion() }})</span>
+      }
+    </p>
+
+    <div class="mt-6 bg-white border border-cream/60 rounded-2xl p-6 shadow-sm text-sm text-navy/70 leading-relaxed">
+      <h2 class="font-display text-lg font-bold text-navy mb-2">Données personnelles (RGPD / APDP Bénin)</h2>
+      <p class="mb-3">Vous pouvez demander l’accès ou la portabilité de vos données. Connecté(e), vous pouvez télécharger une copie JSON de vos informations (compte, sessions, créneaux, répertoire pour les directeurs).</p>
+      @if (auth.isAuthenticated()) {
+        <button type="button" (click)="downloadDataExport()"
+          class="inline-flex items-center gap-2 text-sm font-semibold text-brick border border-brick/30 hover:bg-brick/8 px-4 py-2 rounded-xl transition-colors">
+          Télécharger mes données (export JSON)
+        </button>
+      } @else {
+        <p class="text-xs text-navy/40">Connectez-vous pour lancer un export depuis votre compte.</p>
+      }
+    </div>
+
+    <div class="mt-6 space-y-6 bg-white border border-cream/60 rounded-2xl p-6 shadow-sm text-sm text-navy/70 leading-relaxed">
+      <section>
+        <h2 class="font-display text-lg font-bold text-navy mb-2">1. Données collectées</h2>
+        <p>TimeTutor collecte uniquement les informations nécessaires au fonctionnement du service: nom, email, téléphone professionnel, sessions et créneaux sélectionnés.</p>
+      </section>
+      <section>
+        <h2 class="font-display text-lg font-bold text-navy mb-2">2. Utilisation des données</h2>
+        <p>Les données sont utilisées pour organiser les emplois du temps, envoyer les invitations et notifier les acteurs concernés. Elles ne sont jamais revendues.</p>
+      </section>
+      <section>
+        <h2 class="font-display text-lg font-bold text-navy mb-2">3. Conservation et sécurité</h2>
+        <p>Les données sont stockées avec des mesures de sécurité adaptées. Les accès sont limités aux utilisateurs autorisés de l'établissement et aux administrateurs techniques.</p>
+      </section>
+      <section>
+        <h2 class="font-display text-lg font-bold text-navy mb-2">4. Droits des utilisateurs</h2>
+        <p>Chaque établissement peut demander la rectification ou suppression des données de ses enseignants selon la réglementation locale applicable.</p>
+      </section>
+      <section>
+        <h2 class="font-display text-lg font-bold text-navy mb-2">5. Contact</h2>
+        <p>Pour toute question relative à la confidentialité ou aux conditions d'utilisation, contactez l'équipe TimeTutor via le support indiqué sur le site.</p>
+      </section>
+    </div>
+  </div>
+</div>

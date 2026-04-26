@@ -48,6 +48,16 @@
           <label class="tt-label">Date limite de réponse</label>
           <input formControlName="deadline" type="datetime-local" class="tt-input" />
         </div>
+        <div>
+          <label class="tt-label">Classe (optionnel)</label>
+          <select formControlName="schoolClassId" class="tt-input">
+            <option value="">— Non rattachée —</option>
+            @for (c of schoolClasses(); track c.id) {
+              <option [value]="c.id">{{ c.name }}</option>
+            }
+          </select>
+          <p class="text-xs text-navy/35 mt-1">Aide à filtrer et à retrouver la session plus tard.</p>
+        </div>
         <div class="flex justify-end pt-2">
           <button type="button" (click)="nextStep()" [disabled]="form.get('name')?.invalid"
             class="btn-brick px-6 py-2.5 text-sm disabled:opacity-40">

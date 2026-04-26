@@ -334,3 +334,16 @@ a, button { transition: color .15s, background .15s, border-color .15s, box-shad
   border-color: rgba(147,68,26,.2);
   border-top-color: var(--mahogany);
 }
+
+@media (max-width: 768px) {
+  .toast-container {
+    right: .75rem;
+    left: .75rem;
+    bottom: 1rem;
+  }
+
+  .toast {
+    min-width: 0;
+    max-width: 100%;
+  }
+}

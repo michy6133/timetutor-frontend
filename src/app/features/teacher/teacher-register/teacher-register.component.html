@@ -50,6 +50,13 @@
           <label class="tt-label">Mot de passe <span class="normal-case font-normal text-navy/35">(8 car. min.)</span></label>
           <input formControlName="password" type="password" placeholder="••••••••" class="tt-input" />
         </div>
+        <label class="flex items-start gap-3 cursor-pointer text-sm text-navy/60">
+          <input type="checkbox" formControlName="gdprAccepted" class="mt-1 rounded border-cream text-brick focus:ring-brick/30" />
+          <span>
+            J'accepte la <a routerLink="/policy" class="text-brick font-semibold hover:underline">politique de confidentialité</a>
+            (RGPD / APDP).
+          </span>
+        </label>
         <button type="submit" [disabled]="form.invalid || loading()"
           class="btn-brick w-full py-3.5 text-sm">
           @if (loading()) {

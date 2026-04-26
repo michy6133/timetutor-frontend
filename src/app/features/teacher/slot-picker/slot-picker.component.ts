@@ -9,6 +9,32 @@ import { SvgIconComponent } from '../../../shared/svg-icon.component';
 interface TeacherInfo { fullName: string; email: string; }
 interface SessionInfo { name: string; academicYear: string; status: string; }
 interface VerifyResponse { valid: boolean; sessionId: string; teacherId: string; teacher: TeacherInfo; session: SessionInfo; }
+interface ContactIncomingRequest {
+  id: string;
+  status: 'pending' | 'accepted' | 'rejected' | 'cancelled';
+  message: string | null;
+  createdAt: string;
+  slotId: string;
+  requesterName: string;
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
+}
+interface ContactOutgoingRequest {
+  id: string;
+  status: 'pending' | 'accepted' | 'rejected' | 'cancelled';
+  message: string | null;
+  createdAt: string;
+  slotId: string;
+  targetName: string;
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
+}
+interface ContactRequestsResponse {
+  incoming: ContactIncomingRequest[];
+  outgoing: ContactOutgoingRequest[];
+}
 
 @Component({
   selector: 'app-slot-picker',
@@ -32,6 +58,8 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
   readonly contactModalOpen = signal(false);
   readonly contactTargetSlot = signal<TimeSlot | null>(null);
   readonly contactMessage = signal('');
+  readonly incomingRequests = signal<ContactIncomingRequest[]>([]);
+  readonly outgoingRequests = signal<ContactOutgoingRequest[]>([]);
 
   private token = '';
   private sessionId = '';
@@ -44,6 +72,7 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
         this.session.set(res.session);
         this.sessionId = res.sessionId;
         this.loadSlots();
+        this.loadContactRequests();
         this.socket.connect();
         this.socket.joinSession(this.sessionId);
         this.socket.onSlotSelected().subscribe(({ slotId }) => this.updateStatus(slotId, 'taken'));
@@ -76,6 +105,16 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
     });
   }
 
+  loadContactRequests(): void {
+    this.api.get<ContactRequestsResponse>(`/sessions/${this.sessionId}/slots/contact-requests/${this.token}`).subscribe({
+      next: (payload) => {
+        this.incomingRequests.set(payload.incoming);
+        this.outgoingRequests.set(payload.outgoing);
+      },
+      error: () => undefined,
+    });
+  }
+
   private updateStatus(slotId: string, status: 'free' | 'taken' | 'validated'): void {
     this.slots.update(slots => slots.map(s => s.id === slotId ? { ...s, status } : s));
   }
@@ -89,11 +128,17 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
 
     if (!isSelected && slot.status === 'free') {
       // Select
-      this.api.post(`/sessions/${slot.sessionId}/slots/${slot.id}/select/${this.token}`, {}).subscribe({
-        next: () => {
+      this.api.post<{ message?: string; warnings?: string[] }>(`/sessions/${slot.sessionId}/slots/${slot.id}/select/${this.token}`, {}).subscribe({
+        next: (res) => {
           this.selectedSlotIds.update(s => { const ns = new Set(s); ns.add(slot.id); return ns; });
           this.updateStatus(slot.id, 'taken');
           this.actionLoading.set('');
+          for (const w of res.warnings ?? []) {
+            this.toast.warning(w);
+          }
+          if (!res.warnings?.length) {
+            this.toast.success(res.message ?? 'Créneau sélectionné');
+          }
         },
         error: (e) => { this.toast.error(e.error?.error ?? 'Erreur'); this.actionLoading.set(''); },
       });
@@ -134,11 +179,43 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
       next: () => {
         this.actionLoading.set('');
         this.closeContactModal();
-        this.toast.success('Votre demande a été envoyée par email.');
+        this.toast.success('Votre demande a été envoyée au professeur concerné.');
+        this.loadContactRequests();
       },
       error: (e) => {
         this.actionLoading.set('');
         this.toast.error(e.error?.error ?? 'Erreur lors de l\'envoi.');
+      },
+    });
+  }
+
+  acceptRequest(requestId: string): void {
+    this.actionLoading.set(requestId);
+    this.api.post(`/sessions/${this.sessionId}/slots/contact-requests/${requestId}/accept/${this.token}`, {}).subscribe({
+      next: () => {
+        this.actionLoading.set('');
+        this.toast.success('Demande acceptée. Créneau transféré.');
+        this.loadSlots();
+        this.loadContactRequests();
+      },
+      error: (e) => {
+        this.actionLoading.set('');
+        this.toast.error(e.error?.error ?? 'Impossible d\'accepter la demande.');
+      },
+    });
+  }
+
+  rejectRequest(requestId: string): void {
+    this.actionLoading.set(requestId);
+    this.api.post(`/sessions/${this.sessionId}/slots/contact-requests/${requestId}/reject/${this.token}`, {}).subscribe({
+      next: () => {
+        this.actionLoading.set('');
+        this.toast.success('Demande refusée.');
+        this.loadContactRequests();
+      },
+      error: (e) => {
+        this.actionLoading.set('');
+        this.toast.error(e.error?.error ?? 'Impossible de refuser la demande.');
       },
     });
   }
