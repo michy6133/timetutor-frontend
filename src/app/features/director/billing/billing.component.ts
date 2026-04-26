@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../core/services/api.service';
 import { SvgIconComponent } from '../../../shared/svg-icon.component';
 
@@ -16,7 +17,7 @@ export interface PaymentTxRow {
 @Component({
   selector: 'app-billing',
   standalone: true,
-  imports: [CommonModule, SvgIconComponent],
+  imports: [CommonModule, RouterLink, SvgIconComponent],
   templateUrl: './billing.component.html',
 })
 export class BillingComponent {

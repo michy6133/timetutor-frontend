@@ -56,6 +56,14 @@ export class AuthService {
           localStorage.setItem('tt_user', JSON.stringify(res.user));
         }
         this._user.set(res.user);
+        const role = res.user.role;
+        if (role === 'teacher') {
+          this.router.navigate(['/teacher/portal']);
+        } else if (role === 'super_admin') {
+          this.router.navigate(['/admin']);
+        } else {
+          this.router.navigate(['/director/sessions']);
+        }
       })
     );
   }

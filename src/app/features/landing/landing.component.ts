@@ -11,18 +11,14 @@ import { AuthService } from '../../core/services/auth.service';
   styles: [`
     @keyframes float {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-18px); }
-    }
-    @keyframes float2 {
-      0%, 100% { transform: translateY(0px) scale(1); }
-      50% { transform: translateY(-25px) scale(1.03); }
+      50% { transform: translateY(-14px); }
     }
     @keyframes pulse-glow {
-      0%, 100% { opacity: 0.4; transform: scale(1); }
-      50% { opacity: 0.7; transform: scale(1.1); }
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 0.9; transform: scale(1.08); }
     }
     @keyframes slide-up {
-      from { opacity: 0; transform: translateY(32px); }
+      from { opacity: 0; transform: translateY(28px); }
       to   { opacity: 1; transform: translateY(0); }
     }
     @keyframes marquee {
@@ -33,36 +29,32 @@ import { AuthService } from '../../core/services/auth.service';
       0%, 100% { background-position: 0% 50%; }
       50%       { background-position: 100% 50%; }
     }
-    .orb1 { animation: pulse-glow 7s ease-in-out infinite; }
-    .orb2 { animation: pulse-glow 9s ease-in-out infinite 2s; }
-    .orb3 { animation: float2 10s ease-in-out infinite 1s; }
-    .float-card { animation: float 6s ease-in-out infinite; }
-    .float-card2 { animation: float2 8s ease-in-out infinite 1.5s; }
+    .hero-orb1 { animation: pulse-glow 8s ease-in-out infinite; }
+    .hero-orb2 { animation: pulse-glow 11s ease-in-out infinite 3s; }
+    .cta-orb   { animation: pulse-glow 9s ease-in-out infinite; }
+    .cta-orb2  { animation: pulse-glow 12s ease-in-out infinite 4s; }
+    .product-glow { animation: pulse-glow 6s ease-in-out infinite 1s; }
     .slide-up { animation: slide-up 0.7s ease both; }
-    .marquee { animation: marquee 28s linear infinite; }
-    .gradient-text {
-      background: linear-gradient(135deg, #60a5fa, #818cf8, #a78bfa);
+    .marquee { animation: marquee 30s linear infinite; display: flex; white-space: nowrap; }
+    .hero-gradient-text {
+      background: linear-gradient(135deg, #708D81 0%, #001427 45%, #F4D58D 100%);
       background-size: 200% 200%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      animation: gradient-x 4s ease infinite;
+      animation: gradient-x 5s ease infinite;
     }
     .hero-bg {
-      background: radial-gradient(ellipse at 70% 50%, rgba(203, 238, 243, 0.35) 0%, transparent 60%),
-                  radial-gradient(ellipse at 20% 80%, rgba(244, 156, 187, 0.2) 0%, transparent 50%),
-                  #ffffff;
+      background: #111827;
     }
-    .card-hover {
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    .cta-bg {
+      background: #111827;
     }
-    .card-hover:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.12);
-    }
-    .pricing-popular {
-      background: linear-gradient(145deg, rgba(221,45,74,.07) 0%, #ffffff 100%);
-      border: 2px solid rgba(221,45,74,.3);
+    .hero-grid {
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
     }
   `],
 })
@@ -70,8 +62,22 @@ export class LandingComponent {
   readonly auth = inject(AuthService);
   annual = signal(false);
 
+  readonly mockRows = [
+    { label: '08h', cells: ['free','taken','ok','free','taken','free'] },
+    { label: '10h', cells: ['ok','free','taken','ok','free','ok'] },
+    { label: '12h', cells: ['taken','ok','free','warn','ok','free'] },
+    { label: '14h', cells: ['free','ok','ok','taken','free','taken'] },
+    { label: '16h', cells: ['ok','taken','free','ok','taken','free'] },
+  ];
+
+  readonly mockTeachers = [
+    { name: 'Kofi Akesson', initials: 'KA', slots: 4, status: 'ok' },
+    { name: 'Marie Gbédo', initials: 'MG', slots: 2, status: 'pending' },
+    { name: 'Justin Houndjè', initials: 'JH', slots: 5, status: 'ok' },
+  ];
+
   dashboardLink(): string {
-    return this.auth.currentUser()?.role === 'teacher' ? '/teacher/portal' : '/director/dashboard';
+    return this.auth.currentUser()?.role === 'teacher' ? '/teacher/dashboard' : '/director/dashboard';
   }
 
   getPricingLink(plan: string): { path: string, queryParams: any } {
@@ -89,6 +95,7 @@ export class LandingComponent {
   }
 
   unit(): string { return this.annual() ? '/an' : '/mois'; }
+
   saving(monthly: number): string {
     if (!this.annual()) return '';
     const saved = monthly * 12 - monthly * 10;

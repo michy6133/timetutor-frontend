@@ -38,6 +38,14 @@
         <app-svg-icon name="credit-card" [size]="18" iconClass="shrink-0 opacity-60" />
         Abonnement
       </a>
+      <a routerLink="/profile" routerLinkActive="tt-active" class="sidebar-link">
+        <app-svg-icon name="user-circle" [size]="18" iconClass="shrink-0 opacity-60" />
+        Mon profil
+      </a>
+      <a routerLink="/director/settings" routerLinkActive="tt-active" class="sidebar-link">
+        <app-svg-icon name="cog" [size]="18" iconClass="shrink-0 opacity-60" />
+        Paramètres
+      </a>
     </nav>
 
     <div class="p-4 border-t border-cream/50 space-y-2">
@@ -96,8 +104,16 @@
           <a routerLink="/director/subjects" routerLinkActive="tt-active" class="sidebar-link" (click)="mobileMenuOpen.set(false)">Matières</a>
           <a routerLink="/director/classes" routerLinkActive="tt-active" class="sidebar-link" (click)="mobileMenuOpen.set(false)">Classes</a>
           <a routerLink="/director/billing" routerLinkActive="tt-active" class="sidebar-link" (click)="mobileMenuOpen.set(false)">Abonnement</a>
+          <a routerLink="/profile" routerLinkActive="tt-active" class="sidebar-link" (click)="mobileMenuOpen.set(false)">Mon profil</a>
+          <a routerLink="/director/settings" routerLinkActive="tt-active" class="sidebar-link" (click)="mobileMenuOpen.set(false)">Paramètres</a>
         </nav>
       </aside>
     </div>
+  }
+
+  @if (showOnboarding()) {
+    <app-onboarding-tooltip
+      [steps]="onboardingSteps"
+      (dismiss)="dismissOnboarding()" />
   }
 </div>

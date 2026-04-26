@@ -75,7 +75,7 @@
         <option [value]="c.id">{{ c.name }}</option>
       }
     </select>
-    <button type="button" (click)="saveSessionClass()" [disabled]="savingClass()"
+    <button type="button" (click)="saveSessionClass()" [disabled]="savingClass() || !selectedClassId()"
       class="text-xs font-semibold text-brick border border-brick/25 hover:bg-brick/8 px-3 py-2 rounded-lg disabled:opacity-40">
       Enregistrer
     </button>

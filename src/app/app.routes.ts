@@ -20,6 +20,10 @@ import { RosterComponent } from './features/director/roster/roster.component';
 import { SubjectsComponent } from './features/director/subjects/subjects.component';
 import { SchoolClassesComponent } from './features/director/school-classes/school-classes.component';
 import { PolicyComponent } from './features/policy/policy.component';
+import { ProfileComponent } from './features/profile/profile.component';
+import { SettingsComponent } from './features/director/settings/settings.component';
+import { PricingComponent } from './features/pricing/pricing.component';
+import { TeacherDashboardComponent } from './features/teacher/dashboard/teacher-dashboard.component';
 import { authGuard } from './core/guards/auth.guard';
 import { teacherGuard } from './core/guards/teacher.guard';
 
@@ -32,6 +36,8 @@ export const routes: Routes = [
   { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'help', component: HelpComponent },
   { path: 'policy', component: PolicyComponent },
+  { path: 'pricing', component: PricingComponent },
+  { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   {
     path: 'director',
     component: DirectorLayoutComponent,
@@ -47,6 +53,7 @@ export const routes: Routes = [
       { path: 'roster', component: RosterComponent },
       { path: 'subjects', component: SubjectsComponent },
       { path: 'classes', component: SchoolClassesComponent },
+      { path: 'settings', component: SettingsComponent },
     ],
   },
   { path: 'teacher/:token', component: SlotPickerComponent },
@@ -55,6 +62,7 @@ export const routes: Routes = [
     canActivate: [teacherGuard],
     children: [
       { path: 'portal', component: TeacherPortalComponent },
+      { path: 'dashboard', component: TeacherDashboardComponent },
     ],
   },
   {

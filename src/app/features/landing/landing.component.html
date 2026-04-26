@@ -1,22 +1,21 @@
 <!-- ═══════════ NAVBAR ═══════════ -->
-<nav class="fixed top-0 inset-x-0 z-50 bg-white/92 backdrop-blur-md border-b border-cream/60 shadow-sm">
+<nav class="fixed top-0 inset-x-0 z-50 bg-navy/95 backdrop-blur-md border-b border-white/8">
   <div class="max-w-6xl mx-auto px-6 h-[3.75rem] flex items-center justify-between">
-    <a routerLink="/" class="font-display font-extrabold text-xl tracking-tight text-navy">
-      Time<span class="text-molten">Tutor</span>
+    <a routerLink="/" class="font-display font-extrabold text-xl tracking-tight text-white">
+      Time<span class="text-brick">Tutor</span>
     </a>
-    <div class="hidden md:flex items-center gap-8 text-sm text-navy/55 font-medium">
-      <a href="#fonctionnement" class="hover:text-navy transition-colors">Fonctionnement</a>
-      <a href="#fonctionnalites" class="hover:text-navy transition-colors">Fonctionnalités</a>
-      <a href="#tarifs" class="hover:text-navy transition-colors">Tarifs</a>
-      <a routerLink="/help" class="hover:text-navy transition-colors">Aide</a>
-      <a routerLink="/policy" class="hover:text-navy transition-colors">Politique</a>
+    <div class="hidden md:flex items-center gap-7 text-sm text-white/50 font-medium">
+      <a href="#fonctionnement" class="hover:text-white transition-colors">Fonctionnement</a>
+      <a href="#fonctionnalites" class="hover:text-white transition-colors">Fonctionnalités</a>
+      <a href="#tarifs" class="hover:text-white transition-colors">Tarifs</a>
+      <a routerLink="/help" class="hover:text-white transition-colors">Aide</a>
     </div>
     <div class="flex items-center gap-3">
       @if (auth.isAuthenticated()) {
-        <a [routerLink]="dashboardLink()" class="btn-brick text-sm px-5 py-2">Mon espace →</a>
+        <a [routerLink]="dashboardLink()" class="bg-brick hover:bg-brick/90 text-white font-semibold text-sm px-5 py-2 rounded-xl transition-all hover:-translate-y-px">Mon espace →</a>
       } @else {
-        <a routerLink="/login" class="text-sm text-navy/55 hover:text-navy transition-colors px-3 py-1.5">Connexion</a>
-        <a routerLink="/register" class="btn-brick text-sm px-5 py-2.5">Démarrer gratuitement</a>
+        <a routerLink="/login" class="text-sm text-white/50 hover:text-white transition-colors px-3 py-1.5">Connexion</a>
+        <a routerLink="/register" class="bg-brick hover:bg-brick/90 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-all hover:-translate-y-px shadow-lg shadow-brick/30">Démarrer gratuitement</a>
       }
     </div>
   </div>
@@ -24,178 +23,186 @@
 
 <!-- ═══════════ HERO ═══════════ -->
 <section class="hero-bg min-h-screen pt-[3.75rem] flex flex-col justify-center relative overflow-hidden">
-  <div class="orb1 absolute top-1/4 right-1/5 w-[420px] h-[420px] rounded-full bg-molten/12 blur-3xl pointer-events-none"></div>
-  <div class="orb2 absolute bottom-1/4 left-1/6 w-[320px] h-[320px] rounded-full bg-brick/10 blur-3xl pointer-events-none"></div>
+  <div class="hero-orb1 absolute top-1/4 right-1/4 w-[600px] h-[600px] rounded-full bg-brick/20 blur-[120px] pointer-events-none"></div>
+  <div class="hero-orb2 absolute bottom-1/4 left-1/6 w-[400px] h-[400px] rounded-full bg-emerald/10 blur-[80px] pointer-events-none"></div>
+  <div class="hero-grid absolute inset-0 opacity-[0.06] pointer-events-none"></div>
 
-  <div class="max-w-6xl mx-auto px-6 py-16 relative z-10">
-    <div class="grid lg:grid-cols-2 gap-14 items-center">
+  <div class="max-w-6xl mx-auto px-6 py-20 relative z-10">
+    <div class="flex flex-col items-center text-center max-w-4xl mx-auto">
 
-      <!-- Left: copy -->
-      <div class="slide-up">
-        <div class="inline-flex items-center gap-2 bg-molten/10 border border-molten/25 text-amber-700 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-8">
-          <span class="w-1.5 h-1.5 rounded-full bg-molten animate-pulse"></span>
-          Planification scolaire intelligente
-        </div>
-        <h1 class="font-display text-5xl lg:text-6xl font-extrabold text-navy tracking-tight leading-[1.08] mb-6">
-          Fini les tableurs.<br>
-          <span class="gradient-text">Place au digital.</span>
-        </h1>
-        <p class="text-lg text-navy/55 leading-relaxed mb-10 max-w-lg font-light">
-          TimeTutor automatise la collecte des disponibilités enseignants et génère votre emploi du temps en quelques heures — sans appels, sans conflits, sans stress.
-        </p>
-        <div class="flex flex-wrap gap-4 mb-12">
-          @if (auth.isAuthenticated()) {
-            <a [routerLink]="dashboardLink()" class="btn-brick text-base px-9 py-4">Aller au tableau de bord →</a>
-          } @else {
-            <a routerLink="/register" class="btn-brick text-base px-9 py-4">Démarrer gratuitement →</a>
-          }
-          <a href="#fonctionnement" class="btn-ghost-cream text-base px-8 py-4">Voir comment ça marche</a>
-        </div>
-
-        <div class="flex flex-wrap gap-8 pt-8 border-t border-navy/8">
-          <div class="slide-up-1">
-            <div class="font-display text-2xl font-extrabold text-navy">72h</div>
-            <div class="text-xs text-navy/40 mt-0.5 font-medium uppercase tracking-wide">Session couverte</div>
-          </div>
-          <div class="slide-up-2">
-            <div class="font-display text-2xl font-extrabold text-navy">95%</div>
-            <div class="text-xs text-navy/40 mt-0.5 font-medium uppercase tracking-wide">Taux d'ouverture</div>
-          </div>
-          <div class="slide-up-3">
-            <div class="font-display text-2xl font-extrabold text-navy">0</div>
-            <div class="text-xs text-navy/40 mt-0.5 font-medium uppercase tracking-wide">Conflit de créneaux</div>
-          </div>
-          <div class="slide-up-3">
-            <div class="font-display text-2xl font-extrabold text-navy">3 clics</div>
-            <div class="text-xs text-navy/40 mt-0.5 font-medium uppercase tracking-wide">Pour choisir ses créneaux</div>
-          </div>
-        </div>
+      <div class="inline-flex items-center gap-2 bg-brick/15 border border-brick/25 text-brick text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-8 slide-up">
+        <span class="w-1.5 h-1.5 rounded-full bg-brick animate-pulse"></span>
+        Planification scolaire intelligente
       </div>
 
-      <!-- Right: mock UI -->
-      <div class="hidden lg:block relative">
-        <div class="float-card relative z-10">
-          <div class="bg-white border border-cream/60 rounded-3xl p-5 shadow-2xl shadow-navy/6">
-            <div class="flex items-center justify-between mb-4">
-              <div class="flex items-center gap-2">
-                <div class="w-2.5 h-2.5 rounded-full bg-brick/40"></div>
-                <div class="w-2.5 h-2.5 rounded-full bg-molten/40"></div>
-                <div class="w-2.5 h-2.5 rounded-full bg-steel/60"></div>
-              </div>
-              <div class="text-xs text-navy/40 font-mono">Session 2025–2026</div>
-              <div class="text-xs bg-molten/12 text-amber-700 px-2 py-0.5 rounded-full border border-molten/25">● Ouverte</div>
+      <h1 class="font-display text-5xl lg:text-7xl font-extrabold text-white tracking-tight leading-[1.05] mb-6 slide-up">
+        Fini les tableurs.<br>
+        <span class="hero-gradient-text">Place au digital.</span>
+      </h1>
+
+      <p class="text-xl text-white/50 leading-relaxed mb-10 max-w-2xl font-light slide-up">
+        TimeTutor automatise la collecte des disponibilités enseignants et génère votre emploi du temps en quelques heures — sans appels, sans conflits, sans stress.
+      </p>
+
+      <div class="flex flex-wrap gap-4 justify-center mb-16 slide-up">
+        @if (auth.isAuthenticated()) {
+          <a [routerLink]="dashboardLink()" class="bg-brick hover:bg-brick/90 text-white font-bold text-base px-10 py-4 rounded-2xl transition-all hover:-translate-y-1 shadow-2xl shadow-brick/30">
+            Aller au tableau de bord →
+          </a>
+        } @else {
+          <a routerLink="/register" class="bg-brick hover:bg-brick/90 text-white font-bold text-base px-10 py-4 rounded-2xl transition-all hover:-translate-y-1 shadow-2xl shadow-brick/30">
+            Créer mon établissement gratuit →
+          </a>
+        }
+        <a href="#fonctionnement" class="bg-white/8 border border-white/15 hover:bg-white/12 text-white font-semibold text-base px-8 py-4 rounded-2xl transition-all hover:-translate-y-1">
+          Voir comment ça marche
+        </a>
+      </div>
+
+      <!-- Stats row -->
+      <div class="flex flex-wrap justify-center gap-10 pt-10 border-t border-white/10 slide-up">
+        <div class="text-center">
+          <div class="font-display text-3xl font-extrabold text-white">72h</div>
+          <div class="text-xs text-white/35 mt-1 font-medium uppercase tracking-widest">Session couverte</div>
+        </div>
+        <div class="w-px bg-white/10 hidden md:block"></div>
+        <div class="text-center">
+          <div class="font-display text-3xl font-extrabold text-white">95%</div>
+          <div class="text-xs text-white/35 mt-1 font-medium uppercase tracking-widest">Taux d'ouverture</div>
+        </div>
+        <div class="w-px bg-white/10 hidden md:block"></div>
+        <div class="text-center">
+          <div class="font-display text-3xl font-extrabold text-white">0</div>
+          <div class="text-xs text-white/35 mt-1 font-medium uppercase tracking-widest">Conflit de créneaux</div>
+        </div>
+        <div class="w-px bg-white/10 hidden md:block"></div>
+        <div class="text-center">
+          <div class="font-display text-3xl font-extrabold text-white">3 clics</div>
+          <div class="text-xs text-white/35 mt-1 font-medium uppercase tracking-widest">Pour choisir ses créneaux</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product mockup -->
+    <div class="mt-16 relative max-w-4xl mx-auto">
+      <div class="product-glow absolute inset-0 bg-brick/10 blur-3xl rounded-3xl scale-95"></div>
+      <div class="relative bg-navy/80 border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
+        <!-- Top bar -->
+        <div class="flex items-center gap-2 px-5 py-3 bg-white/5 border-b border-white/8">
+          <div class="w-3 h-3 rounded-full bg-white/15"></div>
+          <div class="w-3 h-3 rounded-full bg-white/10"></div>
+          <div class="w-3 h-3 rounded-full bg-white/8"></div>
+          <div class="flex-1 bg-white/8 rounded-lg h-6 mx-4 flex items-center px-3">
+            <span class="text-white/25 text-xs font-mono">app.timetutor.bj/director/sessions</span>
+          </div>
+        </div>
+        <!-- Mock dashboard -->
+        <div class="p-6 grid md:grid-cols-3 gap-4">
+          <div class="md:col-span-2">
+            <div class="flex items-center justify-between mb-3">
+              <div class="text-white/70 font-semibold text-sm">Emploi du temps — Session 2025–2026</div>
+              <div class="text-[10px] bg-emerald/15 text-emerald border border-emerald/25 px-2 py-0.5 rounded-full">● Ouverte</div>
             </div>
-            <div class="bg-cream/40 rounded-xl p-4 mb-3 border border-cream/70">
-              <div class="flex justify-between text-xs text-navy/45 mb-2">
-                <span>Couverture créneaux</span>
-                <span class="text-navy font-bold">78%</span>
-              </div>
-              <div class="h-1.5 bg-cream/60 rounded-full">
-                <div class="h-full w-[78%] bg-gradient-to-r from-brick to-molten rounded-full"></div>
-              </div>
-              <div class="flex gap-4 mt-3 text-xs">
-                <span class="text-navy/45">45 <span class="text-navy/25">créneaux</span></span>
-                <span class="text-navy/60">12 <span class="text-navy/30">réservés</span></span>
-                <span class="text-brick">23 <span class="text-navy/30">validés</span></span>
-              </div>
-            </div>
-            <div class="grid grid-cols-5 gap-1 mb-3">
-              @for (cell of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]; track cell) {
-                <div class="h-8 rounded-lg flex items-center justify-center text-[9px] font-mono"
-                     [class]="cell % 5 === 0 ? 'bg-molten/12 border border-molten/25 text-amber-700' :
-                              cell % 3 === 0 ? 'bg-brick/10 border border-brick/20 text-brick/70' :
-                              'bg-cream/40 border border-cream/60 text-navy/20'">
-                  @if (cell % 5 === 0) {
-                    <app-svg-icon name="check" [size]="12" iconClass="text-amber-600/70" />
-                  } @else if (cell % 3 === 0) {
-                    <app-svg-icon name="clock" [size]="12" iconClass="text-brick/60" />
-                  }
-                </div>
+            <div class="grid grid-cols-6 gap-1 text-[9px] text-white/30 font-mono mb-2">
+              <div></div>
+              @for (d of ['Lun','Mar','Mer','Jeu','Ven','Sam']; track d) {
+                <div class="text-center">{{d}}</div>
               }
             </div>
-            <div class="flex items-center justify-between bg-cream/30 rounded-xl px-4 py-3 border border-cream/50">
-              <div class="flex items-center gap-2">
-                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-brick to-molten flex items-center justify-center text-white text-[10px] font-bold">KA</div>
-                <div>
-                  <div class="text-xs text-navy font-semibold">Kofi Akesson</div>
-                  <div class="text-[10px] text-navy/35">2 créneaux sélectionnés</div>
+            @for (row of mockRows; track row.label) {
+              <div class="grid grid-cols-6 gap-1 mb-1 text-[9px]">
+                <div class="text-white/25 font-mono text-right pr-1 flex items-center justify-end">{{row.label}}</div>
+                @for (cell of row.cells; track $index) {
+                  <div class="h-8 rounded-md flex items-center justify-center font-medium"
+                       [class]="cell === 'taken' ? 'bg-brick/20 border border-brick/30 text-brick/80' :
+                                cell === 'free'   ? 'bg-white/5 border border-white/8 text-white/15' :
+                                cell === 'ok'     ? 'bg-emerald/15 border border-emerald/25 text-emerald/80' :
+                                                    'bg-molten/10 border border-molten/20 text-molten/70'">
+                    {{ cell === 'taken' ? '●' : cell === 'ok' ? '✓' : cell === 'warn' ? '—' : '' }}
+                  </div>
+                }
+              </div>
+            }
+          </div>
+          <div class="space-y-3">
+            <div class="bg-white/5 border border-white/8 rounded-xl p-3">
+              <div class="text-white/40 text-[9px] uppercase tracking-wider mb-2">Progression</div>
+              <div class="flex items-end gap-1 mb-1">
+                <span class="text-white font-bold text-lg">78%</span>
+                <span class="text-white/30 text-xs mb-0.5">couverts</span>
+              </div>
+              <div class="h-1.5 bg-white/8 rounded-full">
+                <div class="h-full w-[78%] bg-gradient-to-r from-brick to-emerald rounded-full"></div>
+              </div>
+            </div>
+            @for (t of mockTeachers; track t.name) {
+              <div class="bg-white/5 border border-white/8 rounded-xl p-3 flex items-center gap-2">
+                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-brick to-emerald flex items-center justify-center text-white text-[9px] font-bold shrink-0">{{t.initials}}</div>
+                <div class="flex-1 min-w-0">
+                  <div class="text-white/70 text-[10px] font-semibold truncate">{{t.name}}</div>
+                  <div class="text-white/30 text-[9px]">{{t.slots}} créneaux</div>
+                </div>
+                <div [class]="t.status === 'ok' ? 'text-emerald/80 bg-emerald/10 border border-emerald/20' : 'text-molten/80 bg-molten/10 border border-molten/20'"
+                     class="text-[9px] px-1.5 py-0.5 rounded-md">
+                  {{t.status === 'ok' ? 'Validé' : 'En attente'}}
                 </div>
               </div>
-              <div class="text-[10px] bg-molten/12 text-amber-700 px-2 py-1 rounded-lg border border-molten/25">Validé</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="float-card2 absolute -top-4 -right-4 bg-brick text-white text-xs font-bold px-3 py-2 rounded-2xl shadow-lg shadow-brick/30 flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-          Créneau sélectionné
-        </div>
-        <div class="float-card absolute -bottom-4 -left-4 bg-white border border-cream/60 text-navy text-xs px-3 py-2 rounded-2xl shadow-lg flex items-center gap-2">
-          <app-svg-icon name="envelope" [size]="18" iconClass="text-brick shrink-0" />
-          <div>
-            <div class="font-semibold text-[11px] text-navy">Invitation envoyée</div>
-            <div class="text-navy/40 text-[10px]">marie.gbedo@ecole.bj</div>
+            }
           </div>
         </div>
       </div>
-
     </div>
-  </div>
-
-  <div class="absolute bottom-6 left-1/2 -translate-x-1/2 text-navy/25 text-xs flex flex-col items-center gap-1.5 animate-bounce">
-    <div class="w-px h-7 bg-gradient-to-b from-transparent to-navy/20"></div>
-    <div class="font-mono text-[10px] tracking-widest uppercase">Défiler</div>
   </div>
 </section>
 
-<!-- ═══════════ SOCIAL PROOF BAR ═══════════ -->
-<div class="bg-white/80 border-y border-cream/60 py-4 overflow-hidden">
+<!-- ═══════════ TRUST BAR ═══════════ -->
+<div class="bg-white border-y border-steel py-5 overflow-hidden">
   <div class="flex">
-    <div class="marquee items-center gap-16 text-sm text-navy/50 font-medium">
-      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/60" />Cotonou · Lycée Notre-Dame</span>
-      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/60" />Porto-Novo · Institut SÈMÈ</span>
-      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/60" />Parakou · Collège Évangélique</span>
-      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/60" />Abidjan · École Internationale</span>
-      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/60" />Lomé · Lycée Privé Alliance</span>
-      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/60" />Dakar · Institut Sainte-Marie</span>
-      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/60" />Cotonou · Lycée Notre-Dame</span>
-      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/60" />Porto-Novo · Institut SÈMÈ</span>
-      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/60" />Parakou · Collège Évangélique</span>
-      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/60" />Abidjan · École Internationale</span>
-      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/60" />Lomé · Lycée Privé Alliance</span>
-      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/60" />Dakar · Institut Sainte-Marie</span>
+    <div class="marquee flex items-center gap-16 text-sm text-navy/45 font-medium">
+      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/50" />Cotonou · Lycée Notre-Dame</span>
+      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/50" />Porto-Novo · Institut SÈMÈ</span>
+      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/50" />Parakou · Collège Évangélique</span>
+      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/50" />Abidjan · École Internationale</span>
+      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/50" />Lomé · Lycée Privé Alliance</span>
+      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/50" />Dakar · Institut Sainte-Marie</span>
+      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/50" />Cotonou · Lycée Notre-Dame</span>
+      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/50" />Porto-Novo · Institut SÈMÈ</span>
+      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/50" />Parakou · Collège Évangélique</span>
+      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/50" />Abidjan · École Internationale</span>
+      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/50" />Lomé · Lycée Privé Alliance</span>
+      <span class="inline-flex items-center gap-2 shrink-0"><app-svg-icon name="map-pin" [size]="13" iconClass="shrink-0 text-brick/50" />Dakar · Institut Sainte-Marie</span>
     </div>
   </div>
 </div>
 
 <!-- ═══════════ PROBLÈME / SOLUTION ═══════════ -->
-<section class="bg-white py-24">
+<section class="bg-cream py-24">
   <div class="max-w-5xl mx-auto px-6">
-    <div class="text-center mb-14 slide-up">
+    <div class="text-center mb-14">
       <div class="text-brick text-xs font-bold uppercase tracking-widest font-mono mb-3">Le problème</div>
       <h2 class="font-display text-4xl font-extrabold text-navy">La planification scolaire,<br>c'est encore du travail manuel.</h2>
     </div>
     <div class="grid md:grid-cols-2 gap-6">
-      <div class="bg-cream/50 border border-cream/80 rounded-3xl p-8 slide-up">
-        <div class="text-mahogany font-bold text-sm uppercase tracking-widest mb-6 flex items-center gap-2">
-          <app-svg-icon name="x-mark" [size]="18" iconClass="text-mahogany/80" /> Avant TimeTutor
+      <div class="bg-white border border-steel rounded-3xl p-8">
+        <div class="text-navy/60 font-bold text-sm uppercase tracking-widest mb-6 flex items-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-navy/10 flex items-center justify-center text-[11px]">✕</span> Avant TimeTutor
         </div>
         <ul class="space-y-4 text-navy/65 text-sm">
-          <li class="flex items-start gap-3"><span class="text-brick/70 mt-0.5 shrink-0">●</span><span>Appels téléphoniques et messages WhatsApp à chaque enseignant pour connaître leurs disponibilités</span></li>
-          <li class="flex items-start gap-3"><span class="text-brick/70 mt-0.5 shrink-0">●</span><span>Tableurs partagés mal remplis, versions qui se perdent, données incohérentes</span></li>
-          <li class="flex items-start gap-3"><span class="text-brick/70 mt-0.5 shrink-0">●</span><span>Conflits de créneaux découverts à la dernière minute, corrections manuelles en cascade</span></li>
-          <li class="flex items-start gap-3"><span class="text-brick/70 mt-0.5 shrink-0">●</span><span>2 à 4 jours de travail administratif par session — chaque trimestre</span></li>
+          <li class="flex items-start gap-3"><span class="w-1.5 h-1.5 rounded-full bg-navy/30 mt-1.5 shrink-0"></span><span>Appels téléphoniques et messages WhatsApp à chaque enseignant pour connaître leurs disponibilités</span></li>
+          <li class="flex items-start gap-3"><span class="w-1.5 h-1.5 rounded-full bg-navy/30 mt-1.5 shrink-0"></span><span>Tableurs partagés mal remplis, versions qui se perdent, données incohérentes</span></li>
+          <li class="flex items-start gap-3"><span class="w-1.5 h-1.5 rounded-full bg-navy/30 mt-1.5 shrink-0"></span><span>Conflits de créneaux découverts à la dernière minute, corrections manuelles en cascade</span></li>
+          <li class="flex items-start gap-3"><span class="w-1.5 h-1.5 rounded-full bg-navy/30 mt-1.5 shrink-0"></span><span>2 à 4 jours de travail administratif par session — chaque trimestre</span></li>
         </ul>
       </div>
-      <div class="bg-molten/8 border border-molten/25 rounded-3xl p-8 slide-up-1">
-        <div class="text-amber-700 font-bold text-sm uppercase tracking-widest mb-6 flex items-center gap-2">
-          <app-svg-icon name="check" [size]="18" iconClass="text-amber-600" /> Avec TimeTutor
+      <div class="bg-navy border border-navy rounded-3xl p-8">
+        <div class="text-emerald font-bold text-sm uppercase tracking-widest mb-6 flex items-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-emerald/20 flex items-center justify-center text-emerald text-[11px]">✓</span> Avec TimeTutor
         </div>
-        <ul class="space-y-4 text-navy/65 text-sm">
-          <li class="flex items-start gap-3"><span class="text-brick mt-0.5 shrink-0">●</span><span>Un email avec un lien personnel suffit — les enseignants choisissent leurs créneaux en autonomie, sans compte</span></li>
-          <li class="flex items-start gap-3"><span class="text-brick mt-0.5 shrink-0">●</span><span>Verrouillage en temps réel : deux enseignants ne peuvent pas choisir le même créneau simultanément</span></li>
-          <li class="flex items-start gap-3"><span class="text-brick mt-0.5 shrink-0">●</span><span>Le directeur valide les sélections depuis un tableau de bord clair, exporte en PDF/Excel</span></li>
-          <li class="flex items-start gap-3"><span class="text-brick mt-0.5 shrink-0">●</span><span>Emploi du temps complet en moins de 72h — relances automatiques pour les non-répondants</span></li>
+        <ul class="space-y-4 text-white/60 text-sm">
+          <li class="flex items-start gap-3"><span class="w-1.5 h-1.5 rounded-full bg-emerald/60 mt-1.5 shrink-0"></span><span>Un email avec un lien personnel suffit — les enseignants choisissent leurs créneaux en autonomie, sans compte</span></li>
+          <li class="flex items-start gap-3"><span class="w-1.5 h-1.5 rounded-full bg-emerald/60 mt-1.5 shrink-0"></span><span>Verrouillage en temps réel : deux enseignants ne peuvent pas choisir le même créneau simultanément</span></li>
+          <li class="flex items-start gap-3"><span class="w-1.5 h-1.5 rounded-full bg-emerald/60 mt-1.5 shrink-0"></span><span>Le directeur valide les sélections depuis un tableau de bord clair, exporte en PDF/Excel</span></li>
+          <li class="flex items-start gap-3"><span class="w-1.5 h-1.5 rounded-full bg-emerald/60 mt-1.5 shrink-0"></span><span>Emploi du temps complet en moins de 72h — relances automatiques pour les non-répondants</span></li>
         </ul>
       </div>
     </div>
@@ -203,40 +210,31 @@
 </section>
 
 <!-- ═══════════ FONCTIONNEMENT ═══════════ -->
-<section id="fonctionnement" class="py-24 bg-warm-soft">
+<section id="fonctionnement" class="py-24 bg-white">
   <div class="max-w-5xl mx-auto px-6">
     <div class="text-center mb-16">
       <div class="text-brick text-xs font-bold uppercase tracking-widest font-mono mb-3">En 3 étapes</div>
       <h2 class="font-display text-4xl font-extrabold text-navy">Simple. Rapide. Sans friction.</h2>
-      <p class="text-navy/50 mt-3 max-w-xl mx-auto font-medium">Opérationnel en 10 minutes. Aucune formation requise.</p>
+      <p class="text-navy/50 mt-3 max-w-xl mx-auto">Opérationnel en 10 minutes. Aucune formation requise.</p>
     </div>
 
     <div class="grid md:grid-cols-3 gap-6 relative">
-      <div class="hidden md:block absolute top-11 left-[16%] right-[16%] h-px bg-gradient-to-r from-brick/20 via-molten/30 to-brick/20 z-0"></div>
+      <div class="hidden md:block absolute top-10 left-[20%] right-[20%] h-px bg-gradient-to-r from-brick/20 via-emerald/30 to-brick/20 z-0"></div>
 
-      <div class="card-hover bg-white border border-cream/80 rounded-3xl p-8 shadow-sm relative z-10">
+      <div class="step-card bg-white border border-steel rounded-3xl p-8 shadow-sm relative z-10 hover:-translate-y-1 transition-transform">
         <div class="w-12 h-12 rounded-2xl bg-brick text-white font-bold text-lg flex items-center justify-center mb-5 font-display shadow-lg shadow-brick/25">1</div>
-        <div class="flex justify-center mb-4">
-          <app-svg-icon name="calendar-range" [size]="38" iconClass="text-navy/40" />
-        </div>
         <h3 class="font-display text-lg font-bold text-navy mb-3">Configurer</h3>
         <p class="text-navy/55 text-sm leading-relaxed">Créez une session, ajoutez vos créneaux horaires, définissez les règles (min/max par enseignant) et importez votre liste d'enseignants via CSV.</p>
       </div>
 
-      <div class="card-hover bg-white border border-cream/80 rounded-3xl p-8 shadow-sm relative z-10">
+      <div class="step-card bg-white border border-steel rounded-3xl p-8 shadow-sm relative z-10 hover:-translate-y-1 transition-transform">
         <div class="w-12 h-12 rounded-2xl bg-molten text-white font-bold text-lg flex items-center justify-center mb-5 font-display shadow-lg shadow-molten/25">2</div>
-        <div class="flex justify-center mb-4">
-          <app-svg-icon name="envelope" [size]="38" iconClass="text-brick/60" />
-        </div>
         <h3 class="font-display text-lg font-bold text-navy mb-3">Inviter</h3>
         <p class="text-navy/55 text-sm leading-relaxed">Chaque enseignant reçoit un email avec un lien personnel sécurisé. <strong class="text-navy/75">Aucun compte à créer.</strong> Ils cliquent, voient la grille colorée, et choisissent.</p>
       </div>
 
-      <div class="card-hover bg-white border border-cream/80 rounded-3xl p-8 shadow-sm relative z-10">
-        <div class="w-12 h-12 rounded-2xl bg-navy/12 text-navy font-bold text-lg flex items-center justify-center mb-5 font-display shadow-lg shadow-navy/10 border border-navy/15">3</div>
-        <div class="flex justify-center mb-4">
-          <app-svg-icon name="check" [size]="38" iconClass="text-navy/55" />
-        </div>
+      <div class="step-card bg-white border border-steel rounded-3xl p-8 shadow-sm relative z-10 hover:-translate-y-1 transition-transform">
+        <div class="w-12 h-12 rounded-2xl bg-emerald text-white font-bold text-lg flex items-center justify-center mb-5 font-display shadow-lg shadow-emerald/25">3</div>
         <h3 class="font-display text-lg font-bold text-navy mb-3">Valider</h3>
         <p class="text-navy/55 text-sm leading-relaxed">Vous validez les sélections, gérez d'éventuels échanges depuis le tableau de bord, puis exportez l'emploi du temps final.</p>
       </div>
@@ -244,73 +242,92 @@
   </div>
 </section>
 
-<!-- ═══════════ FONCTIONNALITÉS ═══════════ -->
-<section id="fonctionnalites" class="py-24 bg-white">
+<!-- ═══════════ FONCTIONNALITÉS (BENTO) ═══════════ -->
+<section id="fonctionnalites" class="py-24 bg-cream">
   <div class="max-w-5xl mx-auto px-6">
     <div class="text-center mb-16">
       <div class="text-brick text-xs font-bold uppercase tracking-widest font-mono mb-3">Fonctionnalités</div>
       <h2 class="font-display text-4xl font-extrabold text-navy">Tout ce dont votre établissement a besoin</h2>
     </div>
 
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+    <!-- Bento grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-      <div class="card-hover tt-card-dark col-span-2 p-8 relative overflow-hidden group">
-        <div class="absolute right-0 top-0 w-52 h-52 bg-molten/12 rounded-full blur-2xl group-hover:bg-molten/20 transition-all"></div>
-        <div class="flex justify-center mb-4">
-          <app-svg-icon name="bolt" [size]="38" iconClass="text-brick/70" />
+      <!-- Large: Temps réel -->
+      <div class="md:col-span-2 bg-navy rounded-3xl p-8 relative overflow-hidden group">
+        <div class="absolute -right-10 -top-10 w-52 h-52 bg-brick/25 rounded-full blur-3xl group-hover:bg-brick/35 transition-all duration-500"></div>
+        <div class="relative z-10">
+          <div class="w-10 h-10 bg-brick/20 border border-brick/30 rounded-2xl flex items-center justify-center mb-5">
+            <app-svg-icon name="bolt" [size]="22" iconClass="text-brick" />
+          </div>
+          <h3 class="font-display text-white font-bold text-xl mb-3">Temps réel & anti-conflit</h3>
+          <p class="text-white/50 text-sm leading-relaxed max-w-md">Technologie WebSocket native. Un créneau sélectionné par un enseignant se verrouille instantanément pour tous les autres. Zéro double-sélection, zéro conflit.</p>
         </div>
-        <h3 class="font-display text-navy font-bold text-lg mb-2">Temps réel & anti-conflit</h3>
-        <p class="text-navy/55 text-sm leading-relaxed max-w-md">Technologie WebSocket native. Un créneau sélectionné par un enseignant se verrouille instantanément pour tous les autres. Zéro double-sélection, zéro conflit.</p>
+        <div class="mt-6 flex gap-2">
+          <div class="flex items-center gap-1.5 bg-white/8 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white/50">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald animate-pulse"></span> WebSocket natif
+          </div>
+          <div class="flex items-center gap-1.5 bg-white/8 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white/50">
+            <span class="w-1.5 h-1.5 rounded-full bg-brick"></span> Verrouillage instantané
+          </div>
+        </div>
       </div>
 
-      <div class="card-hover tt-card-dark p-6 relative overflow-hidden group">
-        <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-brick/8 rounded-full blur-xl group-hover:bg-brick/15 transition-all"></div>
-        <div class="flex justify-center mb-3">
-          <app-svg-icon name="link" [size]="26" iconClass="text-navy/45" />
+      <!-- Small: Liens magiques -->
+      <div class="bg-white border border-steel rounded-3xl p-7 group hover:-translate-y-1 transition-transform">
+        <div class="w-10 h-10 bg-brick/8 border border-brick/15 rounded-2xl flex items-center justify-center mb-5">
+          <app-svg-icon name="link" [size]="22" iconClass="text-brick" />
         </div>
-        <h3 class="font-display text-navy font-semibold mb-2">Liens magiques</h3>
-        <p class="text-navy/50 text-xs leading-relaxed">Accès immédiat sans compte ni mot de passe. Un lien = un enseignant.</p>
+        <h3 class="font-display text-navy font-bold text-lg mb-2">Liens magiques</h3>
+        <p class="text-navy/50 text-sm leading-relaxed">Accès immédiat sans compte ni mot de passe. Un lien = un enseignant. Sécurisé et unique.</p>
       </div>
 
-      <div class="card-hover tt-card-dark p-6 group">
-        <div class="flex justify-center mb-3">
-          <app-svg-icon name="chart-bar" [size]="26" iconClass="text-brick/60" />
+      <!-- Small: Export -->
+      <div class="bg-white border border-steel rounded-3xl p-7 group hover:-translate-y-1 transition-transform">
+        <div class="w-10 h-10 bg-emerald/8 border border-emerald/15 rounded-2xl flex items-center justify-center mb-5">
+          <app-svg-icon name="chart-bar" [size]="22" iconClass="text-emerald" />
         </div>
-        <h3 class="font-display text-navy font-semibold mb-2">Export PDF & Excel</h3>
-        <p class="text-navy/50 text-xs leading-relaxed">Emploi du temps final exportable en un clic dans les formats standards.</p>
+        <h3 class="font-display text-navy font-bold text-lg mb-2">Export PDF & Excel</h3>
+        <p class="text-navy/50 text-sm leading-relaxed">Emploi du temps final exportable en un clic dans les formats standards.</p>
       </div>
 
-      <div class="card-hover tt-card-dark p-6 group">
-        <div class="flex justify-center mb-3">
-          <app-svg-icon name="bell" [size]="26" iconClass="text-navy/45" />
+      <!-- Large: PWA -->
+      <div class="md:col-span-2 bg-white border border-steel rounded-3xl p-8 relative overflow-hidden group hover:-translate-y-1 transition-transform">
+        <div class="absolute -right-8 -bottom-8 w-48 h-48 bg-molten/8 rounded-full blur-2xl group-hover:bg-molten/15 transition-all duration-500"></div>
+        <div class="relative z-10">
+          <div class="w-10 h-10 bg-molten/10 border border-molten/20 rounded-2xl flex items-center justify-center mb-5">
+            <app-svg-icon name="device-mobile" [size]="22" iconClass="text-molten" />
+          </div>
+          <h3 class="font-display text-navy font-bold text-xl mb-3">PWA — Fonctionne offline</h3>
+          <p class="text-navy/55 text-sm leading-relaxed max-w-md">Application installable sur mobile. Les enseignants consultent leur emploi du temps même sans connexion internet — pensé pour les réalités africaines.</p>
         </div>
-        <h3 class="font-display text-navy font-semibold mb-2">Relances auto</h3>
-        <p class="text-navy/50 text-xs leading-relaxed">Rappels automatiques par email et SMS pour les enseignants qui n'ont pas encore répondu.</p>
       </div>
 
-      <div class="card-hover tt-card-dark p-6 group">
-        <div class="flex justify-center mb-3">
-          <app-svg-icon name="chat" [size]="26" iconClass="text-navy/45" />
+      <!-- Small: Relances -->
+      <div class="bg-white border border-steel rounded-3xl p-7 group hover:-translate-y-1 transition-transform">
+        <div class="w-10 h-10 bg-brick/8 border border-brick/15 rounded-2xl flex items-center justify-center mb-5">
+          <app-svg-icon name="bell" [size]="22" iconClass="text-brick" />
         </div>
-        <h3 class="font-display text-navy font-semibold mb-2">Demandes d'échange</h3>
-        <p class="text-navy/50 text-xs leading-relaxed">Un enseignant peut demander l'échange d'un créneau déjà pris. Le directeur est notifié par email.</p>
+        <h3 class="font-display text-navy font-bold text-lg mb-2">Relances auto</h3>
+        <p class="text-navy/50 text-sm leading-relaxed">Rappels automatiques par email et SMS pour les enseignants qui n'ont pas encore répondu.</p>
       </div>
 
-      <div class="card-hover tt-card-dark col-span-2 p-8 relative overflow-hidden group">
-        <div class="absolute -left-8 -bottom-8 w-52 h-52 bg-molten/10 rounded-full blur-2xl group-hover:bg-molten/18 transition-all"></div>
-        <div class="flex justify-center mb-4">
-          <app-svg-icon name="device-mobile" [size]="38" iconClass="text-brick/60" />
+      <!-- Small: Échanges -->
+      <div class="bg-white border border-steel rounded-3xl p-7 group hover:-translate-y-1 transition-transform">
+        <div class="w-10 h-10 bg-emerald/8 border border-emerald/15 rounded-2xl flex items-center justify-center mb-5">
+          <app-svg-icon name="chat" [size]="22" iconClass="text-emerald" />
         </div>
-        <h3 class="font-display text-navy font-bold text-lg mb-2">PWA — Fonctionne offline</h3>
-        <p class="text-navy/55 text-sm leading-relaxed max-w-md">Application installable sur mobile. Les enseignants consultent leur emploi du temps même sans connexion internet — pensé pour les réalités africaines.</p>
+        <h3 class="font-display text-navy font-bold text-lg mb-2">Demandes d'échange</h3>
+        <p class="text-navy/50 text-sm leading-relaxed">Un enseignant peut demander l'échange d'un créneau déjà pris. Le directeur est notifié par email.</p>
       </div>
 
-      <div class="card-hover tt-card-dark p-6 group">
-        <div class="flex justify-center mb-3">
-          <app-svg-icon name="users" [size]="26" iconClass="text-navy/45" />
+      <!-- Small: Répertoire -->
+      <div class="bg-white border border-steel rounded-3xl p-7 group hover:-translate-y-1 transition-transform">
+        <div class="w-10 h-10 bg-brick/8 border border-brick/15 rounded-2xl flex items-center justify-center mb-5">
+          <app-svg-icon name="users" [size]="22" iconClass="text-brick" />
         </div>
-        <h3 class="font-display text-navy font-semibold mb-2">Répertoire enseignants</h3>
-        <p class="text-navy/50 text-xs leading-relaxed">Importez et gérez votre liste d'enseignants une fois, puis ajoutez-les à n'importe quelle session en un clic.</p>
+        <h3 class="font-display text-navy font-bold text-lg mb-2">Répertoire enseignants</h3>
+        <p class="text-navy/50 text-sm leading-relaxed">Importez et gérez votre liste d'enseignants une fois, puis ajoutez-les à n'importe quelle session en un clic.</p>
       </div>
 
     </div>
@@ -318,7 +335,7 @@
 </section>
 
 <!-- ═══════════ TÉMOIGNAGES ═══════════ -->
-<section class="py-24 bg-cream/30">
+<section class="py-24 bg-white">
   <div class="max-w-5xl mx-auto px-6">
     <div class="text-center mb-14">
       <div class="text-brick text-xs font-bold uppercase tracking-widest font-mono mb-3">Témoignages</div>
@@ -326,16 +343,15 @@
     </div>
     <div class="grid md:grid-cols-3 gap-6">
 
-      <div class="card-hover bg-white border border-cream/70 rounded-3xl p-7">
-        <div class="flex gap-0.5 mb-4">
+      <div class="bg-cream border border-steel rounded-3xl p-7 hover:-translate-y-1 transition-transform">
+        <div class="flex gap-1 mb-5">
           @for (s of [1,2,3,4,5]; track s) {
-            <app-svg-icon name="star" [size]="15" iconClass="text-molten fill-molten" />
+            <app-svg-icon name="star" [size]="14" iconClass="text-molten fill-molten" />
           }
         </div>
-        <div class="w-8 h-0.5 bg-brick/40 mb-4 rounded-full"></div>
-        <p class="text-navy/65 text-sm leading-relaxed mb-6 italic">"Avant, je passais 3 jours à appeler tous les profs. Avec TimeTutor, la session est couverte en 48h. Le directeur peut enfin souffler."</p>
+        <p class="text-navy/70 text-sm leading-relaxed mb-6 italic">"Avant, je passais 3 jours à appeler tous les profs. Avec TimeTutor, la session est couverte en 48h. Le directeur peut enfin souffler."</p>
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-brick to-molten flex items-center justify-center text-white text-sm font-bold shrink-0">AM</div>
+          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-brick to-emerald flex items-center justify-center text-white text-sm font-bold shrink-0">AM</div>
           <div>
             <div class="text-navy font-semibold text-sm font-display">Adjovi Mensah</div>
             <div class="text-navy/40 text-xs">Directrice, Lycée Sainte-Thérèse, Cotonou</div>
@@ -343,14 +359,13 @@
         </div>
       </div>
 
-      <div class="card-hover bg-white border border-cream/70 rounded-3xl p-7">
-        <div class="flex gap-0.5 mb-4">
+      <div class="bg-cream border border-steel rounded-3xl p-7 hover:-translate-y-1 transition-transform">
+        <div class="flex gap-1 mb-5">
           @for (s of [1,2,3,4,5]; track s) {
-            <app-svg-icon name="star" [size]="15" iconClass="text-molten fill-molten" />
+            <app-svg-icon name="star" [size]="14" iconClass="text-molten fill-molten" />
           }
         </div>
-        <div class="w-8 h-0.5 bg-brick/40 mb-4 rounded-full"></div>
-        <p class="text-navy/65 text-sm leading-relaxed mb-6 italic">"Les enseignants adorent le lien direct. Pas de mot de passe, pas d'application à installer — ils cliquent et c'est fait. Brillant."</p>
+        <p class="text-navy/70 text-sm leading-relaxed mb-6 italic">"Les enseignants adorent le lien direct. Pas de mot de passe, pas d'application à installer — ils cliquent et c'est fait. Brillant."</p>
         <div class="flex items-center gap-3">
           <div class="w-9 h-9 rounded-full bg-gradient-to-br from-molten to-brick flex items-center justify-center text-white text-sm font-bold shrink-0">KD</div>
           <div>
@@ -360,16 +375,15 @@
         </div>
       </div>
 
-      <div class="card-hover bg-white border border-cream/70 rounded-3xl p-7">
-        <div class="flex gap-0.5 mb-4">
+      <div class="bg-cream border border-steel rounded-3xl p-7 hover:-translate-y-1 transition-transform">
+        <div class="flex gap-1 mb-5">
           @for (s of [1,2,3,4,5]; track s) {
-            <app-svg-icon name="star" [size]="15" iconClass="text-molten fill-molten" />
+            <app-svg-icon name="star" [size]="14" iconClass="text-molten fill-molten" />
           }
         </div>
-        <div class="w-8 h-0.5 bg-brick/40 mb-4 rounded-full"></div>
-        <p class="text-navy/65 text-sm leading-relaxed mb-6 italic">"Le prix est honnête par rapport à ce qu'on économise. On a amorti en une seule session. Je le recommande à tous les chefs d'établissement."</p>
+        <p class="text-navy/70 text-sm leading-relaxed mb-6 italic">"Le prix est honnête par rapport à ce qu'on économise. On a amorti en une seule session. Je le recommande à tous les chefs d'établissement."</p>
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-navy/70 to-brick/70 flex items-center justify-center text-white text-sm font-bold shrink-0">FB</div>
+          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-emerald to-brick/70 flex items-center justify-center text-white text-sm font-bold shrink-0">FB</div>
           <div>
             <div class="text-navy font-semibold text-sm font-display">Fidèle Bossou</div>
             <div class="text-navy/40 text-xs">Directeur, Collège Évangélique, Parakou</div>
@@ -381,7 +395,7 @@
 </section>
 
 <!-- ═══════════ TARIFS ═══════════ -->
-<section id="tarifs" class="py-24 bg-white">
+<section id="tarifs" class="py-24 bg-cream">
   <div class="max-w-5xl mx-auto px-6">
     <div class="text-center mb-6">
       <div class="text-brick text-xs font-bold uppercase tracking-widest font-mono mb-3">Tarifs</div>
@@ -389,74 +403,78 @@
       <p class="text-navy/45 max-w-lg mx-auto text-sm">Paiement par MTN Mobile Money, Moov Money ou carte bancaire.</p>
     </div>
 
+    <!-- Toggle -->
     <div class="flex items-center justify-center gap-3 mb-12">
-      <span class="text-sm font-medium" [class]="!annual() ? 'text-navy' : 'text-navy/35'">Mensuel</span>
+      <span class="text-sm font-medium" [class]="!annual() ? 'text-navy' : 'text-navy/40'">Mensuel</span>
       <button (click)="annual.set(!annual())"
               class="relative w-12 h-6 rounded-full transition-colors duration-300"
               [class]="annual() ? 'bg-brick' : 'bg-navy/15'">
         <span class="absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all duration-300"
               [class]="annual() ? 'left-6' : 'left-0.5'"></span>
       </button>
-      <span class="text-sm font-medium" [class]="annual() ? 'text-navy' : 'text-navy/35'">
+      <span class="text-sm font-medium" [class]="annual() ? 'text-navy' : 'text-navy/40'">
         Annuel
-        <span class="ml-1.5 text-[10px] bg-molten/12 text-amber-700 border border-molten/25 px-2 py-0.5 rounded-full">2 mois offerts</span>
+        <span class="ml-1.5 text-[10px] bg-emerald/15 text-emerald border border-emerald/25 px-2 py-0.5 rounded-full">2 mois offerts</span>
       </span>
     </div>
 
     <div class="grid md:grid-cols-3 gap-6">
 
-      <div class="tt-card-dark rounded-3xl p-8 flex flex-col">
+      <!-- Free -->
+      <div class="bg-white border border-steel rounded-3xl p-8 flex flex-col">
         <div class="text-navy/45 text-xs font-bold uppercase tracking-widest mb-5">Gratuit</div>
         <div class="mb-1">
           <span class="font-display text-4xl font-extrabold text-navy">0</span>
           <span class="text-navy/40 text-sm ml-1">FCFA</span>
         </div>
         <div class="text-navy/30 text-xs mb-8 font-mono">Pour évaluer l'outil</div>
-        <ul class="space-y-3 text-sm text-navy/55 mb-10 flex-1">
-          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-brick shrink-0" />1 session active</li>
-          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-brick shrink-0" />30 enseignants max</li>
-          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-brick shrink-0" />Grille calendrier</li>
-          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-brick shrink-0" />Liens magiques</li>
-          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-brick shrink-0" />Notifications email</li>
+        <ul class="space-y-3 text-sm text-navy/60 mb-10 flex-1">
+          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-emerald shrink-0" />1 session active</li>
+          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-emerald shrink-0" />30 enseignants max</li>
+          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-emerald shrink-0" />Grille calendrier</li>
+          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-emerald shrink-0" />Liens magiques</li>
+          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-emerald shrink-0" />Notifications email</li>
           <li class="flex items-center gap-2 opacity-35"><app-svg-icon name="x-mark" [size]="13" iconClass="shrink-0" /><span>Export PDF</span></li>
           <li class="flex items-center gap-2 opacity-35"><app-svg-icon name="x-mark" [size]="13" iconClass="shrink-0" /><span>Support dédié</span></li>
         </ul>
         <a [routerLink]="getPricingLink('free').path" [queryParams]="getPricingLink('free').queryParams"
-           class="btn-ghost-cream block text-center py-3 text-sm">
+           class="block text-center py-3 text-sm font-semibold text-navy/60 border border-steel hover:border-navy/30 rounded-xl transition-colors">
           Démarrer gratuitement
         </a>
       </div>
 
-      <div class="pricing-popular rounded-3xl p-8 flex flex-col relative shadow-2xl shadow-molten/12">
-        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-molten text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg inline-flex items-center gap-1.5">
-          <app-svg-icon name="star" [size]="13" iconClass="text-white" />
+      <!-- École — popular -->
+      <div class="bg-navy rounded-3xl p-8 flex flex-col relative shadow-2xl shadow-navy/20">
+        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-brick text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg inline-flex items-center gap-1.5">
+          <app-svg-icon name="star" [size]="12" iconClass="text-white" />
           Le plus populaire
         </div>
-        <div class="text-amber-700 text-xs font-bold uppercase tracking-widest mb-5">Plan École</div>
+        <div class="text-brick text-xs font-bold uppercase tracking-widest mb-5">Plan École</div>
         <div class="mb-1 flex items-end gap-1">
-          <span class="font-display text-4xl font-extrabold text-navy">{{ price(9900) }}</span>
-          <span class="text-navy/45 text-sm mb-1">FCFA{{ unit() }}</span>
+          <span class="font-display text-4xl font-extrabold text-white">{{ price(9900) }}</span>
+          <span class="text-white/40 text-sm mb-1">FCFA{{ unit() }}</span>
         </div>
         @if (annual()) {
-          <div class="text-brick text-xs mb-2">{{ saving(9900) }}</div>
+          <div class="text-emerald text-xs mb-2">{{ saving(9900) }}</div>
         }
-        <div class="text-navy/35 text-xs mb-8 font-mono">Par établissement · 1 mois d'essai gratuit</div>
-        <ul class="space-y-3 text-sm text-navy/70 mb-10 flex-1">
-          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-brick shrink-0" />5 sessions simultanées</li>
-          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-brick shrink-0" />150 enseignants / session</li>
-          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-brick shrink-0" />Créneaux illimités</li>
-          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-brick shrink-0" />Export PDF</li>
-          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-brick shrink-0" />Import CSV enseignants</li>
-          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-brick shrink-0" />Relances automatiques</li>
-          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-brick shrink-0" />Support WhatsApp J+1</li>
+        <div class="text-white/30 text-xs mb-8 font-mono">Par établissement · 1 mois d'essai gratuit</div>
+        <ul class="space-y-3 text-sm text-white/65 mb-10 flex-1">
+          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-emerald shrink-0" />5 sessions simultanées</li>
+          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-emerald shrink-0" />150 enseignants / session</li>
+          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-emerald shrink-0" />Créneaux illimités</li>
+          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-emerald shrink-0" />Export PDF</li>
+          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-emerald shrink-0" />Import CSV enseignants</li>
+          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-emerald shrink-0" />Relances automatiques</li>
+          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-emerald shrink-0" />Support WhatsApp J+1</li>
         </ul>
         <a [routerLink]="getPricingLink('ecole').path" [queryParams]="getPricingLink('ecole').queryParams"
-           class="btn-brick block text-center py-3 text-sm">
+           class="block text-center bg-brick hover:bg-brick/90 text-white font-semibold py-3 text-sm rounded-xl transition-all hover:-translate-y-px shadow-lg shadow-brick/30">
           Commencer l'essai gratuit →
         </a>
       </div>
 
-      <div class="tt-card-dark rounded-3xl p-8 flex flex-col">
+      <!-- Établissement -->
+      <div class="bg-white border border-steel rounded-3xl p-8 flex flex-col">
         <div class="text-navy/45 text-xs font-bold uppercase tracking-widest mb-5">Établissement</div>
         <div class="mb-1 flex items-end gap-1">
           <span class="font-display text-4xl font-extrabold text-navy">{{ price(19900) }}</span>
@@ -467,23 +485,24 @@
         }
         <div class="text-navy/30 text-xs mb-8 font-mono">Pour lycées, instituts & grandes écoles</div>
         <ul class="space-y-3 text-sm text-navy/60 mb-10 flex-1">
-          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-brick shrink-0" />Sessions & enseignants illimités</li>
-          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-brick shrink-0" />Tout Plan École inclus</li>
-          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-brick shrink-0" />Export Excel (XLSX)</li>
-          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-brick shrink-0" />Notifications SMS</li>
-          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-brick shrink-0" />Tableau de bord analytique</li>
-          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-brick shrink-0" />Support prioritaire &lt; 4h</li>
-          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-brick shrink-0" />Onboarding personnalisé (1h)</li>
+          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-emerald shrink-0" />Sessions & enseignants illimités</li>
+          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-emerald shrink-0" />Tout Plan École inclus</li>
+          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-emerald shrink-0" />Export Excel (XLSX)</li>
+          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-emerald shrink-0" />Notifications SMS</li>
+          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-emerald shrink-0" />Tableau de bord analytique</li>
+          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-emerald shrink-0" />Support prioritaire &lt; 4h</li>
+          <li class="flex items-center gap-2"><app-svg-icon name="check" [size]="13" iconClass="text-emerald shrink-0" />Onboarding personnalisé (1h)</li>
         </ul>
         <a [routerLink]="getPricingLink('etablissement').path" [queryParams]="getPricingLink('etablissement').queryParams"
-           class="btn-ghost-cream block text-center py-3 text-sm">
+           class="block text-center py-3 text-sm font-semibold text-navy/60 border border-steel hover:border-navy/30 rounded-xl transition-colors">
           Démarrer l'essai →
         </a>
       </div>
 
     </div>
 
-    <div class="mt-6 bg-cream/50 border border-cream/80 rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+    <!-- Enterprise row -->
+    <div class="mt-6 bg-white border border-steel rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
       <div>
         <div class="text-navy font-bold mb-1 inline-flex items-center gap-2 font-display">
           <app-svg-icon name="library" [size]="18" iconClass="text-brick shrink-0" />
@@ -491,18 +510,18 @@
         </div>
         <div class="text-navy/45 text-sm">Multi-établissements, personnalisation, API, formation incluse, SLA garanti.</div>
       </div>
-      <a href="https://wa.me/22901000000?text=Bonjour%2C%20je%20souhaite%20un%20devis%20TimeTutor%20pour%20mon%20réseau%20scolaire."
+      <a href="https://wa.me/2290151464112?text=Bonjour%2C%20je%20souhaite%20un%20devis%20TimeTutor%20pour%20mon%20réseau%20scolaire."
          target="_blank"
          class="shrink-0 bg-green-600 hover:bg-green-500 text-white font-semibold px-6 py-3 rounded-2xl text-sm transition-all whitespace-nowrap inline-flex items-center gap-2 hover:-translate-y-0.5">
         <app-svg-icon name="chat-bubble" [size]="17" iconClass="text-white shrink-0" />
-        Demander un devis WhatsApp
+        Demander un devis
       </a>
     </div>
   </div>
 </section>
 
 <!-- ═══════════ FAQ ═══════════ -->
-<section class="py-20 bg-warm">
+<section class="py-20 bg-white">
   <div class="max-w-3xl mx-auto px-6">
     <div class="text-center mb-12">
       <div class="text-brick text-xs font-bold uppercase tracking-widest font-mono mb-3">Questions fréquentes</div>
@@ -510,42 +529,42 @@
     </div>
     <div class="space-y-3">
 
-      <details class="group bg-white border border-cream/70 rounded-2xl overflow-hidden shadow-sm">
-        <summary class="px-6 py-4 font-semibold text-navy cursor-pointer hover:bg-cream/30 transition-colors list-none flex justify-between items-center font-display">
+      <details class="group bg-cream border border-steel rounded-2xl overflow-hidden">
+        <summary class="px-6 py-4 font-semibold text-navy cursor-pointer hover:bg-steel/30 transition-colors list-none flex justify-between items-center font-display">
           Les enseignants doivent-ils créer un compte ?
-          <span class="text-navy/30 group-open:rotate-180 transition-transform inline-flex"><app-svg-icon name="chevron-down" [size]="18" iconClass="text-navy/30" /></span>
+          <span class="text-navy/30 group-open:rotate-180 transition-transform inline-flex shrink-0 ml-4"><app-svg-icon name="chevron-down" [size]="18" iconClass="text-navy/30" /></span>
         </summary>
-        <p class="px-6 pb-5 text-navy/60 text-sm leading-relaxed border-t border-cream/50 pt-4 mt-0">
+        <p class="px-6 pb-5 text-navy/60 text-sm leading-relaxed border-t border-steel/60 pt-4 mt-0">
           Non. Chaque enseignant reçoit un lien personnel sécurisé par email. Il clique, voit la grille de créneaux, fait ses choix — c'est tout. Aucun compte, aucun mot de passe.
         </p>
       </details>
 
-      <details class="group bg-white border border-cream/70 rounded-2xl overflow-hidden shadow-sm">
-        <summary class="px-6 py-4 font-semibold text-navy cursor-pointer hover:bg-cream/30 transition-colors list-none flex justify-between items-center font-display">
+      <details class="group bg-cream border border-steel rounded-2xl overflow-hidden">
+        <summary class="px-6 py-4 font-semibold text-navy cursor-pointer hover:bg-steel/30 transition-colors list-none flex justify-between items-center font-display">
           Comment fonctionne le paiement ?
-          <span class="text-navy/30 group-open:rotate-180 transition-transform inline-flex"><app-svg-icon name="chevron-down" [size]="18" iconClass="text-navy/30" /></span>
+          <span class="text-navy/30 group-open:rotate-180 transition-transform inline-flex shrink-0 ml-4"><app-svg-icon name="chevron-down" [size]="18" iconClass="text-navy/30" /></span>
         </summary>
-        <p class="px-6 pb-5 text-navy/60 text-sm leading-relaxed border-t border-cream/50 pt-4 mt-0">
+        <p class="px-6 pb-5 text-navy/60 text-sm leading-relaxed border-t border-steel/60 pt-4 mt-0">
           Nous acceptons MTN Mobile Money, Moov Money et les cartes bancaires (Visa/Mastercard) via FedaPay. Le paiement annuel vous offre 2 mois gratuits. Aucun engagement — annulation possible à tout moment.
         </p>
       </details>
 
-      <details class="group bg-white border border-cream/70 rounded-2xl overflow-hidden shadow-sm">
-        <summary class="px-6 py-4 font-semibold text-navy cursor-pointer hover:bg-cream/30 transition-colors list-none flex justify-between items-center font-display">
+      <details class="group bg-cream border border-steel rounded-2xl overflow-hidden">
+        <summary class="px-6 py-4 font-semibold text-navy cursor-pointer hover:bg-steel/30 transition-colors list-none flex justify-between items-center font-display">
           Que se passe-t-il si deux enseignants veulent le même créneau ?
-          <span class="text-navy/30 group-open:rotate-180 transition-transform inline-flex"><app-svg-icon name="chevron-down" [size]="18" iconClass="text-navy/30" /></span>
+          <span class="text-navy/30 group-open:rotate-180 transition-transform inline-flex shrink-0 ml-4"><app-svg-icon name="chevron-down" [size]="18" iconClass="text-navy/30" /></span>
         </summary>
-        <p class="px-6 pb-5 text-navy/60 text-sm leading-relaxed border-t border-cream/50 pt-4 mt-0">
+        <p class="px-6 pb-5 text-navy/60 text-sm leading-relaxed border-t border-steel/60 pt-4 mt-0">
           TimeTutor verrouille les créneaux en temps réel. Le premier à sélectionner obtient le créneau. L'autre voit un message "créneau pris" et peut envoyer une demande d'échange au directeur.
         </p>
       </details>
 
-      <details class="group bg-white border border-cream/70 rounded-2xl overflow-hidden shadow-sm">
-        <summary class="px-6 py-4 font-semibold text-navy cursor-pointer hover:bg-cream/30 transition-colors list-none flex justify-between items-center font-display">
+      <details class="group bg-cream border border-steel rounded-2xl overflow-hidden">
+        <summary class="px-6 py-4 font-semibold text-navy cursor-pointer hover:bg-steel/30 transition-colors list-none flex justify-between items-center font-display">
           Fonctionne-t-il avec une connexion internet instable ?
-          <span class="text-navy/30 group-open:rotate-180 transition-transform inline-flex"><app-svg-icon name="chevron-down" [size]="18" iconClass="text-navy/30" /></span>
+          <span class="text-navy/30 group-open:rotate-180 transition-transform inline-flex shrink-0 ml-4"><app-svg-icon name="chevron-down" [size]="18" iconClass="text-navy/30" /></span>
         </summary>
-        <p class="px-6 pb-5 text-navy/60 text-sm leading-relaxed border-t border-cream/50 pt-4 mt-0">
+        <p class="px-6 pb-5 text-navy/60 text-sm leading-relaxed border-t border-steel/60 pt-4 mt-0">
           Oui. TimeTutor est une PWA installable sur mobile et fonctionne en mode hors ligne pour consulter les créneaux. Les sélections se synchronisent dès la reconnexion.
         </p>
       </details>
@@ -554,33 +573,33 @@
 </section>
 
 <!-- ═══════════ CTA FINAL ═══════════ -->
-<section class="hero-bg py-28 relative overflow-hidden">
-  <div class="orb1 absolute top-0 right-1/3 w-80 h-80 rounded-full bg-molten/15 blur-3xl pointer-events-none"></div>
-  <div class="orb2 absolute bottom-0 left-1/4 w-72 h-72 rounded-full bg-brick/10 blur-3xl pointer-events-none"></div>
+<section class="cta-bg py-28 relative overflow-hidden">
+  <div class="cta-orb absolute top-0 right-1/4 w-96 h-96 rounded-full bg-brick/30 blur-[100px] pointer-events-none"></div>
+  <div class="cta-orb2 absolute bottom-0 left-1/4 w-80 h-80 rounded-full bg-emerald/15 blur-[80px] pointer-events-none"></div>
   <div class="max-w-3xl mx-auto px-6 text-center relative z-10">
-    <div class="inline-flex items-center gap-2 bg-molten/12 border border-molten/28 text-amber-700 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-8">
-      <span class="w-1.5 h-1.5 rounded-full bg-molten animate-pulse"></span>
+    <div class="inline-flex items-center gap-2 bg-brick/15 border border-brick/25 text-brick text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-8">
+      <span class="w-1.5 h-1.5 rounded-full bg-brick animate-pulse"></span>
       Offre de lancement
     </div>
-    <h2 class="font-display text-4xl font-extrabold text-navy mb-5 leading-tight">
+    <h2 class="font-display text-5xl font-extrabold text-white mb-5 leading-tight">
       Prêt à gagner 3 jours<br>par session ?
     </h2>
-    <p class="text-navy/50 text-lg mb-10 max-w-xl mx-auto font-light">
+    <p class="text-white/50 text-lg mb-10 max-w-xl mx-auto font-light">
       Rejoignez les établissements qui ont dit adieu aux tableurs. Démarrez gratuitement, sans carte bancaire.
     </p>
     <div class="flex flex-wrap gap-4 justify-center">
       @if (auth.isAuthenticated()) {
-        <a [routerLink]="dashboardLink()" class="btn-brick text-base px-10 py-4 shadow-xl shadow-brick/20 hover:-translate-y-1">
+        <a [routerLink]="dashboardLink()" class="bg-brick hover:bg-brick/90 text-white font-bold text-base px-10 py-4 rounded-2xl transition-all hover:-translate-y-1 shadow-2xl shadow-brick/30">
           Accéder à mon espace →
         </a>
       } @else {
-        <a routerLink="/register" class="btn-brick text-base px-10 py-4 shadow-xl shadow-brick/20 hover:-translate-y-1">
+        <a routerLink="/register" class="bg-brick hover:bg-brick/90 text-white font-bold text-base px-10 py-4 rounded-2xl transition-all hover:-translate-y-1 shadow-2xl shadow-brick/30">
           Créer mon établissement gratuit →
         </a>
       }
-      <a href="https://wa.me/22901000000?text=Bonjour%2C%20je%20voudrais%20une%20démo%20de%20TimeTutor."
+      <a href="https://wa.me/2290151464112?text=Bonjour%2C%20je%20voudrais%20une%20démo%20de%20TimeTutor."
          target="_blank"
-         class="bg-green-600 hover:bg-green-500 text-white font-bold px-10 py-4 rounded-2xl transition-all text-base hover:-translate-y-1 inline-flex items-center gap-2 shadow-xl shadow-green-900/20">
+         class="bg-white/10 border border-white/20 hover:bg-white/15 text-white font-bold px-10 py-4 rounded-2xl transition-all text-base hover:-translate-y-1 inline-flex items-center gap-2">
         <app-svg-icon name="chat-bubble" [size]="20" iconClass="text-white shrink-0" />
         Demander une démo
       </a>
@@ -589,41 +608,42 @@
 </section>
 
 <!-- ═══════════ FOOTER ═══════════ -->
-<footer class="bg-white border-t border-cream/60 pt-14 pb-10">
+<footer class="bg-navy border-t border-white/8 pt-14 pb-10">
   <div class="max-w-5xl mx-auto px-6">
     <div class="grid md:grid-cols-4 gap-10 mb-12">
       <div class="md:col-span-2">
-        <div class="font-display font-extrabold text-xl text-navy mb-3">Time<span class="text-molten">Tutor</span></div>
-        <p class="text-navy/50 text-sm leading-relaxed max-w-xs">
+        <div class="font-display font-extrabold text-xl text-white mb-3">Time<span class="text-brick">Tutor</span></div>
+        <p class="text-white/40 text-sm leading-relaxed max-w-xs">
           La plateforme de gestion des emplois du temps scolaires pensée pour l'Afrique francophone.
         </p>
         <div class="flex gap-3 mt-5">
-          <a href="https://wa.me/22901000000" target="_blank"
-             class="w-9 h-9 bg-green-600/15 border border-green-600/25 rounded-xl flex items-center justify-center text-green-600 hover:bg-green-600/30 transition-colors text-xs font-bold">
+          <a href="https://wa.me/2290151464112" target="_blank"
+             class="w-9 h-9 bg-green-600/15 border border-green-600/25 rounded-xl flex items-center justify-center text-green-400 hover:bg-green-600/30 transition-colors text-xs font-bold">
             WA
           </a>
         </div>
       </div>
       <div>
-        <div class="text-navy/65 font-semibold text-sm mb-4">Produit</div>
-        <ul class="space-y-2.5 text-navy/45 text-sm">
-          <li><a href="#fonctionnement" class="hover:text-navy transition-colors">Fonctionnement</a></li>
-          <li><a href="#fonctionnalites" class="hover:text-navy transition-colors">Fonctionnalités</a></li>
-          <li><a href="#tarifs" class="hover:text-navy transition-colors">Tarifs</a></li>
-          <li><a routerLink="/help" class="hover:text-navy transition-colors">Guide d'utilisation</a></li>
-          <li><a routerLink="/policy" class="hover:text-navy transition-colors">Politique du site</a></li>
+        <div class="text-white/40 font-semibold text-sm mb-4">Produit</div>
+        <ul class="space-y-2.5 text-white/30 text-sm">
+          <li><a href="#fonctionnement" class="hover:text-white/60 transition-colors">Fonctionnement</a></li>
+          <li><a href="#fonctionnalites" class="hover:text-white/60 transition-colors">Fonctionnalités</a></li>
+          <li><a href="#tarifs" class="hover:text-white/60 transition-colors">Tarifs</a></li>
+          <li><a routerLink="/help" class="hover:text-white/60 transition-colors">Guide d'utilisation</a></li>
+          <li><a routerLink="/policy" class="hover:text-white/60 transition-colors">Politique du site</a></li>
         </ul>
       </div>
       <div>
-        <div class="text-navy/65 font-semibold text-sm mb-4">Accès</div>
-        <ul class="space-y-2.5 text-navy/45 text-sm">
-          <li><a routerLink="/login" class="hover:text-navy transition-colors">Connexion</a></li>
-          <li><a routerLink="/register" class="hover:text-navy transition-colors">Créer un établissement</a></li>
-          <li><a routerLink="/register-teacher" class="hover:text-navy transition-colors">Compte enseignant</a></li>
+        <div class="text-white/40 font-semibold text-sm mb-4">Accès</div>
+        <ul class="space-y-2.5 text-white/30 text-sm">
+          <li><a routerLink="/login" class="hover:text-white/60 transition-colors">Connexion</a></li>
+          <li><a routerLink="/register" class="hover:text-white/60 transition-colors">Créer un établissement</a></li>
+          <li><a routerLink="/register-teacher" class="hover:text-white/60 transition-colors">Compte enseignant</a></li>
+          <li><a routerLink="/pricing" class="hover:text-white/60 transition-colors">Nos tarifs</a></li>
         </ul>
       </div>
     </div>
-    <div class="border-t border-cream/50 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-navy/35">
+    <div class="border-t border-white/8 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-white/25">
       <span>© 2026 TimeTutor — Tous droits réservés</span>
       <span class="inline-flex items-center gap-1.5">Fait avec <app-svg-icon name="heart" [size]="13" iconClass="text-brick/60 shrink-0" /> pour les établissements d'Afrique francophone</span>
     </div>

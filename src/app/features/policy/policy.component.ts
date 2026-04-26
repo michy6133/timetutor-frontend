@@ -12,6 +12,7 @@ import { AuthService } from '../../core/services/auth.service';
 export class PolicyComponent implements OnInit {
   private readonly api = inject(ApiService);
   readonly auth = inject(AuthService);
+  readonly downloading = signal(false);
   readonly policyVersion = signal<string>('');
 
   ngOnInit(): void {
@@ -21,16 +22,27 @@ export class PolicyComponent implements OnInit {
     });
   }
 
-  downloadDataExport(): void {
-    this.api.getBlob('/auth/me/export').subscribe({
-      next: (blob) => {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'timetutor-export-donnees.json';
-        a.click();
-        URL.revokeObjectURL(url);
-      },
-    });
+  async downloadDataExport(): Promise<void> {
+    if (this.downloading()) return;
+    this.downloading.set(true);
+    const token = localStorage.getItem('tt_token');
+    try {
+      const res = await fetch('http://localhost:3001/api/v1/auth/me/export', {
+        credentials: 'include',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!res.ok) throw new Error('Erreur export');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'timetutor-export-donnees.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      console.error("Impossible d'exporter les données");
+    } finally {
+      this.downloading.set(false);
+    }
   }
 }

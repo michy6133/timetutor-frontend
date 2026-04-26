@@ -1,0 +1,107 @@
+<div class="max-w-3xl mx-auto px-6 py-8">
+  <div class="flex items-center gap-4 mb-7">
+    <div class="w-11 h-11 rounded-xl bg-brick/10 flex items-center justify-center">
+      <svg class="w-6 h-6 text-brick" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+      </svg>
+    </div>
+    <div>
+      <h1 class="font-display text-2xl font-extrabold text-navy">Paramètres</h1>
+      <p class="text-sm text-navy/40 mt-0.5">Configuration de votre espace TimeTutor.</p>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="flex gap-1 bg-cream/60 rounded-xl p-1 mb-7 w-fit border border-steel/50">
+    <button type="button" (click)="activeTab.set('school')"
+      class="px-4 py-2 text-sm font-semibold rounded-lg transition-all"
+      [class]="activeTab() === 'school' ? 'bg-white text-brick shadow-sm' : 'text-navy/55 hover:text-navy'">
+      École
+    </button>
+    <button type="button" (click)="activeTab.set('account')"
+      class="px-4 py-2 text-sm font-semibold rounded-lg transition-all"
+      [class]="activeTab() === 'account' ? 'bg-white text-brick shadow-sm' : 'text-navy/55 hover:text-navy'">
+      Compte
+    </button>
+    <button type="button" (click)="activeTab.set('notifications')"
+      class="px-4 py-2 text-sm font-semibold rounded-lg transition-all"
+      [class]="activeTab() === 'notifications' ? 'bg-white text-brick shadow-sm' : 'text-navy/55 hover:text-navy'">
+      Notifications
+    </button>
+  </div>
+
+  <!-- École tab -->
+  @if (activeTab() === 'school') {
+    <div class="bg-white rounded-2xl border border-steel/60 shadow-sm p-7">
+      <h2 class="font-display font-bold text-navy mb-5">Informations de l'école</h2>
+      <form [formGroup]="schoolForm" (ngSubmit)="saveSchool()" class="space-y-4">
+        <div>
+          <label class="tt-label">Nom de l'école</label>
+          <input formControlName="name" type="text" class="tt-input" placeholder="Lycée XYZ" />
+        </div>
+        <div>
+          <label class="tt-label">Email de contact</label>
+          <input formControlName="contactEmail" type="email" class="tt-input" placeholder="contact@ecole.bj" />
+        </div>
+        <div>
+          <label class="tt-label">Fuseau horaire</label>
+          <select formControlName="timezone" class="tt-input">
+            <option value="Africa/Porto-Novo">Africa/Porto-Novo (WAT +1)</option>
+            <option value="Africa/Abidjan">Africa/Abidjan (GMT +0)</option>
+            <option value="Africa/Lagos">Africa/Lagos (WAT +1)</option>
+            <option value="Europe/Paris">Europe/Paris (CET +1)</option>
+          </select>
+        </div>
+        <div class="pt-2">
+          <button type="submit" [disabled]="schoolForm.invalid || saving()"
+            class="btn-brick px-6 py-2.5 text-sm">
+            @if (saving()) { <span class="spinner mr-2"></span> }
+            Enregistrer
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <!-- Compte tab -->
+  @if (activeTab() === 'account') {
+    <div class="bg-white rounded-2xl border border-steel/60 shadow-sm p-7">
+      <h2 class="font-display font-bold text-navy mb-2">Informations du compte</h2>
+      <p class="text-sm text-navy/45 mb-6">Pour modifier votre nom ou mot de passe, rendez-vous sur la <a routerLink="/profile" class="text-brick underline">page Profil</a>.</p>
+
+      <div class="border-t border-steel/40 pt-6">
+        <h3 class="font-semibold text-red-600 mb-2">Zone de danger</h3>
+        <p class="text-sm text-navy/50 mb-4">La suppression de votre compte est irréversible. Toutes vos données seront désactivées.</p>
+        <button type="button" (click)="deleteAccount()" [disabled]="deletingAccount()"
+          class="px-5 py-2.5 text-sm font-semibold text-red-600 border border-red-300 rounded-xl hover:bg-red-50 transition-all disabled:opacity-50">
+          @if (deleteConfirmCount() === 0) { Supprimer mon compte }
+          @else { Confirmer la suppression — IRRÉVERSIBLE }
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Notifications tab -->
+  @if (activeTab() === 'notifications') {
+    <div class="bg-white rounded-2xl border border-steel/60 shadow-sm p-7">
+      <h2 class="font-display font-bold text-navy mb-5">Préférences de notification</h2>
+      <div class="space-y-4">
+        <div class="flex items-center justify-between p-4 border border-steel/40 rounded-xl">
+          <div>
+            <p class="font-semibold text-navy text-sm">Notifications par email</p>
+            <p class="text-xs text-navy/45 mt-0.5">Recevoir un email lorsqu'un enseignant sélectionne un créneau.</p>
+          </div>
+          <button type="button" (click)="emailNotifs.set(!emailNotifs())"
+            class="relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none"
+            [class]="emailNotifs() ? 'bg-brick' : 'bg-steel'">
+            <span class="absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200"
+              [class]="emailNotifs() ? 'translate-x-5' : 'translate-x-0.5'"></span>
+          </button>
+        </div>
+        <p class="text-xs text-navy/35 px-1">Les préférences de notification seront synchronisées prochainement.</p>
+      </div>
+    </div>
+  }
+</div>

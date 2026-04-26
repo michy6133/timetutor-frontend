@@ -16,17 +16,26 @@
         theme: {
           extend: {
             colors: {
-              /* New warm palette — keeping same names for template compatibility */
-              navy:   { DEFAULT: '#93441A', 50:'#fdf6f0', 100:'#f5e4d2', 200:'#e8c4a0', 300:'#d9a070', 400:'#c87840', 500:'#93441A', 600:'#7a3612', 700:'#60280d', 800:'#3d1806', 900:'#1e0c03' },
-              brick:  { DEFAULT: '#B67332', 50:'#fdf4e8', 100:'#f5e2c0', 200:'#e8c885', 300:'#d9aa4a', 400:'#c68e28', 500:'#B67332', 600:'#935a22', 700:'#704215', 800:'#4d2d0c', 900:'#2a1705' },
-              cream:  { DEFAULT: '#EEE6D8', 50:'#fefcfa', 100:'#f8f3ec', 200:'#EEE6D8', 300:'#e2d3bc', 400:'#d3be9e', 500:'#c0a47c', 600:'#a8875a', 700:'#8a6a3c', 800:'#6a4e26', 900:'#4a3316' },
-              steel:  { DEFAULT: '#e5e7e6', 50:'#fafafa', 100:'#f5f5f5', 200:'#e5e7e6', 300:'#d0d3d2', 400:'#b0b4b3', 500:'#8c9190', 600:'#6a706f', 700:'#4e5453', 800:'#343838', 900:'#1c1e1e' },
-              molten: { DEFAULT: '#DAAB3A', 50:'#fdfbf0', 100:'#f8f0c8', 200:'#f0df90', 300:'#e8cb58', 400:'#DAAB3A', 500:'#b88c25', 600:'#926e15', 700:'#6e5209', 800:'#4a3604', 900:'#261c01' },
-              gold:   { DEFAULT: '#DAAB3A' },
-              amber:  { DEFAULT: '#B67332' },
-              mahogany: { DEFAULT: '#93441A' },
-              sand:   { DEFAULT: '#EEE6D8' },
-              silver: { DEFAULT: '#e5e7e6' },
+              /* Indigo palette — keeping same class names for template compatibility */
+              navy:   { DEFAULT: '#111827', 50:'#f9fafb', 100:'#f3f4f6', 200:'#e5e7eb', 300:'#d1d5db', 400:'#9ca3af', 500:'#6b7280', 600:'#4b5563', 700:'#374151', 800:'#1f2937', 900:'#111827' },
+              /* Primary — Prussian Blue */
+              brick:  { DEFAULT: '#001427', 50:'#e6ecf2', 100:'#b3c4d7', 200:'#80a2bc', 300:'#4d7fa2', 400:'#265d87', 500:'#001427', 600:'#001020', 700:'#000b18', 800:'#000710', 900:'#000308' },
+              cream:  { DEFAULT: '#F9FAFB', 50:'#ffffff', 100:'#f9fafb', 200:'#F9FAFB', 300:'#f3f4f6', 400:'#e5e7eb', 500:'#d1d5db', 600:'#9ca3af', 700:'#6b7280', 800:'#374151', 900:'#111827' },
+              steel:  { DEFAULT: '#E5E7EB', 50:'#f9fafb', 100:'#f3f4f6', 200:'#E5E7EB', 300:'#d1d5db', 400:'#9ca3af', 500:'#6b7280', 600:'#4b5563', 700:'#374151', 800:'#1f2937', 900:'#111827' },
+              /* Accent — Jasmine */
+              molten: { DEFAULT: '#F4D58D', 50:'#fefcf3', 100:'#fdf7e4', 200:'#fbeed0', 300:'#f9e5bc', 400:'#f6dba8', 500:'#F4D58D', 600:'#e8be5e', 700:'#d9a52f', 800:'#b8891a', 900:'#8f6c0f' },
+              /* Secondary — Deep Teal */
+              emerald:{ DEFAULT: '#708D81', 50:'#f0f3f2', 100:'#d6e1dd', 200:'#bccfc9', 300:'#a2bdb5', 400:'#88aba1', 500:'#708D81', 600:'#5a7167', 700:'#44554e', 800:'#2d3835', 900:'#171c1c' },
+              /* Accent alias */
+              amber:  { DEFAULT: '#F4D58D', 50:'#fefcf3', 100:'#fdf7e4', 200:'#fbeed0', 300:'#f9e5bc', 400:'#f6dba8', 500:'#F4D58D', 600:'#e8be5e', 700:'#d9a52f', 800:'#b8891a', 900:'#8f6c0f' },
+              indigo: { DEFAULT: '#001427', 50:'#e6ecf2', 100:'#b3c4d7', 200:'#80a2bc', 300:'#4d7fa2', 400:'#265d87', 500:'#001427', 600:'#001020', 700:'#000b18', 800:'#000710', 900:'#000308' },
+              /* Error / Danger */
+              error:  { DEFAULT: '#BF0603', 50:'#fef0f0', 100:'#fcc6c5', 200:'#f99c9b', 300:'#f67271', 400:'#ee3937', 500:'#BF0603', 600:'#960502', 700:'#6e0402', 800:'#450201', 900:'#1d0100' },
+              danger: { DEFAULT: '#8D0801', 50:'#fcebeb', 100:'#f5b3b2', 200:'#ee7b7a', 300:'#e74342', 400:'#c01514', 500:'#8D0801', 600:'#700701', 700:'#530600', 800:'#360400', 900:'#190200' },
+              gold:   { DEFAULT: '#F4D58D' },
+              mahogany: { DEFAULT: '#111827' },
+              sand:   { DEFAULT: '#F9FAFB' },
+              silver: { DEFAULT: '#E5E7EB' },
             },
             fontFamily: {
               sans: ['Inter', 'system-ui', 'sans-serif'],

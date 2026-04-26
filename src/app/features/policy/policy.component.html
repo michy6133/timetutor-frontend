@@ -13,9 +13,13 @@
       <h2 class="font-display text-lg font-bold text-navy mb-2">Données personnelles (RGPD / APDP Bénin)</h2>
       <p class="mb-3">Vous pouvez demander l’accès ou la portabilité de vos données. Connecté(e), vous pouvez télécharger une copie JSON de vos informations (compte, sessions, créneaux, répertoire pour les directeurs).</p>
       @if (auth.isAuthenticated()) {
-        <button type="button" (click)="downloadDataExport()"
-          class="inline-flex items-center gap-2 text-sm font-semibold text-brick border border-brick/30 hover:bg-brick/8 px-4 py-2 rounded-xl transition-colors">
-          Télécharger mes données (export JSON)
+        <button type="button" (click)="downloadDataExport()" [disabled]="downloading()"
+          class="inline-flex items-center gap-2 text-sm font-semibold text-brick border border-brick/30 hover:bg-brick/8 px-4 py-2 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          @if (downloading()) {
+            <span class="spinner spinner-dark"></span> Export en cours...
+          } @else {
+            Télécharger mes données (export JSON)
+          }
         </button>
       } @else {
         <p class="text-xs text-navy/40">Connectez-vous pour lancer un export depuis votre compte.</p>
