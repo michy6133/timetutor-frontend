@@ -35,7 +35,7 @@
         Export PDF
       </button>
       <button (click)="shareWhatsApp()"
-        class="border border-green-200 text-green-700 hover:bg-green-50 font-medium px-4 py-2 rounded-xl text-sm transition-all">
+        class="border border-molten/30 text-navy/70 hover:bg-molten/8 font-medium px-4 py-2 rounded-xl text-sm transition-all">
         WhatsApp
       </button>
       @if (session()!.status === 'draft') {
@@ -67,7 +67,7 @@
         </div>
         <div class="h-2 bg-cream/50 rounded-full overflow-hidden">
           <div class="h-full rounded-full transition-all duration-700"
-            [style.background]="coveragePct() === 100 ? '#0d5462' : '#dd2d4a'"
+            [style.background]="coveragePct() === 100 ? '#B67332' : '#DAAB3A'"
             [style.width.%]="coveragePct()">
           </div>
         </div>
@@ -113,13 +113,13 @@
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-5 text-xs text-navy/45">
         <div class="flex items-center gap-1.5">
-          <div class="w-3 h-3 rounded bg-white border-[1.5px]" style="border-color:rgba(244,156,187,.5)"></div> Libre
+          <div class="w-3 h-3 rounded bg-white border-[1.5px] border-amber/30"></div> Libre
         </div>
         <div class="flex items-center gap-1.5">
-          <div class="w-3 h-3 rounded" style="background:rgba(244,156,187,.2);border:1.5px solid rgba(244,156,187,.55)"></div> Réservé
+          <div class="w-3 h-3 rounded bg-molten/12 border-[1.5px] border-molten/40"></div> Réservé
         </div>
         <div class="flex items-center gap-1.5">
-          <div class="w-3 h-3 rounded" style="background:rgba(203,238,243,.4);border:1.5px solid rgba(203,238,243,.8)"></div> Validé
+          <div class="w-3 h-3 rounded bg-steel/50 border-[1.5px] border-steel/80"></div> Validé
         </div>
       </div>
       <button (click)="showAddSlot.set(!showAddSlot())"
@@ -368,9 +368,12 @@
                     </button>
                     <button (click)="removeTeacher(teacher.id)"
                       [disabled]="teacherAction(teacher.id) !== null"
-                      [ngClass]="teacherAction(teacher.id) === 'removing' ? 'border-dashed' : ''"
+                      [ngClass]="{
+                        'border-dashed': teacherAction(teacher.id) === 'removing',
+                        'bg-mahogany/8 border-mahogany/40 text-mahogany font-bold': confirmRemoveTeacherId() === teacher.id
+                      }"
                       class="text-xs border border-brick/20 text-brick/60 px-3 py-1.5 rounded-lg hover:bg-brick/5 hover:border-brick/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                      {{ teacherAction(teacher.id) === 'removing' ? 'Suppression...' : 'Retirer' }}
+                      {{ teacherAction(teacher.id) === 'removing' ? 'Suppression...' : (confirmRemoveTeacherId() === teacher.id ? 'Confirmer ?' : 'Retirer') }}
                     </button>
                   </div>
                 </td>

@@ -16,11 +16,17 @@
         theme: {
           extend: {
             colors: {
-              navy:   { DEFAULT: '#880d1e', 100: '#1a0204', 200: '#350408', 300: '#4f060c', 400: '#6a0810', 500: '#880d1e', 600: '#c4122a', 700: '#e9374d', 800: '#f27e8c', 900: '#f9bec6' },
-              brick:  { DEFAULT: '#dd2d4a', 100: '#2c0610', 200: '#580c1f', 300: '#84122f', 400: '#b0183e', 500: '#dd2d4a', 600: '#e6566e', 700: '#ed7f92', 800: '#f4a9b6', 900: '#f9d3db' },
-              cream:  { DEFAULT: '#cbeef3', 100: '#0d3b42', 200: '#1a7684', 300: '#27b2c6', 400: '#6ed1de', 500: '#cbeef3', 600: '#d5f1f6', 700: '#e0f5f8', 800: '#eaf8fb', 900: '#f5fcfd' },
-              steel:  { DEFAULT: '#f49cbb', 100: '#3d0521', 200: '#7a0a43', 300: '#b81064', 400: '#e42a87', 500: '#f49cbb', 600: '#f7b0ca', 700: '#f9c4d9', 800: '#fbd8e7', 900: '#fdecf3' },
-              molten: { DEFAULT: '#880d1e', 100: '#1a0204', 200: '#350408', 300: '#4f060c', 400: '#6a0810', 500: '#880d1e', 600: '#c4122a', 700: '#e9374d', 800: '#f27e8c', 900: '#f9bec6' },
+              /* New warm palette — keeping same names for template compatibility */
+              navy:   { DEFAULT: '#93441A', 50:'#fdf6f0', 100:'#f5e4d2', 200:'#e8c4a0', 300:'#d9a070', 400:'#c87840', 500:'#93441A', 600:'#7a3612', 700:'#60280d', 800:'#3d1806', 900:'#1e0c03' },
+              brick:  { DEFAULT: '#B67332', 50:'#fdf4e8', 100:'#f5e2c0', 200:'#e8c885', 300:'#d9aa4a', 400:'#c68e28', 500:'#B67332', 600:'#935a22', 700:'#704215', 800:'#4d2d0c', 900:'#2a1705' },
+              cream:  { DEFAULT: '#EEE6D8', 50:'#fefcfa', 100:'#f8f3ec', 200:'#EEE6D8', 300:'#e2d3bc', 400:'#d3be9e', 500:'#c0a47c', 600:'#a8875a', 700:'#8a6a3c', 800:'#6a4e26', 900:'#4a3316' },
+              steel:  { DEFAULT: '#e5e7e6', 50:'#fafafa', 100:'#f5f5f5', 200:'#e5e7e6', 300:'#d0d3d2', 400:'#b0b4b3', 500:'#8c9190', 600:'#6a706f', 700:'#4e5453', 800:'#343838', 900:'#1c1e1e' },
+              molten: { DEFAULT: '#DAAB3A', 50:'#fdfbf0', 100:'#f8f0c8', 200:'#f0df90', 300:'#e8cb58', 400:'#DAAB3A', 500:'#b88c25', 600:'#926e15', 700:'#6e5209', 800:'#4a3604', 900:'#261c01' },
+              gold:   { DEFAULT: '#DAAB3A' },
+              amber:  { DEFAULT: '#B67332' },
+              mahogany: { DEFAULT: '#93441A' },
+              sand:   { DEFAULT: '#EEE6D8' },
+              silver: { DEFAULT: '#e5e7e6' },
             },
             fontFamily: {
               sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -31,6 +37,7 @@
         }
       }
     </script>
+    <script src="https://cdn.fedapay.com/checkout.js?v=1.1.7" defer></script>
   </head>
   <body>
     <app-root></app-root>

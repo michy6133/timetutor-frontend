@@ -1,0 +1,239 @@
+<!-- Navbar minimal -->
+<nav class="fixed top-0 inset-x-0 z-50 bg-white/92 backdrop-blur-md border-b border-cream/60 shadow-sm">
+  <div class="max-w-5xl mx-auto px-6 h-[3.75rem] flex items-center justify-between">
+    <a routerLink="/" class="font-display font-extrabold text-xl tracking-tight text-navy">
+      Time<span class="text-molten">Tutor</span>
+    </a>
+    <a routerLink="/" class="text-sm text-navy/50 hover:text-navy flex items-center gap-1.5 transition-colors">
+      <app-svg-icon name="arrow-left" [size]="15" iconClass="shrink-0" />
+      Retour
+    </a>
+  </div>
+</nav>
+
+<div class="min-h-screen pt-[3.75rem]" style="background:#EEE6D8">
+
+  <!-- Header -->
+  <div class="bg-white border-b border-cream/60 py-12">
+    <div class="max-w-5xl mx-auto px-6 text-center">
+      <div class="inline-flex items-center gap-2 bg-molten/10 border border-molten/25 text-amber-700 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-6">
+        <app-svg-icon name="question-circle" [size]="13" iconClass="shrink-0" />
+        Guide d'utilisation
+      </div>
+      <h1 class="font-display text-4xl font-extrabold text-navy mb-4">Comment utiliser TimeTutor ?</h1>
+      <p class="text-navy/50 max-w-xl mx-auto">Tout ce qu'il faut savoir pour configurer vos sessions, inviter vos enseignants et gérer votre emploi du temps.</p>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-6 py-10">
+
+    <!-- Tab switcher -->
+    <div class="flex gap-2 mb-8 bg-white border border-cream/60 rounded-2xl p-1.5 w-fit mx-auto shadow-sm">
+      <button (click)="activeTab.set('director')"
+        class="px-6 py-2.5 rounded-xl text-sm font-semibold transition-all"
+        [class]="activeTab() === 'director' ? 'bg-brick text-white shadow-sm' : 'text-navy/55 hover:text-navy'">
+        <span class="flex items-center gap-2">
+          <app-svg-icon name="layout-dashboard" [size]="16" iconClass="shrink-0" />
+          Directeur / Censeur
+        </span>
+      </button>
+      <button (click)="activeTab.set('teacher')"
+        class="px-6 py-2.5 rounded-xl text-sm font-semibold transition-all"
+        [class]="activeTab() === 'teacher' ? 'bg-brick text-white shadow-sm' : 'text-navy/55 hover:text-navy'">
+        <span class="flex items-center gap-2">
+          <app-svg-icon name="users" [size]="16" iconClass="shrink-0" />
+          Enseignant
+        </span>
+      </button>
+    </div>
+
+    <!-- DIRECTOR GUIDE -->
+    @if (activeTab() === 'director') {
+      <div class="space-y-6 fade-in">
+
+        <!-- Step 1 -->
+        <div class="bg-white rounded-3xl border border-cream/60 overflow-hidden shadow-sm">
+          <div class="bg-molten/8 border-b border-molten/20 px-8 py-5 flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl bg-brick text-white font-bold text-lg flex items-center justify-center font-display shrink-0">1</div>
+            <div>
+              <h2 class="font-display font-bold text-navy text-lg">Créer votre compte</h2>
+              <p class="text-navy/50 text-sm">Inscription gratuite, sans carte bancaire</p>
+            </div>
+          </div>
+          <div class="px-8 py-6 space-y-3 text-navy/65 text-sm leading-relaxed">
+            <p>Cliquez sur <strong class="text-navy">"Démarrer gratuitement"</strong> sur la page d'accueil. Renseignez le nom de votre établissement, votre email et un mot de passe.</p>
+            <p>Votre compte démarre automatiquement en <span class="badge badge-trial">essai gratuit</span> pendant 30 jours — aucune limite, toutes les fonctionnalités actives.</p>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="bg-white rounded-3xl border border-cream/60 overflow-hidden shadow-sm">
+          <div class="bg-molten/8 border-b border-molten/20 px-8 py-5 flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl bg-brick text-white font-bold text-lg flex items-center justify-center font-display shrink-0">2</div>
+            <div>
+              <h2 class="font-display font-bold text-navy text-lg">Constituer votre répertoire</h2>
+              <p class="text-navy/50 text-sm">Optionnel mais recommandé pour gagner du temps</p>
+            </div>
+          </div>
+          <div class="px-8 py-6 space-y-3 text-navy/65 text-sm leading-relaxed">
+            <p>Allez dans <strong class="text-navy">Répertoire profs</strong> dans le menu. Vous pouvez :</p>
+            <ul class="space-y-2 ml-4">
+              <li class="flex items-start gap-2"><app-svg-icon name="check" [size]="14" iconClass="text-brick shrink-0 mt-0.5" />Ajouter des enseignants un par un (nom, email, téléphone optionnel)</li>
+              <li class="flex items-start gap-2"><app-svg-icon name="check" [size]="14" iconClass="text-brick shrink-0 mt-0.5" />Importer un fichier CSV avec les colonnes <code class="font-mono bg-cream/60 px-1.5 py-0.5 rounded text-xs">full_name,email,phone</code></li>
+            </ul>
+            <p class="bg-molten/8 border border-molten/20 rounded-xl px-4 py-3 text-amber-800 text-xs">
+              <strong>Astuce :</strong> Le répertoire est partagé entre toutes vos sessions. Vous n'importez qu'une fois.
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="bg-white rounded-3xl border border-cream/60 overflow-hidden shadow-sm">
+          <div class="bg-molten/8 border-b border-molten/20 px-8 py-5 flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl bg-brick text-white font-bold text-lg flex items-center justify-center font-display shrink-0">3</div>
+            <div>
+              <h2 class="font-display font-bold text-navy text-lg">Créer une session</h2>
+              <p class="text-navy/50 text-sm">La session = une période de collecte des disponibilités</p>
+            </div>
+          </div>
+          <div class="px-8 py-6 space-y-3 text-navy/65 text-sm leading-relaxed">
+            <p>Cliquez sur <strong class="text-navy">"+ Nouvelle session"</strong>. Renseignez :</p>
+            <ul class="space-y-1.5 ml-4">
+              <li class="flex items-start gap-2"><app-svg-icon name="check" [size]="14" iconClass="text-brick shrink-0 mt-0.5" /><strong>Nom</strong> de la session (ex: "1er trimestre 2025-2026")</li>
+              <li class="flex items-start gap-2"><app-svg-icon name="check" [size]="14" iconClass="text-brick shrink-0 mt-0.5" /><strong>Année scolaire</strong> pour l'organisation</li>
+              <li class="flex items-start gap-2"><app-svg-icon name="check" [size]="14" iconClass="text-brick shrink-0 mt-0.5" /><strong>Deadline</strong> optionnelle pour rappels automatiques</li>
+              <li class="flex items-start gap-2"><app-svg-icon name="check" [size]="14" iconClass="text-brick shrink-0 mt-0.5" /><strong>Min/Max créneaux</strong> par enseignant</li>
+            </ul>
+            <p>Ensuite ajoutez vos <strong class="text-navy">créneaux horaires</strong> (lundi 8h-10h, etc.) et vos <strong class="text-navy">enseignants</strong> (via le répertoire ou manuellement).</p>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="bg-white rounded-3xl border border-cream/60 overflow-hidden shadow-sm">
+          <div class="bg-molten/8 border-b border-molten/20 px-8 py-5 flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl bg-brick text-white font-bold text-lg flex items-center justify-center font-display shrink-0">4</div>
+            <div>
+              <h2 class="font-display font-bold text-navy text-lg">Inviter les enseignants</h2>
+              <p class="text-navy/50 text-sm">Un clic suffit — ils reçoivent un lien personnalisé</p>
+            </div>
+          </div>
+          <div class="px-8 py-6 space-y-3 text-navy/65 text-sm leading-relaxed">
+            <p>Utilisez le bouton <strong class="text-navy">"Inviter tous"</strong> pour envoyer en une fois, ou invitez enseignant par enseignant depuis le tableau de bord de session.</p>
+            <p>Chaque enseignant reçoit un email avec un lien unique valable 72h. <strong class="text-navy">Aucun compte à créer de leur côté.</strong></p>
+          </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="bg-white rounded-3xl border border-cream/60 overflow-hidden shadow-sm">
+          <div class="bg-molten/8 border-b border-molten/20 px-8 py-5 flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl bg-brick text-white font-bold text-lg flex items-center justify-center font-display shrink-0">5</div>
+            <div>
+              <h2 class="font-display font-bold text-navy text-lg">Valider et exporter</h2>
+              <p class="text-navy/50 text-sm">Dernière étape avant l'emploi du temps final</p>
+            </div>
+          </div>
+          <div class="px-8 py-6 space-y-3 text-navy/65 text-sm leading-relaxed">
+            <p>Dans la page de session, vous voyez en temps réel les créneaux sélectionnés. Validez ceux qui vous conviennent. En cas de demande d'échange, vous recevrez un email de notification.</p>
+            <p>Une fois satisfait, exportez en <strong class="text-navy">PDF</strong> (Plan École+) ou fermez la session pour archiver.</p>
+          </div>
+        </div>
+
+        <!-- Code couleurs -->
+        <div class="bg-white rounded-3xl border border-cream/60 p-8 shadow-sm">
+          <h2 class="font-display font-bold text-navy text-lg mb-5 flex items-center gap-2">
+            <app-svg-icon name="eye" [size]="20" iconClass="text-brick/60" />
+            Code couleurs des statuts
+          </h2>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <p class="text-xs font-bold text-navy/50 uppercase tracking-widest mb-3">Sessions</p>
+              <div class="space-y-2">
+                <div class="flex items-center gap-3"><span class="badge badge-draft">Brouillon</span><span class="text-sm text-navy/55">Session non encore ouverte aux enseignants</span></div>
+                <div class="flex items-center gap-3"><span class="badge badge-open">Ouvert</span><span class="text-sm text-navy/55">Enseignants peuvent choisir leurs créneaux</span></div>
+                <div class="flex items-center gap-3"><span class="badge badge-closed">Fermé</span><span class="text-sm text-navy/55">Collecte terminée, validation en cours</span></div>
+                <div class="flex items-center gap-3"><span class="badge badge-published">Publié</span><span class="text-sm text-navy/55">Emploi du temps finalisé et partagé</span></div>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-navy/50 uppercase tracking-widest mb-3">Créneaux</p>
+              <div class="space-y-2">
+                <div class="flex items-center gap-3"><span class="badge badge-draft">Libre</span><span class="text-sm text-navy/55">Disponible à la sélection</span></div>
+                <div class="flex items-center gap-3"><span class="badge badge-open">Sélectionné</span><span class="text-sm text-navy/55">Choisi par un enseignant, en attente de validation</span></div>
+                <div class="flex items-center gap-3"><span class="badge badge-published">Validé</span><span class="text-sm text-navy/55">Confirmé par le directeur</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    }
+
+    <!-- TEACHER GUIDE -->
+    @if (activeTab() === 'teacher') {
+      <div class="space-y-6 fade-in">
+
+        <div class="bg-white rounded-3xl border border-cream/60 overflow-hidden shadow-sm">
+          <div class="bg-molten/8 border-b border-molten/20 px-8 py-5 flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl bg-brick text-white font-bold text-lg flex items-center justify-center font-display shrink-0">1</div>
+            <div>
+              <h2 class="font-display font-bold text-navy text-lg">Recevoir votre invitation</h2>
+            </div>
+          </div>
+          <div class="px-8 py-6 text-navy/65 text-sm leading-relaxed">
+            <p>Vous recevrez un email de <strong class="text-navy">TimeTutor</strong> avec un lien personnel. Ce lien vous donne accès direct à la grille de créneaux — <strong class="text-navy">aucun compte à créer, aucun mot de passe.</strong></p>
+            <p class="mt-3 bg-molten/8 border border-molten/20 rounded-xl px-4 py-3 text-amber-800 text-xs">
+              <strong>Important :</strong> Le lien est valable 72 heures. Passé ce délai, contactez votre directeur pour un nouveau lien.
+            </p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-cream/60 overflow-hidden shadow-sm">
+          <div class="bg-molten/8 border-b border-molten/20 px-8 py-5 flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl bg-brick text-white font-bold text-lg flex items-center justify-center font-display shrink-0">2</div>
+            <div>
+              <h2 class="font-display font-bold text-navy text-lg">Choisir vos créneaux</h2>
+            </div>
+          </div>
+          <div class="px-8 py-6 space-y-3 text-navy/65 text-sm leading-relaxed">
+            <p>Sur la grille de créneaux :</p>
+            <ul class="space-y-2 ml-4">
+              <li class="flex items-start gap-2"><span class="w-3 h-3 rounded-sm bg-white border-2 border-brick/30 shrink-0 mt-1"></span><strong>Blanc</strong> = créneau libre, cliquez pour le sélectionner</li>
+              <li class="flex items-start gap-2"><span class="w-3 h-3 rounded-sm bg-molten/20 border-2 border-molten/40 shrink-0 mt-1"></span><strong>Doré</strong> = votre sélection en cours</li>
+              <li class="flex items-start gap-2"><span class="w-3 h-3 rounded-sm bg-mahogany/15 border-2 border-mahogany/30 shrink-0 mt-1"></span><strong>Brun foncé</strong> = créneau déjà pris par un autre enseignant</li>
+              <li class="flex items-start gap-2"><span class="w-3 h-3 rounded-sm bg-steel/60 border-2 border-steel/80 shrink-0 mt-1"></span><strong>Gris</strong> = créneau validé (verrouillé)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-cream/60 overflow-hidden shadow-sm">
+          <div class="bg-molten/8 border-b border-molten/20 px-8 py-5 flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl bg-brick text-white font-bold text-lg flex items-center justify-center font-display shrink-0">3</div>
+            <div>
+              <h2 class="font-display font-bold text-navy text-lg">Demander un échange</h2>
+            </div>
+          </div>
+          <div class="px-8 py-6 text-navy/65 text-sm leading-relaxed">
+            <p>Si un créneau qui vous intéresse est déjà pris, cliquez dessus et choisissez <strong class="text-navy">"Demander un échange"</strong>. Vous pouvez laisser un message pour expliquer votre demande.</p>
+            <p class="mt-3">Le directeur reçoit une notification par email et peut approuver ou refuser l'échange.</p>
+          </div>
+        </div>
+
+      </div>
+    }
+
+    <!-- CTA -->
+    <div class="mt-10 bg-white rounded-3xl border border-cream/60 p-8 text-center shadow-sm">
+      <h3 class="font-display font-bold text-navy text-xl mb-3">Encore des questions ?</h3>
+      <p class="text-navy/50 text-sm mb-6">Notre équipe répond sous 24h ouvrées via WhatsApp.</p>
+      <div class="flex gap-3 justify-center flex-wrap">
+        <a href="https://wa.me/22901000000" target="_blank"
+           class="bg-green-600 hover:bg-green-500 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-all inline-flex items-center gap-2">
+          <app-svg-icon name="chat-bubble" [size]="16" iconClass="text-white shrink-0" />
+          Contacter sur WhatsApp
+        </a>
+        <a routerLink="/" class="btn-ghost-cream px-6 py-3 text-sm">Retour à l'accueil</a>
+      </div>
+    </div>
+
+  </div>
+</div>

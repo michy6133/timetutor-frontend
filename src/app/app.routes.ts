@@ -15,6 +15,8 @@ import { ResetPasswordComponent } from './features/auth/reset-password/reset-pas
 import { TeacherPortalComponent } from './features/teacher/teacher-portal/teacher-portal.component';
 import { AdminDashboardComponent } from './features/admin/admin-dashboard/admin-dashboard.component';
 import { DirectorLayoutComponent } from './features/director/director-layout/director-layout.component';
+import { HelpComponent } from './features/help/help.component';
+import { RosterComponent } from './features/director/roster/roster.component';
 import { authGuard } from './core/guards/auth.guard';
 import { teacherGuard } from './core/guards/teacher.guard';
 
@@ -25,6 +27,7 @@ export const routes: Routes = [
   { path: 'register-teacher', component: TeacherRegisterComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
+  { path: 'help', component: HelpComponent },
   {
     path: 'director',
     component: DirectorLayoutComponent,
@@ -33,9 +36,11 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: DashboardComponent },
       { path: 'billing', component: BillingComponent },
+      { path: 'checkout', component: CheckoutComponent },
       { path: 'sessions', component: SessionsListComponent },
       { path: 'sessions/new', component: SessionCreateComponent },
       { path: 'sessions/:id', component: SessionDetailComponent },
+      { path: 'roster', component: RosterComponent },
     ],
   },
   { path: 'teacher/:token', component: SlotPickerComponent },

@@ -19,7 +19,7 @@ export class SocketService {
   connect(token?: string): void {
     if (!isPlatformBrowser(this.platformId)) return;
     if (this.socket?.connected) return;
-    this.socket = io('http://localhost:3000', {
+    this.socket = io('http://localhost:3001', {
       auth: { token },
       transports: ['websocket'],
     });

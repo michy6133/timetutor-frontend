@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../../core/services/api.service';
+import { ToastService } from '../../../../core/services/toast.service';
 import type { Session } from '../../../../core/models';
 import { CommonModule } from '@angular/common';
 import { SvgIconComponent } from '../../../../shared/svg-icon.component';
@@ -27,6 +28,7 @@ interface SchoolTeacher {
 })
 export class SessionsListComponent implements OnInit {
   private readonly api = inject(ApiService);
+  private readonly toast = inject(ToastService);
   readonly sessions = signal<Session[]>([]);
   readonly loading = signal(true);
   readonly filter = signal<string>('all');
@@ -117,12 +119,12 @@ export class SessionsListComponent implements OnInit {
     ).subscribe({
       next: (res) => {
         this.invitingSessionId.set('');
-        alert(`Invitations envoyées: ${res.invited}/${res.total}${res.failed ? ` (échecs: ${res.failed})` : ''}`);
+        this.toast.success(`Invitations envoyées : ${res.invited}/${res.total}${res.failed ? ` (échecs : ${res.failed})` : ''}`);
         this.api.get<Session[]>('/sessions').subscribe(s => this.sessions.set(s));
       },
       error: (e) => {
         this.invitingSessionId.set('');
-        alert(e.error?.error ?? "Erreur d'invitation groupée");
+        this.toast.error(e.error?.error ?? "Erreur d'invitation groupée");
       },
     });
   }

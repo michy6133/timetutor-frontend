@@ -3,6 +3,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../../../core/services/api.service';
 import { SocketService } from '../../../../core/services/socket.service';
+import { ToastService } from '../../../../core/services/toast.service';
 import type { Session, TimeSlot, Teacher } from '../../../../core/models';
 import { DatePipe, CommonModule } from '@angular/common';
 
@@ -16,6 +17,7 @@ export class SessionDetailComponent implements OnInit {
   private readonly api = inject(ApiService);
   private readonly route = inject(ActivatedRoute);
   private readonly socket = inject(SocketService);
+  private readonly toast = inject(ToastService);
   private readonly fb = inject(FormBuilder);
 
   readonly session = signal<Session | null>(null);
@@ -35,6 +37,7 @@ export class SessionDetailComponent implements OnInit {
   readonly actionByTeacherId = signal<Record<string, 'inviting' | 'reminding' | 'updating' | 'removing'>>({});
   readonly showEditTeacher = signal(false);
   readonly editingTeacherId = signal<string | null>(null);
+  readonly confirmRemoveTeacherId = signal<string | null>(null);
   readonly editingTeacherError = signal('');
 
   readonly teacherForm = this.fb.group({
@@ -142,13 +145,13 @@ export class SessionDetailComponent implements OnInit {
     formData.append('file', file);
     this.api.post<{ imported: number }>(`/sessions/${this.sessionId}/teachers/import`, formData).subscribe({
       next: (r) => {
-        alert(`${r.imported} enseignant(s) importé(s) avec succès.`);
+        this.toast.success(`${r.imported} enseignant(s) importé(s) avec succès.`);
         this.csvImporting.set(false);
         input.value = '';
         this.loadAll();
       },
       error: (e) => {
-        alert(e.error?.error ?? 'Erreur import CSV');
+        this.toast.error(e.error?.error ?? 'Erreur import CSV');
         this.csvImporting.set(false);
         input.value = '';
       },
@@ -180,7 +183,7 @@ export class SessionDetailComponent implements OnInit {
       },
       error: (e) => {
         this.stopTeacherAction(teacherId);
-        alert(e.error?.error ?? 'Erreur envoi invitation');
+        this.toast.error(e.error?.error ?? 'Erreur envoi invitation');
       },
     });
   }
@@ -190,17 +193,21 @@ export class SessionDetailComponent implements OnInit {
     this.api.post(`/sessions/${this.sessionId}/teachers/${teacherId}/remind`, {}).subscribe({
       next: () => {
         this.stopTeacherAction(teacherId);
-        alert('Relance envoyée !');
+        this.toast.success('Relance envoyée !');
       },
       error: (e) => {
         this.stopTeacherAction(teacherId);
-        alert(e.error?.error ?? 'Erreur relance');
+        this.toast.error(e.error?.error ?? 'Erreur relance');
       }
     });
   }
 
   removeTeacher(teacherId: string): void {
-    if (!confirm('Supprimer cet enseignant de la session ?')) return;
+    if (this.confirmRemoveTeacherId() !== teacherId) {
+      this.confirmRemoveTeacherId.set(teacherId);
+      return;
+    }
+    this.confirmRemoveTeacherId.set(null);
     this.startTeacherAction(teacherId, 'removing');
     this.api.delete(`/sessions/${this.sessionId}/teachers/${teacherId}`).subscribe({
       next: () => {
@@ -218,11 +225,11 @@ export class SessionDetailComponent implements OnInit {
       next: (result) => {
         this.invitingAll.set(false);
         this.loadAll();
-        alert(`Invitations envoyées: ${result.invited}/${result.total}${result.failed ? ` (échecs: ${result.failed})` : ''}`);
+        this.toast.success(`Invitations envoyées : ${result.invited}/${result.total}${result.failed ? ` (échecs : ${result.failed})` : ''}`);
       },
       error: (e) => {
         this.invitingAll.set(false);
-        alert(e.error?.error ?? 'Erreur invitation groupée');
+        this.toast.error(e.error?.error ?? 'Erreur invitation groupée');
       },
     });
   }
@@ -274,7 +281,7 @@ export class SessionDetailComponent implements OnInit {
   }
 
   async exportPdf(): Promise<void> {
-    const url = `http://localhost:3000/api/v1/sessions/${this.sessionId}/export/pdf?includeTeacherName=true&includeContact=true&includeEmail=true&includeSubject=true&includeRoom=true`;
+    const url = `http://localhost:3001/api/v1/sessions/${this.sessionId}/export/pdf?includeTeacherName=true&includeContact=true&includeEmail=true&includeSubject=true&includeRoom=true`;
     const token = localStorage.getItem('tt_token');
     try {
       const response = await fetch(url, {
@@ -291,7 +298,7 @@ export class SessionDetailComponent implements OnInit {
       a.click();
       URL.revokeObjectURL(fileUrl);
     } catch {
-      alert("Impossible d'exporter le PDF");
+      this.toast.error("Impossible d'exporter le PDF.");
     }
   }
 
@@ -306,7 +313,7 @@ export class SessionDetailComponent implements OnInit {
   }
 
   slotClass(status: string): string {
-    return { free: 'bg-green-50 border-green-200', taken: 'bg-orange-50 border-orange-200', validated: 'bg-blue-50 border-blue-200' }[status] ?? '';
+    return { free: 'bg-white border-amber/30', taken: 'bg-molten/12 border-molten/40', validated: 'bg-steel/50 border-steel/70' }[status] ?? '';
   }
 
   statusBadge(status: string): string {
@@ -340,17 +347,17 @@ export class SessionDetailComponent implements OnInit {
 
   slotCardClass(status: string): string {
     return {
-      free:      'bg-white border border-gray-200 text-gray-600',
-      taken:     'bg-amber-50 border border-amber-300 text-amber-900',
-      validated: 'bg-blue-50 border border-blue-300 text-blue-900',
-    }[status] ?? 'bg-white border border-gray-200';
+      free:      'bg-white border border-amber/25 text-navy/70',
+      taken:     'bg-molten/12 border border-molten/40 text-navy',
+      validated: 'bg-steel/50 border border-steel/80 text-navy/50',
+    }[status] ?? 'bg-white border border-cream/60';
   }
 
   badgeClass(status: string): string {
     return {
-      free: 'bg-gray-100 text-gray-500',
-      taken: 'bg-amber-100 text-amber-700',
-      validated: 'bg-blue-100 text-blue-700',
+      free:      'bg-cream/60 text-navy/50',
+      taken:     'bg-molten/20 text-navy',
+      validated: 'bg-steel text-navy/50',
     }[status] ?? '';
   }
 

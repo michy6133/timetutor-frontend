@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../../core/services/api.service';
 import { SocketService } from '../../../core/services/socket.service';
+import { ToastService } from '../../../core/services/toast.service';
 import type { TimeSlot } from '../../../core/models';
 import { CommonModule } from '@angular/common';
 import { SvgIconComponent } from '../../../shared/svg-icon.component';
@@ -19,6 +20,7 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
   private readonly api = inject(ApiService);
   private readonly route = inject(ActivatedRoute);
   private readonly socket = inject(SocketService);
+  private readonly toast = inject(ToastService);
 
   readonly loading = signal(true);
   readonly error = signal('');
@@ -93,7 +95,7 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
           this.updateStatus(slot.id, 'taken');
           this.actionLoading.set('');
         },
-        error: (e) => { alert(e.error?.error ?? 'Erreur'); this.actionLoading.set(''); },
+        error: (e) => { this.toast.error(e.error?.error ?? 'Erreur'); this.actionLoading.set(''); },
       });
     } else if (isSelected) {
       // Deselect
@@ -103,7 +105,7 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
           this.updateStatus(slot.id, 'free');
           this.actionLoading.set('');
         },
-        error: (e) => { alert(e.error?.error ?? 'Erreur'); this.actionLoading.set(''); },
+        error: (e) => { this.toast.error(e.error?.error ?? 'Erreur'); this.actionLoading.set(''); },
       });
     } else if (slot.status === 'taken') {
       this.actionLoading.set('');
@@ -132,11 +134,11 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
       next: () => {
         this.actionLoading.set('');
         this.closeContactModal();
-        alert('Votre demande a ete envoyee par email.');
+        this.toast.success('Votre demande a été envoyée par email.');
       },
       error: (e) => {
         this.actionLoading.set('');
-        alert(e.error?.error ?? 'Erreur');
+        this.toast.error(e.error?.error ?? 'Erreur lors de l\'envoi.');
       },
     });
   }
@@ -164,10 +166,10 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
 
   cardClass(slot: TimeSlot): string {
     const isOwn = this.selectedSlotIds().has(slot.id);
-    if (slot.status === 'validated') return 'bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed';
-    if (isOwn) return 'bg-green-50 border-green-400 text-green-800 cursor-pointer hover:bg-green-100';
-    if (slot.status === 'taken') return 'bg-amber-50 border-amber-300 text-amber-800 cursor-pointer hover:bg-amber-100';
-    return 'bg-white border-gray-200 text-gray-700 cursor-pointer hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700';
+    if (slot.status === 'validated') return 'bg-steel/60 border-steel/80 text-navy/40 cursor-not-allowed';
+    if (isOwn) return 'bg-molten/18 border-molten/45 text-navy cursor-pointer hover:bg-molten/25';
+    if (slot.status === 'taken') return 'bg-mahogany/12 border-mahogany/35 text-mahogany cursor-pointer hover:bg-mahogany/20';
+    return 'bg-white border-amber/30 text-navy cursor-pointer hover:border-molten/60 hover:bg-molten/8';
   }
 
   slotLabel(slot: TimeSlot): string {

@@ -1,0 +1,135 @@
+<div class="max-w-5xl mx-auto px-6 py-8">
+
+  <div class="flex items-center justify-between mb-6 gap-3 flex-wrap">
+    <div class="flex items-center gap-4">
+      <div class="w-11 h-11 rounded-xl bg-brick/10 flex items-center justify-center">
+        <app-svg-icon name="users" [size]="22" iconClass="text-brick" />
+      </div>
+      <div>
+        <h1 class="font-display text-2xl font-extrabold text-navy">Répertoire des enseignants</h1>
+        <p class="text-sm text-navy/40 mt-0.5">{{ teachers().length }} enseignant(s) enregistré(s) dans votre établissement</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 flex-wrap">
+      <!-- CSV Import -->
+      <label class="btn-ghost-navy px-4 py-2.5 text-sm cursor-pointer" [class.opacity-60]="importing()">
+        @if (importing()) {
+          <span class="spinner spinner-dark"></span> Import...
+        } @else {
+          <app-svg-icon name="upload" [size]="15" iconClass="shrink-0" /> Importer CSV
+        }
+        <input type="file" accept=".csv" class="hidden" (change)="importCsv($event)" [disabled]="importing()">
+      </label>
+      <button (click)="showAddForm.set(!showAddForm())"
+        class="btn-brick px-4 py-2.5 text-sm">
+        <app-svg-icon name="user-plus" [size]="16" iconClass="shrink-0" />
+        Ajouter
+      </button>
+    </div>
+  </div>
+
+  <!-- Add form -->
+  @if (showAddForm()) {
+    <div class="bg-white border border-cream/60 rounded-2xl p-6 mb-6 shadow-sm fade-in">
+      <h3 class="font-display font-bold text-navy mb-4">Nouvel enseignant</h3>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div>
+          <label class="tt-label">Nom complet *</label>
+          <input [formControl]="addForm.controls.fullName" type="text" class="tt-input" placeholder="Marie Gbedo">
+        </div>
+        <div>
+          <label class="tt-label">Email *</label>
+          <input [formControl]="addForm.controls.email" type="email" class="tt-input" placeholder="marie@ecole.bj">
+        </div>
+        <div>
+          <label class="tt-label">Téléphone</label>
+          <input [formControl]="addForm.controls.phone" type="text" class="tt-input" placeholder="+229 01 00 00 00">
+        </div>
+      </div>
+      <div class="flex gap-2 mt-4">
+        <button (click)="addTeacher()" [disabled]="addForm.invalid || saving()"
+          class="btn-brick px-5 py-2.5 text-sm">
+          @if (saving()) { <span class="spinner"></span> Enregistrement... }
+          @else { <app-svg-icon name="check" [size]="15" iconClass="shrink-0" /> Enregistrer }
+        </button>
+        <button (click)="showAddForm.set(false)" class="btn-ghost-navy px-5 py-2.5 text-sm">Annuler</button>
+      </div>
+    </div>
+  }
+
+  <!-- Search -->
+  <div class="mb-4">
+    <input [ngModel]="search()" (ngModelChange)="search.set($event)" type="text" class="tt-input max-w-sm" placeholder="Rechercher par nom, email ou téléphone…">
+  </div>
+
+  <!-- CSV hint -->
+  @if (teachers().length === 0 && !loading()) {
+    <div class="border-2 border-dashed border-cream/80 rounded-2xl p-14 text-center bg-white">
+      <div class="flex justify-center mb-4 text-navy/18">
+        <app-svg-icon name="users" [size]="48" />
+      </div>
+      <p class="text-navy/45 font-medium mb-2">Répertoire vide</p>
+      <p class="text-navy/30 text-sm mb-6">Ajoutez des enseignants manuellement ou importez un fichier CSV.<br>
+        Format CSV : <code class="font-mono text-xs bg-cream/60 px-2 py-0.5 rounded">full_name,email,phone</code>
+      </p>
+      <button (click)="showAddForm.set(true)" class="btn-brick px-6 py-3 text-sm">
+        <app-svg-icon name="user-plus" [size]="16" iconClass="shrink-0" /> Ajouter le premier enseignant
+      </button>
+    </div>
+  } @else if (loading()) {
+    <div class="space-y-3">
+      @for (i of [1,2,3,4,5]; track i) { <div class="skeleton h-16 rounded-2xl"></div> }
+    </div>
+  } @else {
+    <div class="bg-white border border-cream/60 rounded-2xl overflow-hidden shadow-sm">
+      @for (t of filtered(); track t.id) {
+        <div class="border-b border-cream/40 last:border-b-0">
+
+          <!-- Normal view -->
+          @if (editingId() !== t.id) {
+            <div class="flex items-center gap-4 px-5 py-4 hover:bg-cream/20 transition-colors group">
+              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-brick to-molten flex items-center justify-center text-white text-xs font-bold shrink-0 uppercase">
+                {{ initials(t.fullName) }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="font-semibold text-navy truncate">{{ t.fullName }}</div>
+                <div class="text-xs text-navy/45 truncate">{{ t.email }}{{ t.phone ? ' · ' + t.phone : '' }}</div>
+              </div>
+              <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                <button (click)="openEdit(t)" class="text-xs px-3 py-1.5 rounded-lg border border-brick/20 text-brick font-semibold hover:bg-brick/5 transition-all">
+                  <app-svg-icon name="pencil" [size]="13" iconClass="inline" /> Modifier
+                </button>
+                <button (click)="deleteTeacher(t.id)" [disabled]="deletingId() === t.id"
+                  class="text-xs px-3 py-1.5 rounded-lg border border-mahogany/20 text-mahogany font-semibold hover:bg-mahogany/5 transition-all disabled:opacity-40">
+                  @if (deletingId() === t.id) { <span class="spinner spinner-dark"></span> }
+                  @else { <app-svg-icon name="trash" [size]="13" iconClass="inline" /> }
+                </button>
+              </div>
+            </div>
+
+          <!-- Edit view -->
+          } @else {
+            <div class="px-5 py-4 bg-molten/5 fade-in">
+              <div class="grid md:grid-cols-3 gap-3">
+                <input [formControl]="editForm.controls.fullName" type="text" class="tt-input" placeholder="Nom complet">
+                <input [formControl]="editForm.controls.email" type="email" class="tt-input" placeholder="Email">
+                <input [formControl]="editForm.controls.phone" type="text" class="tt-input" placeholder="Téléphone">
+              </div>
+              <div class="flex gap-2 mt-3">
+                <button (click)="saveEdit()" [disabled]="editForm.invalid || saving()" class="btn-brick px-4 py-2 text-xs">
+                  @if (saving()) { <span class="spinner"></span> } @else { Enregistrer }
+                </button>
+                <button (click)="editingId.set(null)" class="btn-ghost-navy px-4 py-2 text-xs">Annuler</button>
+              </div>
+            </div>
+          }
+
+        </div>
+      }
+      @if (filtered().length === 0 && search()) {
+        <div class="py-10 text-center text-navy/40 text-sm">Aucun résultat pour "{{ search() }}"</div>
+      }
+    </div>
+  }
+
+</div>
