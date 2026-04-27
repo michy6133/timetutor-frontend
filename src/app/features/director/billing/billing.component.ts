@@ -6,12 +6,12 @@ import { SvgIconComponent } from '../../../shared/svg-icon.component';
 
 export interface PaymentTxRow {
   id: number;
-  transaction_id: string;
-  plan_code: string;
+  transactionId: string;
+  planCode: string;
   amount: number;
-  is_annual: boolean;
+  isAnnual: boolean;
   status: string;
-  created_at: string;
+  createdAt: string;
 }
 
 @Component({
@@ -31,7 +31,7 @@ export class BillingComponent {
       next: (sub) => this.subscription.set(sub),
       error: () => {
         this.error.set('Aucun abonnement actif trouvé. Veuillez contacter le support.');
-        this.subscription.set({ plan_code: 'Aucun', status: 'Inconnu' });
+        this.subscription.set({ planCode: 'Aucun', status: 'Inconnu' });
       },
     });
     this.api.get<PaymentTxRow[]>('/billing/transactions').subscribe({

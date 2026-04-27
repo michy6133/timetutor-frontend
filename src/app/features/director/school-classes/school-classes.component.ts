@@ -8,9 +8,9 @@ import { ToastService } from '../../../core/services/toast.service';
 interface SchoolClassRow {
   id: string;
   name: string;
-  sort_order: number;
-  is_active: boolean;
-  is_system_template: boolean;
+  sortOrder: number;
+  isActive: boolean;
+  isSystemTemplate: boolean;
 }
 
 @Component({
@@ -42,7 +42,7 @@ export class SchoolClassesComponent implements OnInit {
       next: (rows) => {
         this.classes.set(
           rows.sort((a, b) =>
-            a.sort_order !== b.sort_order ? a.sort_order - b.sort_order : a.name.localeCompare(b.name)
+            a.sortOrder !== b.sortOrder ? a.sortOrder - b.sortOrder : a.name.localeCompare(b.name)
           )
         );
         this.loading.set(false);
@@ -57,11 +57,11 @@ export class SchoolClassesComponent implements OnInit {
   toggleActive(row: SchoolClassRow): void {
     if (this.saving()) return;
     this.saving.set(true);
-    this.api.patch(`/school-classes/${row.id}`, { isActive: !row.is_active }).subscribe({
+    this.api.patch(`/school-classes/${row.id}`, { isActive: !row.isActive }).subscribe({
       next: () => {
-        this.classes.update((list) => list.map((c) => (c.id === row.id ? { ...c, is_active: !c.is_active } : c)));
+        this.classes.update((list) => list.map((c) => (c.id === row.id ? { ...c, isActive: !c.isActive } : c)));
         this.saving.set(false);
-        this.toast.success(row.is_active ? 'Classe masquée pour les nouvelles sessions.' : 'Classe réactivée.');
+        this.toast.success(row.isActive ? 'Classe masquée pour les nouvelles sessions.' : 'Classe réactivée.');
       },
       error: (e) => {
         this.saving.set(false);
@@ -89,7 +89,7 @@ export class SchoolClassesComponent implements OnInit {
   }
 
   remove(row: SchoolClassRow): void {
-    if (row.is_system_template) {
+    if (row.isSystemTemplate) {
       this.toast.info('Les classes du référentiel se désactivent, elles ne se suppriment pas.');
       return;
     }

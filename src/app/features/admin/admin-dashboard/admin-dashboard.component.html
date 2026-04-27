@@ -67,35 +67,35 @@
           <tr class="border-b border-cream/35 last:border-0 hover:bg-cream/15 transition-colors">
             <td class="px-5 py-4">
               <div class="font-semibold text-navy font-display">{{ school.name }}</div>
-              <div class="text-navy/30 text-xs mt-0.5">{{ school.directors_count }} directeur(s)</div>
+              <div class="text-navy/30 text-xs mt-0.5">{{ school.directorsCount }} directeur(s)</div>
             </td>
             <td class="px-5 py-4">
               <div class="flex items-center gap-2">
-                <span class="badge badge-active capitalize">{{ school.subscription_plan }}</span>
+                <span class="badge badge-active capitalize">{{ school.subscriptionPlan }}</span>
                 <select #planSel class="text-xs border border-cream text-navy/55 rounded-lg px-2 py-1 bg-white focus:outline-none focus:border-brick transition-colors"
                         (change)="updateSubscription(school.id, planSel.value)">
                   <option value="">Changer...</option>
                   @for (plan of plans(); track plan.code) {
-                    <option [value]="plan.code">{{ plan.display_name }}</option>
+                    <option [value]="plan.code">{{ plan.displayName }}</option>
                   }
                 </select>
               </div>
             </td>
-            <td class="px-5 py-4 text-navy/55 font-mono">{{ school.sessions_count }}</td>
+            <td class="px-5 py-4 text-navy/55 font-mono">{{ school.sessionsCount }}</td>
             <td class="px-5 py-4">
               <span class="badge"
-                [class]="school.is_active ? 'badge-open' : 'badge-closed'">
-                {{ school.is_active ? 'Active' : 'Inactive' }}
+                [class]="school.isActive ? 'badge-open' : 'badge-closed'">
+                {{ school.isActive ? 'Active' : 'Inactive' }}
               </span>
             </td>
             <td class="px-5 py-4 text-right">
               <button (click)="toggleSchool(school)"
                 [disabled]="togglingId() === school.id"
                 class="text-xs border px-3 py-1.5 rounded-lg transition-all disabled:opacity-40"
-                [class]="school.is_active
+                [class]="school.isActive
                   ? 'border-brick/22 text-brick/65 hover:bg-brick/5 hover:border-brick/38'
                   : 'border-navy/20 text-navy/55 hover:bg-navy/5 hover:border-navy/35'">
-                {{ togglingId() === school.id ? '...' : (school.is_active ? 'Désactiver' : 'Activer') }}
+                {{ togglingId() === school.id ? '...' : (school.isActive ? 'Désactiver' : 'Activer') }}
               </button>
             </td>
           </tr>

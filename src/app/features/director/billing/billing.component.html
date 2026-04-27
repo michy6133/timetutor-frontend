@@ -29,7 +29,7 @@
           <div class="flex justify-between items-start mb-6">
             <div>
               <div class="text-xs font-bold uppercase tracking-widest text-navy/38 mb-2">Plan actuel</div>
-              <h2 class="font-display text-3xl font-extrabold text-navy">{{ subscription()!.display_name || subscription()!.plan_code }}</h2>
+              <h2 class="font-display text-3xl font-extrabold text-navy">{{ subscription()!.displayName || subscription()!.planCode }}</h2>
             </div>
             <span class="badge"
               [ngClass]="{
@@ -43,7 +43,7 @@
           </div>
           <div class="flex items-center gap-2 text-sm text-navy/55">
             <app-svg-icon name="calendar" [size]="16" iconClass="text-navy/30" />
-            <span>Fin de période : <strong class="text-navy">{{ subscription()!.current_period_end ? (subscription()!.current_period_end | date:'longDate') : 'Illimité' }}</strong></span>
+            <span>Fin de période : <strong class="text-navy">{{ subscription()!.currentPeriodEnd ? (subscription()!.currentPeriodEnd | date:'longDate') : 'Illimité' }}</strong></span>
           </div>
         </div>
         <div class="p-5 bg-cream/10 flex items-center justify-between gap-4">
@@ -70,10 +70,10 @@
                   @if (u.sessionsLimit != null) {
                     {{ u.sessionsCount }} / {{ u.sessionsLimit }}
                   } @else {
-                    {{ subscription()!.limits_json?.maxSessionsPerSchool || '∞' }}
+                    {{ subscription()!.limitsJson?.maxSessionsPerSchool || '∞' }}
                   }
                 } @else {
-                  {{ subscription()!.limits_json?.maxSessionsPerSchool || '∞' }}
+                  {{ subscription()!.limitsJson?.maxSessionsPerSchool || '∞' }}
                 }
               </span>
             </div>
@@ -90,10 +90,10 @@
                   @if (u2.teachersPerSessionLimit != null) {
                     {{ u2.maxTeachersInSession }} / {{ u2.teachersPerSessionLimit }}
                   } @else {
-                    {{ subscription()!.limits_json?.maxTeachersPerSession || '∞' }}
+                    {{ subscription()!.limitsJson?.maxTeachersPerSession || '∞' }}
                   }
                 } @else {
-                  {{ subscription()!.limits_json?.maxTeachersPerSession || '∞' }}
+                  {{ subscription()!.limitsJson?.maxTeachersPerSession || '∞' }}
                 }
               </span>
             </div>
@@ -140,9 +140,9 @@
             <tbody>
               @for (tx of transactions(); track tx.id) {
                 <tr class="border-b border-cream/40 text-navy/75">
-                  <td class="py-2 pr-4 whitespace-nowrap">{{ tx.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
-                  <td class="py-2 pr-4 font-mono text-xs truncate max-w-[8rem]" [title]="tx.transaction_id">{{ tx.transaction_id }}</td>
-                  <td class="py-2 pr-4">{{ tx.plan_code }}@if (tx.is_annual) { <span class="text-navy/35">(annuel)</span> }</td>
+                  <td class="py-2 pr-4 whitespace-nowrap">{{ tx.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                  <td class="py-2 pr-4 font-mono text-xs truncate max-w-[8rem]" [title]="tx.transactionId">{{ tx.transactionId }}</td>
+                  <td class="py-2 pr-4">{{ tx.planCode }}@if (tx.isAnnual) { <span class="text-navy/35">(annuel)</span> }</td>
                   <td class="py-2 pr-4">{{ formatAmountFcfa(tx.amount) }}</td>
                   <td class="py-2"><span class="capitalize">{{ tx.status }}</span></td>
                 </tr>
@@ -153,14 +153,14 @@
       }
     </div>
 
-    @if (subscription()?.features_json) {
+    @if (subscription()?.featuresJson) {
       <div class="mt-6 bg-white rounded-3xl border border-cream/50 p-8 shadow-sm">
         <h3 class="font-display font-bold text-navy mb-6 flex items-center gap-2">
           <app-svg-icon name="bolt" [size]="18" iconClass="text-brick" />
           Options du plan
         </h3>
         <div class="grid md:grid-cols-2 gap-3">
-          @for (kv of $any(subscription()!.features_json) | keyvalue; track kv.key) {
+          @for (kv of $any(subscription()!.featuresJson) | keyvalue; track kv.key) {
             @if (kv.value === true || kv.value === 'true') {
               <div class="flex items-start gap-3">
                 <div class="mt-0.5 bg-brick/8 text-brick p-1 rounded-lg shrink-0">

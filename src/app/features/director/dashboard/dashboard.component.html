@@ -18,8 +18,8 @@
       <app-svg-icon name="bell" [size]="18" iconClass="text-brick shrink-0" />
       <div class="flex-1 text-sm">
         <span class="font-semibold text-navy">Période d'essai active</span>
-        @if (subscription()?.current_period_end) {
-          <span class="text-navy/60"> — expire le <strong>{{ subscription()!.current_period_end | date:'dd/MM/yyyy' }}</strong>.</span>
+        @if (subscription()?.currentPeriodEnd) {
+          <span class="text-navy/60"> — expire le <strong>{{ subscription()!.currentPeriodEnd | date:'dd/MM/yyyy' }}</strong>.</span>
         }
         <a routerLink="/director/billing" class="text-brick font-semibold ml-1 underline-offset-2 hover:underline">Choisir un plan →</a>
       </div>
@@ -142,7 +142,7 @@
       @if (subscription()) {
         <div class="bg-white border border-steel/30 rounded-2xl p-5">
           <div class="text-[10px] text-navy/35 uppercase tracking-widest font-bold mb-1">Abonnement</div>
-          <div class="font-display font-bold text-navy text-base">{{ subscription()!.display_name || subscription()!.plan_code }}</div>
+          <div class="font-display font-bold text-navy text-base">{{ subscription()!.displayName || subscription()!.planCode }}</div>
           <div class="text-navy/40 text-xs mt-1 font-mono">{{ subscription()!.status }}</div>
           <a routerLink="/director/billing" class="mt-3 text-xs text-brick hover:text-brick/80 font-medium inline-block">Gérer →</a>
         </div>

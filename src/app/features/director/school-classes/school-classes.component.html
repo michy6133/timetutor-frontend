@@ -36,16 +36,16 @@
         </thead>
         <tbody>
           @for (c of classes(); track c.id) {
-            <tr class="border-t border-cream/40" [class.opacity-45]="!c.is_active">
+            <tr class="border-t border-cream/40" [class.opacity-45]="!c.isActive">
               <td class="px-4 py-3 font-medium text-navy">{{ c.name }}</td>
-              <td class="px-4 py-3 text-navy/45">{{ c.is_system_template ? 'Oui' : 'Personnalisée' }}</td>
+              <td class="px-4 py-3 text-navy/45">{{ c.isSystemTemplate ? 'Oui' : 'Personnalisée' }}</td>
               <td class="px-4 py-3">
                 <button type="button" class="text-brick text-xs font-semibold underline" (click)="toggleActive(c)" [disabled]="saving()">
-                  {{ c.is_active ? 'Désactiver' : 'Réactiver' }}
+                  {{ c.isActive ? 'Désactiver' : 'Réactiver' }}
                 </button>
               </td>
               <td class="px-4 py-3 text-right">
-                @if (!c.is_system_template) {
+                @if (!c.isSystemTemplate) {
                   <button type="button" class="text-navy/40 hover:text-brick text-xs" (click)="remove(c)" [disabled]="saving()">Supprimer</button>
                 }
               </td>

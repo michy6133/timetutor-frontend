@@ -4,8 +4,8 @@ import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../../core/services/auth.service';
 
 interface AdminStats { activeSchools: number; openSessions: number; totalTeachers: number; validatedSlots: number; }
-interface SchoolRow { id: string; name: string; subscription_plan: string; is_active: boolean; directors_count: number; sessions_count: number; }
-interface PlanRow { code: string; display_name: string; }
+interface SchoolRow { id: string; name: string; subscriptionPlan: string; isActive: boolean; directorsCount: number; sessionsCount: number; }
+interface PlanRow { code: string; displayName: string; }
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -36,7 +36,7 @@ export class AdminDashboardComponent implements OnInit {
     this.togglingId.set(school.id);
     this.api.put<{ isActive: boolean }>(`/admin/schools/${school.id}/toggle`, {}).subscribe({
       next: (r) => {
-        this.schools.update(list => list.map(s => s.id === school.id ? { ...s, is_active: r.isActive } : s));
+        this.schools.update(list => list.map(s => s.id === school.id ? { ...s, isActive: r.isActive } : s));
         this.togglingId.set('');
         this.loadData();
       },

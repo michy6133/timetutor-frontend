@@ -28,8 +28,8 @@
     <div>
       <h1 class="font-display text-xl font-extrabold text-navy">{{ session()!.name }}</h1>
       <p class="text-navy/38 text-sm mt-0.5 font-mono">{{ sessionYear(session()) }}</p>
-      @if (session()!.school_class_name) {
-        <p class="text-xs text-navy/45 mt-1">Classe : <span class="font-semibold text-navy">{{ session()!.school_class_name }}</span></p>
+      @if (session()!.schoolClassName) {
+        <p class="text-xs text-navy/45 mt-1">Classe : <span class="font-semibold text-navy">{{ session()!.schoolClassName }}</span></p>
       }
     </div>
     <div class="flex flex-wrap items-center gap-2 flex-shrink-0">
@@ -45,6 +45,10 @@
         class="border border-cream text-navy/60 hover:border-brick/25 hover:text-navy font-medium px-4 py-2 rounded-xl text-sm transition-all">
         Dupliquer la grille…
       </button>
+      <a [routerLink]="['/director/sessions', session()!.id, 'negotiation']"
+        class="border border-molten/30 text-navy/70 hover:bg-molten/8 font-medium px-4 py-2 rounded-xl text-sm transition-all">
+        Négociations
+      </a>
       @if (session()!.status === 'draft') {
         <button (click)="setStatus('open')"
           class="btn-navy px-4 py-2 text-sm">
@@ -224,7 +228,7 @@
                 @let slot = getSlot(day, time.start);
                 <div class="border-l border-cream/35 p-1.5 min-h-[88px]">
                   @if (slot) {
-                    <div class="h-full min-h-[72px] rounded-xl p-2.5 flex flex-col gap-1 transition-all hover:shadow-sm cursor-default"
+                    <div class="h-full min-h-[78px] rounded-xl p-2.5 flex flex-col gap-1 transition-all hover:shadow-sm cursor-default"
                          [class]="slotCardClass(slot.status)">
 
                       <div class="flex items-center justify-between">
@@ -236,7 +240,7 @@
                       @if (slot.teacherName) {
                         <div class="text-xs font-bold truncate">{{ slot.teacherName }}</div>
                       } @else {
-                        <div class="text-xs opacity-25 italic">Libre</div>
+                        <div class="text-xs opacity-70 italic font-medium">Créneau disponible</div>
                       }
 
                       @if (slot.subjectName) {
@@ -247,10 +251,10 @@
                       }
 
                       <div class="mt-auto pt-1">
-                        @if (slot.status === 'taken') {
+                        @if (slot.status === 'taken' || slot.status === 'locked') {
                           <button (click)="validateSlot(slot.id)"
                             class="w-full text-[11px] bg-brick text-white py-1 rounded-lg hover:bg-brick/80 font-bold transition-all">
-                            Valider
+                            {{ slot.status === 'locked' ? 'Valider (conflit résolu)' : 'Valider' }}
                           </button>
                         }
                         @if (slot.status === 'validated') {
@@ -402,7 +406,7 @@
                         class="text-xs bg-brick text-white px-3 py-1.5 rounded-lg hover:bg-brick/80 font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                         {{ inviteButtonLabel(teacher) }}
                       </button>
-                    } @else if (teacher.status === 'pending') {
+                    } @else if (teacher.status !== 'done') {
                       <button (click)="remindTeacher(teacher.id)"
                         [disabled]="teacherAction(teacher.id) !== null"
                         [ngClass]="teacherAction(teacher.id) === 'reminding' ? 'border-dashed' : ''"

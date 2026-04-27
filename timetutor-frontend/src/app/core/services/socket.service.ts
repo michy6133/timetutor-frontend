@@ -16,7 +16,7 @@ export class SocketService {
 
   connect(token?: string): void {
     if (this.socket?.connected) return;
-    this.socket = io('http://localhost:3001', {
+    this.socket = io('http://localhost:3000', {
       auth: { token },
       transports: ['websocket'],
     });

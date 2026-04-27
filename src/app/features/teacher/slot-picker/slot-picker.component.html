@@ -16,24 +16,24 @@
 } @else {
 
   <!-- Top bar -->
-  <div class="bg-navy border-b border-white/10 px-6 py-4 sticky top-0 z-30">
-    <div class="max-w-6xl mx-auto flex items-center justify-between">
-      <div>
-        <div class="font-display font-extrabold text-lg text-white">Time<span class="text-emerald">Tutor</span></div>
-        <h1 class="text-sm font-semibold text-white/80 mt-0.5">{{ teacher()?.fullName }}</h1>
-        <p class="text-white/35 text-xs font-mono">{{ session()?.name }} · {{ session()?.academicYear }}</p>
+  <div class="bg-white border-b border-cream/60 px-6 py-5 shadow-sm sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto flex items-center justify-between gap-4">
+      <div class="min-w-0 flex-1">
+        <div class="font-display font-extrabold text-lg text-navy">Time<span class="text-molten">Tutor</span></div>
+        <h1 class="text-base font-semibold text-navy mt-1">Bonjour, {{ teacher()?.fullName }}</h1>
+        <p class="text-navy/45 text-sm font-mono">{{ session()?.name }} · {{ session()?.academicYear }}</p>
       </div>
-      <div class="flex items-center gap-4">
-        @if (pendingIncomingCount() > 0) {
-          <a href="#demandes" class="flex items-center gap-2 bg-error/15 border border-error/30 text-white px-3 py-1.5 rounded-xl text-xs font-semibold hover:bg-error/25 transition-colors">
-            <span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
-            {{ pendingIncomingCount() }} demande{{ pendingIncomingCount() > 1 ? 's' : '' }} en attente
-          </a>
-        }
-        <div class="text-right">
-          <div class="font-display text-2xl font-extrabold text-white">{{ myCount() }}</div>
-          <div class="text-[10px] text-white/35 uppercase tracking-wide">créneau(x)</div>
+      <div class="text-right flex flex-col items-end gap-2 shrink-0 relative z-40">
+        <div>
+          <div class="font-display text-3xl font-extrabold text-navy">{{ myCount() }}</div>
+          <div class="text-xs text-navy/40 uppercase tracking-wide mt-0.5">créneau(x) choisi(s)</div>
         </div>
+        <!-- Fallback natif : si Angular n'accroche pas le click, le href garde /teacher/:token + #section. -->
+        <a [attr.href]="echangeAnchorHref()"
+          (click)="scrollToEchangeSection($event)"
+          class="relative z-40 text-xs font-semibold text-brick border border-brick/30 rounded-lg px-3 py-1.5 hover:bg-brick/10 transition-colors cursor-pointer inline-block no-underline text-center font-sans">
+          Demandes d’échange
+        </a>
       </div>
     </div>
   </div>
@@ -50,12 +50,16 @@
         <span>Sélectionné par vous</span>
       </div>
       <div class="flex items-center gap-1.5">
-        <div class="w-3.5 h-3.5 rounded-md bg-navy/8 border-[1.5px] border-navy/20"></div>
-        <span>Pris — cliquez pour demander un échange</span>
+        <div class="w-3.5 h-3.5 rounded-md bg-mahogany/12 border-[1.5px] border-mahogany/35"></div>
+        <span>Pris par un collègue — cliquez pour ouvrir une demande d’échange</span>
       </div>
       <div class="flex items-center gap-1.5">
         <div class="w-3.5 h-3.5 rounded-md bg-steel/50 border-[1.5px] border-steel/70"></div>
         <span>Validé — définitif</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <div class="w-3.5 h-3.5 rounded-md bg-steel/70 border-[1.5px] border-steel/90"></div>
+        <span>Verrouillé — en attente validation directeur</span>
       </div>
     </div>
   </div>
@@ -94,7 +98,7 @@
                 @if (slot) {
                   <button
                     (click)="toggleSlot(slot)"
-                    [disabled]="slot.status === 'validated' || (actionLoading() !== '' && actionLoading() !== slot.id)"
+                    [disabled]="slot.status === 'validated' || slot.status === 'locked' || (actionLoading() !== '' && actionLoading() !== slot.id)"
                     class="relative w-full rounded-xl border-[1.5px] text-left px-2.5 py-2 text-xs font-medium transition-all"
                     [class]="cardClass(slot)">
 
@@ -112,10 +116,10 @@
                     }
 
                     <div class="mt-1.5 flex items-center gap-1">
-                      @if (slot.status === 'validated') {
-                        <app-svg-icon name="lock" [size]="10" iconClass="shrink-0 opacity-40" />
-                      } @else if (selectedSlotIds().has(slot.id)) {
-                        <app-svg-icon name="check" [size]="11" iconClass="shrink-0 text-brick" />
+                      @if (slot.status === 'validated' || slot.status === 'locked') {
+                        <app-svg-icon name="lock" [size]="10" iconClass="shrink-0 opacity-50" />
+                      } @else if (ownsSlot(slot)) {
+                        <app-svg-icon name="check" [size]="11" iconClass="shrink-0" />
                       } @else if (slot.status === 'taken') {
                         <app-svg-icon name="arrow-swap" [size]="10" iconClass="shrink-0 opacity-60" />
                       }
@@ -138,106 +142,97 @@
         <p class="text-navy/40 text-xs mt-1">Revenez sur ce lien à tout moment pour modifier vos choix avant la deadline.</p>
       </div>
 
-      <!-- Exchange requests -->
-      <div id="demandes" class="mt-6 grid gap-4 md:grid-cols-2">
-
-        <!-- Incoming -->
-        <div class="bg-white border rounded-2xl overflow-hidden"
-             [class]="pendingIncomingCount() > 0 ? 'border-brick/30 shadow-lg shadow-brick/8' : 'border-steel'">
-          <div class="flex items-center justify-between px-5 py-4 border-b"
-               [class]="pendingIncomingCount() > 0 ? 'bg-brick/6 border-brick/15' : 'bg-cream/40 border-steel/50'">
-            <h3 class="font-display font-bold text-navy text-sm">Demandes reçues</h3>
-            @if (pendingIncomingCount() > 0) {
-              <span class="bg-brick text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                {{ pendingIncomingCount() }} en attente
-              </span>
-            }
-          </div>
-          <div class="p-4">
-            @if (incomingRequests().length === 0) {
-              <p class="text-xs text-navy/35 text-center py-3">Aucune demande reçue.</p>
-            } @else {
-              <div class="space-y-3">
-                @for (request of incomingRequests(); track request.id) {
-                  <div class="border rounded-xl p-3.5 transition-colors"
-                       [class]="request.status === 'pending' ? 'border-brick/20 bg-brick/4' : 'border-steel/60 bg-cream/30'">
-                    <div class="flex items-start justify-between gap-2 mb-2">
-                      <div>
-                        <p class="text-xs font-semibold text-navy">{{ request.requesterName }}</p>
-                        <p class="text-[11px] text-navy/50 font-mono">{{ request.dayOfWeek }} {{ request.startTime.slice(0,5) }}–{{ request.endTime.slice(0,5) }}</p>
-                      </div>
-                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0"
-                            [class]="request.status === 'pending' ? 'bg-brick/10 text-brick border border-brick/20' :
-                                     request.status === 'accepted' ? 'bg-emerald/10 text-emerald border border-emerald/20' :
-                                     'bg-navy/8 text-navy/50 border border-navy/15'">
-                        {{ request.status === 'pending' ? 'En attente' : request.status === 'accepted' ? 'Acceptée' : 'Refusée' }}
-                      </span>
-                    </div>
-                    @if (request.message) {
-                      <p class="text-[11px] text-navy/55 bg-white border border-steel/50 rounded-lg px-3 py-2 mb-2 leading-relaxed italic">{{ request.message }}</p>
-                    }
-                    @if (request.status === 'pending') {
-                      <div class="flex gap-2 mt-1">
-                        <button class="flex-1 bg-brick hover:bg-brick/90 text-white text-xs font-semibold px-3 py-2 rounded-lg transition-colors"
-                                (click)="acceptRequest(request.id)"
-                                [disabled]="actionLoading() === request.id">
-                          @if (actionLoading() === request.id) { <span class="spinner"></span> }
-                          @else { Accepter l'échange }
-                        </button>
-                        <button class="px-3 py-2 text-xs font-semibold text-navy/60 border border-steel hover:border-navy/30 rounded-lg transition-colors"
-                                (click)="rejectRequest(request.id)"
-                                [disabled]="actionLoading() === request.id">
-                          Refuser
-                        </button>
-                      </div>
-                    }
-                  </div>
-                }
-              </div>
-            }
-          </div>
-        </div>
-
-        <!-- Outgoing -->
-        <div class="bg-white border border-steel rounded-2xl overflow-hidden">
-          <div class="flex items-center justify-between px-5 py-4 border-b border-steel/50 bg-cream/40">
-            <h3 class="font-display font-bold text-navy text-sm">Demandes envoyées</h3>
-            @if (outgoingRequests().length > 0) {
-              <span class="text-[10px] text-navy/40 font-mono">{{ outgoingRequests().length }}</span>
-            }
-          </div>
-          <div class="p-4">
-            @if (outgoingRequests().length === 0) {
-              <p class="text-xs text-navy/35 text-center py-3">Aucune demande envoyée.</p>
-            } @else {
-              <div class="space-y-3">
-                @for (request of outgoingRequests(); track request.id) {
-                  <div class="border border-steel/60 bg-cream/20 rounded-xl p-3.5">
-                    <div class="flex items-start justify-between gap-2">
-                      <div>
-                        <p class="text-xs font-semibold text-navy">{{ request.targetName }}</p>
-                        <p class="text-[11px] text-navy/50 font-mono">{{ request.dayOfWeek }} {{ request.startTime.slice(0,5) }}–{{ request.endTime.slice(0,5) }}</p>
-                      </div>
-                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0"
-                            [class]="request.status === 'pending' ? 'bg-molten/20 text-navy/60 border border-molten/30' :
-                                     request.status === 'accepted' ? 'bg-emerald/10 text-emerald border border-emerald/20' :
-                                     'bg-error/8 text-error border border-error/20'">
-                        {{ request.status === 'pending' ? 'En attente' : request.status === 'accepted' ? 'Acceptée' : 'Refusée' }}
-                      </span>
-                    </div>
-                    @if (request.message) {
-                      <p class="text-[11px] text-navy/45 mt-2 italic">{{ request.message }}</p>
-                    }
-                  </div>
-                }
-              </div>
-            }
-          </div>
-        </div>
-
-      </div>
-
     }
+  </div>
+
+  <div class="max-w-6xl mx-auto px-4 pb-2 mt-2">
+    <div class="bg-white border border-cream/60 rounded-2xl p-4">
+      <h3 class="font-display font-bold text-navy mb-3">Calendrier global (toutes vos écoles)</h3>
+      @if (globalSchedule().length === 0) {
+        <p class="text-xs text-navy/40">Aucun créneau sélectionné pour le moment.</p>
+      } @else {
+        <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+          @for (day of globalScheduleDays(); track day) {
+            <div class="border border-cream/50 rounded-xl p-3">
+              <p class="text-xs font-bold uppercase tracking-wide text-brick/80 mb-2">{{ day }}</p>
+              <div class="space-y-2">
+                @for (row of globalForDay(day); track row.slotId) {
+                  <div class="rounded-lg border border-cream/45 px-2.5 py-2 bg-cream/10">
+                    <p class="text-[11px] font-semibold text-navy">{{ row.startTime.slice(0,5) }}-{{ row.endTime.slice(0,5) }} · {{ row.sessionName }}</p>
+                    <p class="text-[10px] text-navy/45">{{ row.schoolName }} @if (row.subjectName) { · {{ row.subjectName }} }</p>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <div id="echange-section" class="max-w-6xl mx-auto px-4 pb-10 mt-6 grid gap-4 lg:grid-cols-2 scroll-mt-40">
+    <div class="bg-white border border-cream/60 rounded-2xl p-4">
+      <h3 class="font-display font-bold text-navy mb-3">Négociations de créneaux</h3>
+      @if (negotiations().length === 0) {
+        <p class="text-xs text-navy/40">Aucune négociation active.</p>
+      } @else {
+        <div class="space-y-3">
+          @for (neg of negotiations(); track neg.id) {
+            <div class="border border-cream/50 rounded-xl p-3">
+              <div class="flex items-center justify-between gap-2">
+                <p class="text-xs text-navy/65 font-semibold">
+                  Cible: {{ neg.dayOfWeek }} {{ neg.startTime }}-{{ neg.endTime }}
+                </p>
+                <span class="text-[10px] uppercase tracking-wide"
+                  [class]="neg.status === 'locked' ? 'text-mahogany font-bold' : 'text-brick/70 font-semibold'">
+                  {{ neg.status === 'locked' ? 'verrouillé' : 'actif' }}
+                </span>
+              </div>
+              <p class="text-[11px] text-navy/40 mt-1">
+                Propriétaire actuel: {{ neg.ownerName || '—' }} · Participants: {{ participantsForNegotiation(neg.id).length }}
+              </p>
+              @if (neg.status === 'active') {
+                <div class="mt-3 grid gap-2 sm:grid-cols-2">
+                  @for (free of negotiationFreeSlots(); track free.id) {
+                    <button type="button"
+                      class="text-left border border-cream/50 rounded-lg px-2.5 py-2 hover:border-molten/50 hover:bg-molten/10 transition-all"
+                      [disabled]="isChoosing(neg.id, free.id)"
+                      (click)="chooseFreeSlot(neg.id, free.id)">
+                      <div class="text-[11px] font-semibold text-navy">{{ free.dayOfWeek }} {{ free.startTime }}–{{ free.endTime }}</div>
+                      @if (free.room) { <div class="text-[10px] text-navy/40 mt-0.5">Salle {{ free.room }}</div> }
+                    </button>
+                  }
+                </div>
+              } @else {
+                <p class="text-[11px] text-navy/45 mt-2">Conflit résolu : en attente de validation finale du directeur.</p>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="bg-white border border-cream/60 rounded-2xl p-4">
+      <h3 class="font-display font-bold text-navy mb-3">Historique des demandes</h3>
+      @if (incomingRequests().length === 0 && outgoingRequests().length === 0) {
+        <p class="text-xs text-navy/40">Aucune demande d’échange.</p>
+      } @else {
+        <div class="space-y-3">
+          @for (request of incomingRequests(); track request.id) {
+            <div class="border border-cream/50 rounded-xl p-3">
+              <p class="text-xs text-navy/65 font-semibold">{{ request.requesterName }} · {{ request.dayOfWeek }} {{ request.startTime.slice(0,5) }}-{{ request.endTime.slice(0,5) }}</p>
+              <p class="text-[11px] text-navy/35 mt-1">Statut: {{ request.status }}</p>
+            </div>
+          }
+          @for (request of outgoingRequests(); track request.id) {
+            <div class="border border-cream/50 rounded-xl p-3">
+              <p class="text-xs text-navy/65 font-semibold">{{ request.targetName }} · {{ request.dayOfWeek }} {{ request.startTime.slice(0,5) }}-{{ request.endTime.slice(0,5) }}</p>
+              <p class="text-[11px] text-navy/35 mt-1">Statut: {{ request.status }}</p>
+            </div>
+          }
+        </div>
+      }
+    </div>
   </div>
 }
 

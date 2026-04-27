@@ -89,30 +89,41 @@ export class SessionDetailComponent implements OnInit {
     });
     this.socket.connect();
     this.socket.joinSession(this.sessionId);
-    this.socket.onSlotSelected().subscribe(({ slotId }) => this.updateSlotStatus(slotId, 'taken'));
-    this.socket.onSlotReleased().subscribe(({ slotId }) => this.updateSlotStatus(slotId, 'free'));
-    this.socket.onSlotValidated().subscribe(({ slotId }) => this.updateSlotStatus(slotId, 'validated'));
+    this.socket.onSlotSelected().subscribe(({ slotId, teacherName }) =>
+      this.updateSlot(slotId, { status: 'taken', teacherName: teacherName || undefined })
+    );
+    this.socket.onSlotReleased().subscribe(({ slotId }) =>
+      this.updateSlot(slotId, {
+        status: 'free',
+        teacherName: undefined,
+        selectedByTeacherId: undefined,
+      })
+    );
+    this.socket.onSlotValidated().subscribe(({ slotId }) => this.updateSlot(slotId, { status: 'validated' }));
+    this.socket.onSlotLocked().subscribe(({ slotId }) => this.updateSlot(slotId, { status: 'locked' }));
   }
 
   loadAll(): void {
     this.api.get<Session>(`/sessions/${this.sessionId}`).subscribe((s) => {
       this.session.set(s);
-      const raw = s as Session & { school_class_id?: string | null };
-      this.selectedClassId.set(raw.school_class_id ?? '');
+      const raw = s as Session & { schoolClassId?: string | null };
+      this.selectedClassId.set(raw.schoolClassId ?? '');
       this.api
-        .get<Array<{ id: string; name: string; is_active: boolean }>>('/school-classes?includeInactive=1')
+        .get<Array<{ id: string; name: string; isActive: boolean }>>('/school-classes?includeInactive=1')
         .subscribe((rows) => {
-          const sid = raw.school_class_id;
-          const list = rows.filter((r) => r.is_active || r.id === sid);
+          const sid = raw.schoolClassId;
+          const list = rows.filter((r) => r.isActive || r.id === sid);
           this.schoolClasses.set(
             list.map((r) => ({
               id: r.id,
-              name: r.name + (!r.is_active && r.id === sid ? ' (masquée)' : ''),
+              name: r.name + (!r.isActive && r.id === sid ? ' (masquée)' : ''),
             }))
           );
         });
     });
-    this.api.get<TimeSlot[]>(`/sessions/${this.sessionId}/slots`).subscribe((s) => this.slots.set(s));
+    this.api.get<TimeSlot[]>(`/sessions/${this.sessionId}/slots`).subscribe((s) => {
+      this.slots.set(this.normalizeSlotsFromApi(s));
+    });
     this.api.get<Subject[]>('/subjects').subscribe((subjects) => this.subjects.set(subjects));
     this.api.get<Teacher[]>(`/sessions/${this.sessionId}/teachers`).subscribe((t) => {
       this.teachers.set(t);
@@ -120,8 +131,22 @@ export class SessionDetailComponent implements OnInit {
     });
   }
 
-  private updateSlotStatus(slotId: string, status: 'free' | 'taken' | 'validated'): void {
-    this.slots.update(slots => slots.map(s => s.id === slotId ? { ...s, status } : s));
+  private updateSlot(
+    slotId: string,
+    patch: Partial<Pick<TimeSlot, 'status' | 'teacherName' | 'selectedByTeacherId'>>
+  ): void {
+    this.slots.update((slots) => slots.map((s) => (s.id === slotId ? { ...s, ...patch } : s)));
+  }
+
+  /** Tolère une désynchronisation DB : s'il y a une sélection, le créneau est affiché comme réservé. */
+  private normalizeSlotsFromApi(slots: TimeSlot[]): TimeSlot[] {
+    return slots.map((slot) => {
+      if (slot.status === 'validated') return slot;
+      if (slot.selectedByTeacherId || slot.teacherName || slot.status === 'taken') {
+        return { ...slot, status: 'taken' as const };
+      }
+      return { ...slot, status: 'free' as const };
+    });
   }
 
   addTeacher(): void {
@@ -201,7 +226,7 @@ export class SessionDetailComponent implements OnInit {
 
   validateSlot(slotId: string): void {
     this.api.post(`/sessions/${this.sessionId}/slots/${slotId}/validate`, {}).subscribe(() => {
-      this.updateSlotStatus(slotId, 'validated');
+      this.updateSlot(slotId, { status: 'validated' });
     });
   }
 
@@ -211,7 +236,7 @@ export class SessionDetailComponent implements OnInit {
 
   unvalidateSlot(slotId: string): void {
     this.api.post(`/sessions/${this.sessionId}/slots/${slotId}/unvalidate`, {}).subscribe(() => {
-      this.updateSlotStatus(slotId, 'taken');
+      this.updateSlot(slotId, { status: 'taken' });
     });
   }
 
@@ -220,6 +245,7 @@ export class SessionDetailComponent implements OnInit {
     this.api.post(`/sessions/${this.sessionId}/teachers/${teacherId}/invite`, {}).subscribe({
       next: () => {
         this.stopTeacherAction(teacherId);
+        this.toast.success('Invitation envoyée par e-mail.');
         this.loadAll();
       },
       error: (e) => {
@@ -234,7 +260,8 @@ export class SessionDetailComponent implements OnInit {
     this.api.post(`/sessions/${this.sessionId}/teachers/${teacherId}/remind`, {}).subscribe({
       next: () => {
         this.stopTeacherAction(teacherId);
-        this.toast.success('Relance envoyée !');
+        this.toast.success('Relance envoyée par e-mail.');
+        this.loadAll();
       },
       error: (e) => {
         this.stopTeacherAction(teacherId);
@@ -262,11 +289,15 @@ export class SessionDetailComponent implements OnInit {
   inviteAllTeachers(): void {
     if (this.invitingAll()) return;
     this.invitingAll.set(true);
-    this.api.post<{ invited: number; failed: number; total: number }>(`/sessions/${this.sessionId}/teachers/invite-all`, {}).subscribe({
+    this.api.post<{ invited: number; failed: number; eligible: number; totalTeachers: number; alreadyInvited: number }>(`/sessions/${this.sessionId}/teachers/invite-all`, {}).subscribe({
       next: (result) => {
         this.invitingAll.set(false);
         this.loadAll();
-        this.toast.success(`Invitations envoyées : ${result.invited}/${result.total}${result.failed ? ` (échecs : ${result.failed})` : ''}`);
+        if (result.eligible === 0) {
+          this.toast.success(`Aucun nouvel enseignant à inviter (déjà invités : ${result.alreadyInvited}/${result.totalTeachers}).`);
+          return;
+        }
+        this.toast.success(`Invitations envoyées : ${result.invited}/${result.eligible}${result.failed ? ` (échecs : ${result.failed})` : ''}`);
       },
       error: (e) => {
         this.invitingAll.set(false);
@@ -379,12 +410,11 @@ export class SessionDetailComponent implements OnInit {
 
   sessionYear(s: Session | null): string {
     if (!s) return '';
-    const x = s as Session & { academic_year?: string };
-    return s.academicYear ?? x.academic_year ?? '';
+    return s.academicYear ?? '';
   }
 
   async exportPdf(): Promise<void> {
-    const url = `http://localhost:3001/api/v1/sessions/${this.sessionId}/export/pdf?includeTeacherName=true&includeContact=true&includeEmail=true&includeSubject=true&includeRoom=true`;
+    const url = `http://localhost:3000/api/v1/sessions/${this.sessionId}/export/pdf?includeTeacherName=true&includeContact=true&includeEmail=true&includeSubject=true&includeRoom=true`;
     const token = localStorage.getItem('tt_token');
     try {
       const response = await fetch(url, {
@@ -451,8 +481,9 @@ export class SessionDetailComponent implements OnInit {
 
   slotCardClass(status: string): string {
     return {
-      free:      'bg-white border border-amber/25 text-navy/70',
+      free:      'bg-white border border-amber/35 text-navy/80',
       taken:     'bg-molten/12 border border-molten/40 text-navy',
+      locked:    'bg-steel/70 border border-steel/90 text-navy/50',
       validated: 'bg-steel/50 border border-steel/80 text-navy/50',
     }[status] ?? 'bg-white border border-cream/60';
   }
@@ -484,13 +515,13 @@ export class SessionDetailComponent implements OnInit {
   inviteButtonLabel(teacher: Teacher): string {
     const action = this.teacherAction(teacher.id);
     if (action === 'inviting') return 'Invitation...';
-    return !teacher.invitationSentAt ? 'Inviter' : 'Invité';
+    return 'Inviter';
   }
 
   remindButtonLabel(teacher: Teacher): string {
     const action = this.teacherAction(teacher.id);
     if (action === 'reminding') return 'Relance...';
-    return teacher.status === 'pending' ? 'Relancer' : 'En attente retour';
+    return 'Relancer';
   }
 
   onTeacherSubjectInput(query: string): void {

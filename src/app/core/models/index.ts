@@ -36,11 +36,13 @@ export interface Session {
   id: string;
   name: string;
   academicYear: string;
-  /** Alias API snake_case */
+  /** Legacy snake_case aliases kept for compatibility. */
   academic_year?: string;
   status: SessionStatus;
   deadline: string | null;
   schoolId: string;
+  schoolClassId?: string | null;
+  schoolClassName?: string | null;
   school_class_id?: string | null;
   school_class_name?: string | null;
   totalSlots?: number;
@@ -63,7 +65,7 @@ export interface Subject {
   color: string;
 }
 
-export type SlotStatus = 'free' | 'taken' | 'validated';
+export type SlotStatus = 'free' | 'taken' | 'locked' | 'validated';
 
 export interface TimeSlot {
   id: string;

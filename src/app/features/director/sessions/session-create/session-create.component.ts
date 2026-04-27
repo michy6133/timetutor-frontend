@@ -31,8 +31,8 @@ export class SessionCreateComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.api.get<Array<{ id: string; name: string; is_active: boolean }>>('/school-classes').subscribe((rows) => {
-      this.schoolClasses.set(rows.filter((r) => r.is_active).map((r) => ({ id: r.id, name: r.name })));
+    this.api.get<Array<{ id: string; name: string; isActive: boolean }>>('/school-classes').subscribe((rows) => {
+      this.schoolClasses.set(rows.filter((r) => r.isActive).map((r) => ({ id: r.id, name: r.name })));
     });
   }
 

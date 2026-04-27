@@ -1,4 +1,15 @@
-import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  inject,
+  signal,
+  OnInit,
+  OnDestroy,
+  DestroyRef,
+  PLATFORM_ID,
+} from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { interval } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../../core/services/api.service';
 import { SocketService } from '../../../core/services/socket.service';
@@ -6,6 +17,7 @@ import { ToastService } from '../../../core/services/toast.service';
 import type { TimeSlot } from '../../../core/models';
 import { CommonModule } from '@angular/common';
 import { SvgIconComponent } from '../../../shared/svg-icon.component';
+
 interface TeacherInfo { fullName: string; email: string; }
 interface SessionInfo { name: string; academicYear: string; status: string; }
 interface VerifyResponse { valid: boolean; sessionId: string; teacherId: string; teacher: TeacherInfo; session: SessionInfo; }
@@ -36,30 +48,86 @@ interface ContactRequestsResponse {
   outgoing: ContactOutgoingRequest[];
 }
 
+interface NegotiationItem {
+  id: string;
+  sessionId: string;
+  targetSlotId: string;
+  status: 'active' | 'locked' | 'cancelled';
+  lockedAt: string | null;
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
+  ownerName: string | null;
+}
+
+interface NegotiationParticipant {
+  negotiationId: string;
+  teacherId: string;
+  teacherName: string;
+  role: 'owner' | 'requester';
+  resolved: boolean;
+  desiredSlotId: string | null;
+}
+
+interface NegotiationFreeSlot {
+  id: string;
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
+  room?: string | null;
+}
+
+interface NegotiationsResponse {
+  negotiations: NegotiationItem[];
+  participants: NegotiationParticipant[];
+  freeSlots: NegotiationFreeSlot[];
+}
+
+interface GlobalScheduleRow {
+  slotId: string;
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
+  room: string | null;
+  status: string;
+  sessionId: string;
+  sessionName: string;
+  academicYear: string;
+  schoolName: string;
+  subjectName: string | null;
+}
+
 @Component({
   selector: 'app-slot-picker',
   standalone: true,
   imports: [CommonModule, SvgIconComponent],
   templateUrl: './slot-picker.component.html',
+  /** Page très interactive + lien magique : évite les clics « morts » avec withEventReplay (hydratation). */
+  host: { ngSkipHydration: '' },
 })
 export class SlotPickerComponent implements OnInit, OnDestroy {
   private readonly api = inject(ApiService);
   private readonly route = inject(ActivatedRoute);
   private readonly socket = inject(SocketService);
   private readonly toast = inject(ToastService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly platformId = inject(PLATFORM_ID);
 
   readonly loading = signal(true);
   readonly error = signal('');
   readonly teacher = signal<TeacherInfo | null>(null);
   readonly session = signal<SessionInfo | null>(null);
   readonly slots = signal<TimeSlot[]>([]);
-  readonly selectedSlotIds = signal<Set<string>>(new Set());
   readonly actionLoading = signal<string>('');
   readonly contactModalOpen = signal(false);
   readonly contactTargetSlot = signal<TimeSlot | null>(null);
   readonly contactMessage = signal('');
   readonly incomingRequests = signal<ContactIncomingRequest[]>([]);
   readonly outgoingRequests = signal<ContactOutgoingRequest[]>([]);
+  readonly negotiations = signal<NegotiationItem[]>([]);
+  readonly negotiationParticipants = signal<NegotiationParticipant[]>([]);
+  readonly negotiationFreeSlots = signal<NegotiationFreeSlot[]>([]);
+  readonly globalSchedule = signal<GlobalScheduleRow[]>([]);
 
   private token = '';
   private sessionId = '';
@@ -69,17 +137,34 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
     this.token = this.route.snapshot.params['token'];
     this.api.get<VerifyResponse>(`/teachers/verify/${this.token}`).subscribe({
       next: (res) => {
+        this.myTeacherId = res.teacherId;
         this.teacher.set(res.teacher);
         this.session.set(res.session);
         this.sessionId = res.sessionId;
         this.myTeacherId = res.teacherId;
         this.loadSlots();
         this.loadContactRequests();
+        this.loadNegotiations();
+        this.loadGlobalSchedule();
         this.socket.connect();
         this.socket.joinSession(this.sessionId);
-        this.socket.onSlotSelected().subscribe(({ slotId }) => this.updateStatus(slotId, 'taken'));
-        this.socket.onSlotReleased().subscribe(({ slotId }) => this.updateStatus(slotId, 'free'));
-        this.socket.onSlotValidated().subscribe(({ slotId }) => this.updateStatus(slotId, 'validated'));
+        this.socket.onSlotSelected().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.loadSlots());
+        this.socket.onSlotReleased().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.loadSlots());
+        this.socket.onSlotValidated().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.loadSlots());
+        this.socket.onSlotLocked().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.loadSlots());
+        this.socket.onContactRequestsChanged().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.loadContactRequests());
+        this.socket.onNegotiationUpdated().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.loadNegotiations());
+        this.socket.onContactRequest().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.loadNegotiations());
+
+        interval(12000)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe(() => {
+            if (!this.sessionId || !this.token) return;
+            this.loadSlots();
+            this.loadContactRequests();
+            this.loadNegotiations();
+            this.loadGlobalSchedule();
+          });
       },
       error: () => {
         this.error.set('Lien invalide ou expiré. Contactez votre directeur.');
@@ -92,18 +177,60 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
     this.socket.disconnect();
   }
 
+  /** Créneaux réellement attribués à cet enseignant (pas « tout créneau pris »). */
+  ownsSlot(slot: TimeSlot): boolean {
+    return !!this.myTeacherId && slot.selectedByTeacherId === this.myTeacherId;
+  }
+
   loadSlots(): void {
     this.api.get<TimeSlot[]>(`/sessions/${this.sessionId}/slots/teacher/${this.token}`).subscribe({
       next: (slots) => {
-        this.slots.set(slots);
-        const myIds = new Set(
-          slots.filter(s => s.selectedByTeacherId === this.myTeacherId).map(s => s.id)
-        );
-        this.selectedSlotIds.set(myIds);
+        this.slots.set(this.normalizeSlotsFromApi(slots));
         this.loading.set(false);
       },
       error: () => this.loading.set(false),
     });
+  }
+
+  /** Affiche « pris » dès qu’une sélection existe, même si `time_slots.status` était désynchronisé. */
+  private normalizeSlotsFromApi(slots: TimeSlot[]): TimeSlot[] {
+    return slots.map((s) => {
+      if (s.status === 'validated' || s.status === 'locked') return s;
+      if (s.selectedByTeacherId || s.status === 'taken') {
+        return { ...s, status: 'taken' };
+      }
+      return { ...s, status: 'free' };
+    });
+  }
+
+  loadNegotiations(): void {
+    this.api.get<NegotiationsResponse>(`/sessions/${this.sessionId}/slots/negotiations/${this.token}`).subscribe({
+      next: (payload) => {
+        this.negotiations.set(payload.negotiations);
+        this.negotiationParticipants.set(payload.participants);
+        this.negotiationFreeSlots.set(payload.freeSlots);
+      },
+      error: () => undefined,
+    });
+  }
+
+  loadGlobalSchedule(): void {
+    this.api.get<GlobalScheduleRow[]>(`/teachers/my-schedule/${this.token}`).subscribe({
+      next: (rows) => this.globalSchedule.set(rows),
+      error: () => this.globalSchedule.set([]),
+    });
+  }
+
+  globalScheduleDays(): string[] {
+    const order = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+    const seen = new Set(this.globalSchedule().map((r) => r.dayOfWeek));
+    return order.filter((d) => seen.has(d));
+  }
+
+  globalForDay(day: string): GlobalScheduleRow[] {
+    return this.globalSchedule()
+      .filter((r) => r.dayOfWeek === day)
+      .sort((a, b) => a.startTime.localeCompare(b.startTime));
   }
 
   loadContactRequests(): void {
@@ -116,23 +243,72 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
     });
   }
 
-  private updateStatus(slotId: string, status: 'free' | 'taken' | 'validated'): void {
-    this.slots.update(slots => slots.map(s => s.id === slotId ? { ...s, status } : s));
+  echangeAnchorHref(): string {
+    return this.token ? `/teacher/${this.token}#echange-section` : '/#echange-section';
+  }
+
+  /** Scroll vers #echange-section. Si Angular n'accroche pas le click, le href fait le fallback. */
+  scrollToEchangeSection(event?: Event): void {
+    event?.preventDefault();
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    const HEADER_STICKY_OFFSET_PX = 100;
+    const doScroll = (): boolean => {
+      const el = document.getElementById('echange-section');
+      if (!el) return false;
+      const y = el.getBoundingClientRect().top + window.scrollY - HEADER_STICKY_OFFSET_PX;
+      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      return true;
+    };
+
+    if (doScroll()) return;
+    requestAnimationFrame(() => {
+      if (doScroll()) return;
+      setTimeout(() => {
+        if (!doScroll()) {
+          this.toast.info('Section échanges introuvable. Rechargez la page.');
+        }
+      }, 120);
+    });
   }
 
   toggleSlot(slot: TimeSlot): void {
-    if (slot.status === 'validated') return;
+    if (slot.status === 'validated' || slot.status === 'locked') return;
     if (this.actionLoading()) return;
 
-    const isSelected = this.selectedSlotIds().has(slot.id);
-    this.actionLoading.set(slot.id);
+    if (this.ownsSlot(slot)) {
+      this.actionLoading.set(slot.id);
+      this.api.delete(`/sessions/${slot.sessionId}/slots/${slot.id}/select/${this.token}`).subscribe({
+        next: () => {
+          this.patchSlot(slot.id, {
+            status: 'free',
+            selectedByTeacherId: undefined,
+            teacherName: undefined,
+          });
+          this.actionLoading.set('');
+          this.toast.success('Créneau libéré');
+        },
+        error: (e) => {
+          this.toast.error(e.error?.error ?? 'Erreur');
+          this.actionLoading.set('');
+          this.loadSlots();
+        },
+      });
+      return;
+    }
 
-    if (!isSelected && slot.status === 'free') {
-      // Select
-      this.api.post<{ message?: string; warnings?: string[] }>(`/sessions/${slot.sessionId}/slots/${slot.id}/select/${this.token}`, {}).subscribe({
+    if (slot.status === 'free') {
+      this.actionLoading.set(slot.id);
+      this.api.post<{ message?: string; warnings?: string[] }>(
+        `/sessions/${slot.sessionId}/slots/${slot.id}/select/${this.token}`,
+        {}
+      ).subscribe({
         next: (res) => {
-          this.selectedSlotIds.update(s => { const ns = new Set(s); ns.add(slot.id); return ns; });
-          this.updateStatus(slot.id, 'taken');
+          this.patchSlot(slot.id, {
+            status: 'taken',
+            selectedByTeacherId: this.myTeacherId,
+            teacherName: this.teacher()?.fullName ?? undefined,
+          });
           this.actionLoading.set('');
           for (const w of res.warnings ?? []) {
             this.toast.warning(w);
@@ -141,22 +317,23 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
             this.toast.success(res.message ?? 'Créneau sélectionné');
           }
         },
-        error: (e) => { this.toast.error(e.error?.error ?? 'Erreur'); this.actionLoading.set(''); },
-      });
-    } else if (isSelected) {
-      // Deselect
-      this.api.delete(`/sessions/${slot.sessionId}/slots/${slot.id}/select/${this.token}`).subscribe({
-        next: () => {
-          this.selectedSlotIds.update(s => { const ns = new Set(s); ns.delete(slot.id); return ns; });
-          this.updateStatus(slot.id, 'free');
+        error: (e) => {
+          this.toast.error(e.error?.error ?? 'Erreur');
           this.actionLoading.set('');
+          this.loadSlots();
+          this.loadContactRequests();
         },
-        error: (e) => { this.toast.error(e.error?.error ?? 'Erreur'); this.actionLoading.set(''); },
       });
-    } else if (slot.status === 'taken') {
-      this.actionLoading.set('');
+      return;
+    }
+
+    if (slot.status === 'taken') {
       this.openContactModal(slot);
     }
+  }
+
+  private patchSlot(slotId: string, patch: Partial<TimeSlot>): void {
+    this.slots.update((slots) => slots.map((s) => (s.id === slotId ? { ...s, ...patch } : s)));
   }
 
   openContactModal(slot: TimeSlot): void {
@@ -221,9 +398,38 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
     });
   }
 
+  participantsForNegotiation(negotiationId: string): NegotiationParticipant[] {
+    return this.negotiationParticipants().filter((p) => p.negotiationId === negotiationId);
+  }
+
+  chooseFreeSlot(negotiationId: string, slotId: string): void {
+    this.actionLoading.set(`${negotiationId}:${slotId}`);
+    this.api.post<{ message: string; locked: boolean }>(
+      `/sessions/${this.sessionId}/slots/negotiations/${negotiationId}/choose/${this.token}`,
+      { slotId }
+    ).subscribe({
+      next: (res) => {
+        this.actionLoading.set('');
+        this.toast.success(res.message);
+        this.loadSlots();
+        this.loadNegotiations();
+      },
+      error: (e) => {
+        this.actionLoading.set('');
+        this.toast.error(e.error?.error ?? 'Choix impossible');
+        this.loadSlots();
+        this.loadNegotiations();
+      },
+    });
+  }
+
+  isChoosing(negotiationId: string, slotId: string): boolean {
+    return this.actionLoading() === `${negotiationId}:${slotId}`;
+  }
+
   days(): string[] {
     const order = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-    return order.filter(d => this.slots().some(s => s.dayOfWeek === d));
+    return order.filter((d) => this.slots().some((s) => s.dayOfWeek === d));
   }
 
   uniqueTimes(): { start: string; end: string }[] {
@@ -231,33 +437,35 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
     const times: { start: string; end: string }[] = [];
     for (const slot of this.slots()) {
       const key = `${slot.startTime}-${slot.endTime}`;
-      if (!seen.has(key)) { seen.add(key); times.push({ start: slot.startTime, end: slot.endTime }); }
+      if (!seen.has(key)) {
+        seen.add(key);
+        times.push({ start: slot.startTime, end: slot.endTime });
+      }
     }
     return times.sort((a, b) => a.start.localeCompare(b.start));
   }
 
   getSlot(day: string, startTime: string): TimeSlot | null {
-    return this.slots().find(s => s.dayOfWeek === day && s.startTime === startTime) ?? null;
+    return this.slots().find((s) => s.dayOfWeek === day && s.startTime === startTime) ?? null;
   }
 
-  myCount(): number { return this.selectedSlotIds().size; }
+  myCount(): number {
+    return this.slots().filter((s) => this.ownsSlot(s)).length;
+  }
 
   cardClass(slot: TimeSlot): string {
-    const isOwn = this.selectedSlotIds().has(slot.id);
-    if (slot.status === 'validated') return 'bg-steel/50 border-steel/70 text-navy/35 cursor-not-allowed';
-    if (isOwn) return 'bg-brick/10 border-brick/35 text-brick cursor-pointer hover:bg-brick/15';
-    if (slot.status === 'taken') return 'bg-navy/8 border-navy/20 text-navy/60 cursor-pointer hover:bg-navy/12';
-    return 'bg-white border-steel text-navy cursor-pointer hover:border-brick/40 hover:bg-brick/5';
-  }
-
-  pendingIncomingCount(): number {
-    return this.incomingRequests().filter(r => r.status === 'pending').length;
+    if (slot.status === 'validated') return 'bg-steel/60 border-steel/80 text-navy/40 cursor-not-allowed';
+    if (slot.status === 'locked') return 'bg-steel/70 border-steel/90 text-navy/45 cursor-not-allowed';
+    if (this.ownsSlot(slot)) return 'bg-molten/18 border-molten/45 text-navy cursor-pointer hover:bg-molten/25';
+    if (slot.status === 'taken') return 'bg-mahogany/12 border-mahogany/35 text-mahogany cursor-pointer hover:bg-mahogany/20';
+    return 'bg-white border-amber/30 text-navy cursor-pointer hover:border-molten/60 hover:bg-molten/8';
   }
 
   slotLabel(slot: TimeSlot): string {
     if (slot.status === 'validated') return 'Validé';
-    if (this.selectedSlotIds().has(slot.id)) return 'Sélectionné';
-    if (slot.status === 'taken') return 'Demander';
+    if (slot.status === 'locked') return 'Verrouillé';
+    if (this.ownsSlot(slot)) return 'Sélectionné';
+    if (slot.status === 'taken') return 'Échanger';
     return 'Libre';
   }
 }

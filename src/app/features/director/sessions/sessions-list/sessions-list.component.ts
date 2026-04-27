@@ -8,16 +8,16 @@ import { SvgIconComponent } from '../../../../shared/svg-icon.component';
 
 interface SchoolTeacher {
   id: string;
-  full_name: string;
+  fullName: string;
   email: string;
   phone: string | null;
   status: 'pending' | 'active' | 'done';
-  invitation_sent_at: string | null;
-  session_id: string;
-  session_name: string;
-  academic_year: string;
-  session_status: string;
-  slots_selected: number;
+  invitationSentAt: string | null;
+  sessionId: string;
+  sessionName: string;
+  academicYear: string;
+  sessionStatus: string;
+  slotsSelected: number;
 }
 
 @Component({
@@ -53,8 +53,8 @@ export class SessionsListComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.api.get<Array<{ id: string; name: string; is_active: boolean }>>('/school-classes').subscribe((rows) => {
-      this.schoolClasses.set(rows.filter((r) => r.is_active).map((r) => ({ id: r.id, name: r.name })));
+    this.api.get<Array<{ id: string; name: string; isActive: boolean }>>('/school-classes').subscribe((rows) => {
+      this.schoolClasses.set(rows.filter((r) => r.isActive).map((r) => ({ id: r.id, name: r.name })));
     });
     this.reloadSessions();
   }
@@ -134,12 +134,16 @@ export class SessionsListComponent implements OnInit {
     event?.preventDefault();
     if (this.invitingSessionId()) return;
     this.invitingSessionId.set(sessionId);
-    this.api.post<{ invited: number; failed: number; total: number }>(
+    this.api.post<{ invited: number; failed: number; eligible: number; totalTeachers: number; alreadyInvited: number }>(
       `/sessions/${sessionId}/teachers/invite-all`, {}
     ).subscribe({
       next: (res) => {
         this.invitingSessionId.set('');
-        this.toast.success(`Invitations envoyées : ${res.invited}/${res.total}${res.failed ? ` (échecs : ${res.failed})` : ''}`);
+        if (res.eligible === 0) {
+          this.toast.success(`Aucun nouvel enseignant à inviter (déjà invités : ${res.alreadyInvited}/${res.totalTeachers}).`);
+        } else {
+          this.toast.success(`Invitations envoyées : ${res.invited}/${res.eligible}${res.failed ? ` (échecs : ${res.failed})` : ''}`);
+        }
         this.api.get<Session[]>('/sessions').subscribe(s => this.sessions.set(s));
       },
       error: (e) => {

@@ -8,6 +8,7 @@ import { CheckoutComponent } from './features/director/checkout/checkout.compone
 import { SessionsListComponent } from './features/director/sessions/sessions-list/sessions-list.component';
 import { SessionCreateComponent } from './features/director/sessions/session-create/session-create.component';
 import { SessionDetailComponent } from './features/director/sessions/session-detail/session-detail.component';
+import { SessionNegotiationComponent } from './features/director/sessions/session-negotiation/session-negotiation.component';
 import { SlotPickerComponent } from './features/teacher/slot-picker/slot-picker.component';
 import { TeacherRegisterComponent } from './features/teacher/teacher-register/teacher-register.component';
 import { ForgotPasswordComponent } from './features/auth/forgot-password/forgot-password.component';
@@ -23,7 +24,6 @@ import { PolicyComponent } from './features/policy/policy.component';
 import { ProfileComponent } from './features/profile/profile.component';
 import { SettingsComponent } from './features/director/settings/settings.component';
 import { PricingComponent } from './features/pricing/pricing.component';
-import { TeacherDashboardComponent } from './features/teacher/dashboard/teacher-dashboard.component';
 import { authGuard } from './core/guards/auth.guard';
 import { teacherGuard } from './core/guards/teacher.guard';
 
@@ -50,6 +50,7 @@ export const routes: Routes = [
       { path: 'sessions', component: SessionsListComponent },
       { path: 'sessions/new', component: SessionCreateComponent },
       { path: 'sessions/:id', component: SessionDetailComponent },
+      { path: 'sessions/:id/negotiation', component: SessionNegotiationComponent },
       { path: 'roster', component: RosterComponent },
       { path: 'subjects', component: SubjectsComponent },
       { path: 'classes', component: SchoolClassesComponent },
@@ -62,7 +63,7 @@ export const routes: Routes = [
     canActivate: [teacherGuard],
     children: [
       { path: 'portal', component: TeacherPortalComponent },
-      { path: 'dashboard', component: TeacherDashboardComponent },
+      { path: 'dashboard', redirectTo: 'portal', pathMatch: 'full' },
     ],
   },
   {

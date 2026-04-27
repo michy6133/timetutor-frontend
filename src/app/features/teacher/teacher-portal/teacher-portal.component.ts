@@ -7,17 +7,17 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { SvgIconComponent } from '../../../shared/svg-icon.component';
 
 export interface AggregatedScheduleRow {
-  slot_id: string;
-  day_of_week: string;
-  start_time: string;
-  end_time: string;
+  slotId: string;
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
   room: string | null;
   status: string;
-  session_id: string;
-  session_name: string;
-  academic_year: string;
-  school_name: string;
-  subject_name: string | null;
+  sessionId: string;
+  sessionName: string;
+  academicYear: string;
+  schoolName: string;
+  subjectName: string | null;
 }
 
 @Component({
@@ -56,14 +56,39 @@ export class TeacherPortalComponent implements OnInit {
   }
 
   scheduleDays(): string[] {
-    const seen = new Set(this.schedule().map((r) => r.day_of_week));
+    const seen = new Set(this.schedule().map((r) => r.dayOfWeek));
     return this.dayOrder.filter((d) => seen.has(d));
   }
 
   slotsForDay(day: string): AggregatedScheduleRow[] {
     return this.schedule()
-      .filter((r) => r.day_of_week === day)
-      .sort((a, b) => a.start_time.localeCompare(b.start_time));
+      .filter((r) => r.dayOfWeek === day)
+      .sort((a, b) => a.startTime.localeCompare(b.startTime));
+  }
+
+  uniqueTimes(): { start: string; end: string }[] {
+    const seen = new Set<string>();
+    const times: { start: string; end: string }[] = [];
+    for (const row of this.schedule()) {
+      const key = `${row.startTime}-${row.endTime}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        times.push({ start: row.startTime, end: row.endTime });
+      }
+    }
+    return times.sort((a, b) => a.start.localeCompare(b.start));
+  }
+
+  slotForDayAndStart(day: string, start: string): AggregatedScheduleRow | null {
+    return this.schedule().find((r) => r.dayOfWeek === day && r.startTime === start) ?? null;
+  }
+
+  scrollToGlobalCalendar(): void {
+    if (typeof document === 'undefined' || typeof window === 'undefined') return;
+    const target = document.getElementById('global-calendar');
+    if (!target) return;
+    const y = target.getBoundingClientRect().top + window.scrollY - 76;
+    window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
   }
 
   openSession(s: TeacherSession): void {
