@@ -29,6 +29,7 @@ export class RosterComponent implements OnInit {
   readonly saving = signal(false);
   readonly importing = signal(false);
   readonly showAddForm = signal(false);
+  readonly showConflictGuide = signal(false);
   readonly editingId = signal<string | null>(null);
   readonly deletingId = signal<string | null>(null);
   readonly search = signal('');

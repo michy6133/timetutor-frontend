@@ -10,19 +10,19 @@
     </div>
 
     <nav class="p-3 flex flex-col gap-1 flex-1">
-      <a routerLink="/director/dashboard" routerLinkActive="tt-active" [routerLinkActiveOptions]="{ exact: true }" class="sidebar-link">
+      <a data-tour="dir-dashboard" routerLink="/director/dashboard" routerLinkActive="tt-active" [routerLinkActiveOptions]="{ exact: true }" class="sidebar-link">
         <app-svg-icon name="layout-dashboard" [size]="18" iconClass="shrink-0 opacity-60" />
         Tableau de bord
       </a>
-      <a routerLink="/director/sessions" routerLinkActive="tt-active" [routerLinkActiveOptions]="{ exact: true }" class="sidebar-link">
+      <a data-tour="dir-sessions" routerLink="/director/sessions" routerLinkActive="tt-active" [routerLinkActiveOptions]="{ exact: true }" class="sidebar-link">
         <app-svg-icon name="calendar" [size]="18" iconClass="shrink-0 opacity-60" />
         Sessions
       </a>
-      <a routerLink="/director/sessions/new" routerLinkActive="tt-active" class="sidebar-link">
+      <a data-tour="dir-new-session" routerLink="/director/sessions/new" routerLinkActive="tt-active" class="sidebar-link">
         <app-svg-icon name="plus-circle" [size]="18" iconClass="shrink-0 opacity-60" />
         Nouvelle session
       </a>
-      <a routerLink="/director/roster" routerLinkActive="tt-active" class="sidebar-link">
+      <a data-tour="dir-roster" routerLink="/director/roster" routerLinkActive="tt-active" class="sidebar-link">
         <app-svg-icon name="users" [size]="18" iconClass="shrink-0 opacity-60" />
         Répertoire profs
       </a>
@@ -34,7 +34,7 @@
         <app-svg-icon name="building" [size]="18" iconClass="shrink-0 opacity-60" />
         Classes
       </a>
-      <a routerLink="/director/billing" routerLinkActive="tt-active" class="sidebar-link">
+      <a data-tour="dir-billing" routerLink="/director/billing" routerLinkActive="tt-active" class="sidebar-link">
         <app-svg-icon name="credit-card" [size]="18" iconClass="shrink-0 opacity-60" />
         Abonnement
       </a>
@@ -46,6 +46,12 @@
         <app-svg-icon name="cog" [size]="18" iconClass="shrink-0 opacity-60" />
         Paramètres
       </a>
+      <div class="h-px bg-cream/60 mx-1 mt-1"></div>
+      <button type="button" (click)="auth.logout()"
+        class="sidebar-link text-brick/65 hover:text-brick hover:bg-brick/8 w-full text-left">
+        <app-svg-icon name="log-out" [size]="18" iconClass="shrink-0" />
+        Déconnexion
+      </button>
     </nav>
 
     <div class="p-4 border-t border-cream/50 space-y-2">
@@ -111,9 +117,8 @@
     </div>
   }
 
-  @if (showOnboarding()) {
-    <app-onboarding-tooltip
-      [steps]="onboardingSteps"
-      (dismiss)="dismissOnboarding()" />
-  }
 </div>
+
+@if (showOnboarding()) {
+  <app-onboarding-overlay [steps]="onboardingSteps" (dismiss)="dismissOnboarding()" />
+}

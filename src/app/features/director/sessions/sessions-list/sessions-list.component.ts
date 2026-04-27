@@ -32,6 +32,7 @@ export class SessionsListComponent implements OnInit {
   readonly sessions = signal<Session[]>([]);
   readonly loading = signal(true);
   readonly filter = signal<string>('all');
+  readonly showConflictGuide = signal(false);
 
   readonly teacherQuery = signal('');
   readonly teacherResults = signal<SchoolTeacher[]>([]);

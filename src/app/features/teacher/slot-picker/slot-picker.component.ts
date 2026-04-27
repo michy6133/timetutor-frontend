@@ -18,6 +18,8 @@ import { ToastService } from '../../../core/services/toast.service';
 import type { TimeSlot } from '../../../core/models';
 import { CommonModule } from '@angular/common';
 import { SvgIconComponent } from '../../../shared/svg-icon.component';
+import { OnboardingService } from '../../../shared/onboarding.service';
+import { OnboardingOverlayComponent, type OnboardingStep } from '../../../shared/onboarding-overlay.component';
 
 interface TeacherInfo { fullName: string; email: string; }
 interface SessionInfo { name: string; academicYear: string; status: string; }
@@ -101,7 +103,7 @@ interface GlobalScheduleRow {
 @Component({
   selector: 'app-slot-picker',
   standalone: true,
-  imports: [CommonModule, SvgIconComponent],
+  imports: [CommonModule, SvgIconComponent, OnboardingOverlayComponent],
   templateUrl: './slot-picker.component.html',
   /** Page très interactive + lien magique : évite les clics « morts » avec withEventReplay (hydratation). */
   host: { ngSkipHydration: '' },
@@ -113,6 +115,7 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly onboarding = inject(OnboardingService);
 
   readonly loading = signal(true);
   readonly error = signal('');
@@ -130,6 +133,35 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
   readonly negotiationParticipants = signal<NegotiationParticipant[]>([]);
   readonly negotiationFreeSlots = signal<NegotiationFreeSlot[]>([]);
   readonly globalSchedule = signal<GlobalScheduleRow[]>([]);
+  readonly showOnboarding = signal(false);
+  readonly showConflictGuide = signal(false);
+
+  readonly onboardingSteps: OnboardingStep[] = [
+    {
+      selector: '[data-tour="teacher-count"]',
+      title: 'Vos créneaux sélectionnés',
+      text: 'Ce compteur indique combien de créneaux vous avez déjà réservés dans cette session.',
+      position: 'left',
+    },
+    {
+      selector: '[data-tour="teacher-grid"]',
+      title: 'Grille horaire',
+      text: 'Cliquez sur un créneau libre (blanc) pour le sélectionner. Cliquez à nouveau pour le libérer. Vos choix sont sauvegardés en temps réel.',
+      position: 'top',
+    },
+    {
+      selector: '[data-tour="teacher-exchanges"]',
+      title: 'Demandes d\'échange',
+      text: 'Un créneau vous intéresse mais il est pris ? Cliquez dessus pour envoyer une demande d\'échange au collègue concerné.',
+      position: 'bottom',
+    },
+    {
+      selector: '[data-tour="teacher-global"]',
+      title: 'Calendrier global',
+      text: 'Retrouvez ici tous vos créneaux confirmés sur l\'ensemble de vos écoles. Téléchargez-les en format .ics pour les importer dans votre agenda.',
+      position: 'top',
+    },
+  ];
 
   private token = '';
   private sessionId = '';
@@ -148,6 +180,9 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
         this.loadContactRequests();
         this.loadNegotiations();
         this.loadGlobalSchedule();
+        if (!this.onboarding.isDone('teacher')) {
+          this.showOnboarding.set(true);
+        }
         this.socket.connect();
         this.socket.joinSession(this.sessionId);
         this.socket.onSlotSelected().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.loadSlots());
@@ -177,6 +212,11 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.socket.disconnect();
+  }
+
+  dismissOnboarding(): void {
+    this.onboarding.markDone('teacher');
+    this.showOnboarding.set(false);
   }
 
   /** Créneaux réellement attribués à cet enseignant (pas « tout créneau pris »). */
@@ -427,6 +467,77 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
 
   isChoosing(negotiationId: string, slotId: string): boolean {
     return this.actionLoading() === `${negotiationId}:${slotId}`;
+  }
+
+  downloadCalendar(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    const rows = this.globalSchedule();
+    if (!rows.length) { this.toast.info('Aucun créneau à exporter.'); return; }
+
+    const dayOffset: Record<string, number> = { Lundi: 0, Mardi: 1, Mercredi: 2, Jeudi: 3, Vendredi: 4, Samedi: 5 };
+    const dayByday: Record<string, string> = { Lundi: 'MO', Mardi: 'TU', Mercredi: 'WE', Jeudi: 'TH', Vendredi: 'FR', Samedi: 'SA' };
+
+    const today = new Date();
+    const dow = today.getDay();
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+    monday.setHours(0, 0, 0, 0);
+
+    const fmt = (base: Date, offset: number, h: number, m: number): string => {
+      const d = new Date(base);
+      d.setDate(base.getDate() + offset);
+      const y = d.getFullYear();
+      const mo = String(d.getMonth() + 1).padStart(2, '0');
+      const da = String(d.getDate()).padStart(2, '0');
+      return `${y}${mo}${da}T${String(h).padStart(2, '0')}${String(m).padStart(2, '0')}00`;
+    };
+
+    const esc = (s: string) => s.replace(/[,;\\]/g, (c) => '\\' + c);
+    const lines: string[] = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//TimeTutor//FR', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH'];
+
+    for (const row of rows) {
+      const offset = dayOffset[row.dayOfWeek] ?? 0;
+      const [sh, sm] = row.startTime.slice(0, 5).split(':').map(Number);
+      const [eh, em] = row.endTime.slice(0, 5).split(':').map(Number);
+      const summary = row.subjectName ? `${row.subjectName} — ${row.schoolName}` : `${row.sessionName} — ${row.schoolName}`;
+      lines.push('BEGIN:VEVENT',
+        `UID:${row.slotId}@timetutor.app`,
+        `DTSTART:${fmt(monday, offset, sh, sm)}`,
+        `DTEND:${fmt(monday, offset, eh, em)}`,
+        `RRULE:FREQ=WEEKLY;BYDAY=${dayByday[row.dayOfWeek] ?? 'MO'}`,
+        `SUMMARY:${esc(summary)}`,
+        `DESCRIPTION:Session : ${esc(row.sessionName)}\\nÉcole : ${esc(row.schoolName)}`,
+        'END:VEVENT');
+    }
+    lines.push('END:VCALENDAR');
+
+    const blob = new Blob([lines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'calendrier-timetutor.ics'; a.click();
+    URL.revokeObjectURL(url);
+    this.toast.success('Calendrier .ics téléchargé.');
+  }
+
+  copySessionLink(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    navigator.clipboard.writeText(window.location.href).then(
+      () => this.toast.success('Lien copié dans le presse-papiers.'),
+      () => this.toast.error('Impossible de copier le lien.')
+    );
+  }
+
+  requestStatusClass(status: string): string {
+    if (status === 'accepted') return 'bg-emerald/15 text-emerald';
+    if (status === 'rejected' || status === 'cancelled') return 'bg-steel/60 text-navy/40';
+    return 'bg-jasmine/20 text-navy/60';
+  }
+
+  requestStatusLabel(status: string): string {
+    if (status === 'accepted') return 'Accepté';
+    if (status === 'rejected') return 'Refusé';
+    if (status === 'cancelled') return 'Annulé';
+    return 'En attente';
   }
 
   days(): string[] {

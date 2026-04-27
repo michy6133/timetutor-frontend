@@ -11,6 +11,13 @@
       </div>
     </div>
     <div class="flex items-center gap-2 flex-wrap">
+      <button
+        type="button"
+        (click)="showConflictGuide.set(!showConflictGuide())"
+        class="btn-ghost-navy px-4 py-2.5 text-sm">
+        <app-svg-icon name="information-circle" [size]="15" iconClass="shrink-0" />
+        {{ showConflictGuide() ? 'Masquer le guide conflits' : 'Comprendre la gestion des conflits' }}
+      </button>
       <!-- CSV Import -->
       <label class="btn-ghost-navy px-4 py-2.5 text-sm cursor-pointer" [class.opacity-60]="importing()">
         @if (importing()) {
@@ -27,6 +34,50 @@
       </button>
     </div>
   </div>
+
+  @if (showConflictGuide()) {
+    <div class="bg-white border border-brick/20 rounded-2xl p-5 mb-6 shadow-sm fade-in">
+      <div class="flex items-start justify-between gap-3 mb-4">
+        <div>
+          <h3 class="font-display font-bold text-navy text-base">Comment TimeTutor gère les conflits de créneaux</h3>
+          <p class="text-xs text-navy/45 mt-1">Version simple pour vos enseignants et coordinateurs.</p>
+        </div>
+        <span class="text-[10px] px-2 py-1 rounded-full bg-brick/10 border border-brick/20 text-brick font-bold uppercase tracking-wide">
+          Guide visuel
+        </span>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-3">
+        <div class="rounded-xl border border-cream/60 bg-cream/20 p-4">
+          <p class="text-xs font-bold text-navy uppercase tracking-wider mb-2">Concept 1 · Négociation ouverte</p>
+          <p class="text-sm text-navy/70 leading-relaxed mb-3">
+            Deux enseignants veulent le meme créneau. Le système ouvre une négociation et chacun propose une option.
+          </p>
+          <div class="text-xs text-navy/60 font-medium flex items-center gap-2 flex-wrap">
+            <span class="px-2 py-1 rounded-lg bg-white border border-steel/50">Conflit détecté</span>
+            <span>→</span>
+            <span class="px-2 py-1 rounded-lg bg-white border border-steel/50">Proposition d'échange</span>
+            <span>→</span>
+            <span class="px-2 py-1 rounded-lg bg-white border border-steel/50">Accord entre profs</span>
+          </div>
+        </div>
+
+        <div class="rounded-xl border border-cream/60 bg-cream/20 p-4">
+          <p class="text-xs font-bold text-navy uppercase tracking-wider mb-2">Concept 2 · Verrouillage + validation directeur</p>
+          <p class="text-sm text-navy/70 leading-relaxed mb-3">
+            Une fois un accord trouvé, le créneau passe en mode verrouillé. Le directeur valide pour rendre la décision finale.
+          </p>
+          <div class="text-xs text-navy/60 font-medium flex items-center gap-2 flex-wrap">
+            <span class="px-2 py-1 rounded-lg bg-white border border-steel/50">Accord trouvé</span>
+            <span>→</span>
+            <span class="px-2 py-1 rounded-lg bg-steel/40 border border-steel/80">Verrouillé</span>
+            <span>→</span>
+            <span class="px-2 py-1 rounded-lg bg-brick/10 border border-brick/30 text-brick">Validé</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
 
   <!-- Add form -->
   @if (showAddForm()) {

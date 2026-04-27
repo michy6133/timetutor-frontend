@@ -3,20 +3,20 @@ import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({ providedIn: 'root' })
 export class OnboardingService {
-  private readonly key = 'tt_onboarding_done';
   private readonly platformId = inject(PLATFORM_ID);
 
-  private get canUseStorage(): boolean {
+  private canUse(): boolean {
     return isPlatformBrowser(this.platformId) && typeof localStorage !== 'undefined';
   }
 
-  isDone(): boolean {
-    if (!this.canUseStorage) return false;
-    return !!localStorage.getItem(this.key);
+  /** Returns true on SSR (prevents hydration flicker — onboarding only runs in browser). */
+  isDone(context: string): boolean {
+    if (!this.canUse()) return true;
+    return !!localStorage.getItem(`tt_onboarding_${context}`);
   }
 
-  markDone(): void {
-    if (!this.canUseStorage) return;
-    localStorage.setItem(this.key, '1');
+  markDone(context: string): void {
+    if (!this.canUse()) return;
+    localStorage.setItem(`tt_onboarding_${context}`, '1');
   }
 }

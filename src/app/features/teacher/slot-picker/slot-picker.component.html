@@ -24,18 +24,25 @@
         <p class="text-navy/45 text-sm font-mono">{{ session()?.name }} · {{ session()?.academicYear }}</p>
       </div>
       <div class="flex items-center gap-3 shrink-0 relative z-40">
+        <button
+          type="button"
+          (click)="showConflictGuide.set(!showConflictGuide())"
+          class="text-xs font-semibold text-navy/65 border border-navy/20 rounded-lg px-3 py-1.5 hover:bg-navy/5 transition-colors">
+          {{ showConflictGuide() ? 'Masquer guide conflits' : 'Guide conflits' }}
+        </button>
         @if (pendingIncomingCount() > 0) {
           <a href="#echange-section" class="flex items-center gap-1.5 bg-error/8 border border-error/25 text-error px-3 py-1.5 rounded-xl text-xs font-semibold hover:bg-error/15 transition-colors">
             <span class="w-2 h-2 rounded-full bg-error animate-pulse shrink-0"></span>
             {{ pendingIncomingCount() }} demande{{ pendingIncomingCount() > 1 ? 's' : '' }}
           </a>
         }
-        <div class="text-right">
+        <div data-tour="teacher-count" class="text-right">
           <div class="font-display text-3xl font-extrabold text-brick">{{ myCount() }}</div>
           <div class="text-xs text-navy/40 uppercase tracking-wide mt-0.5">créneau(x)</div>
         </div>
         <!-- Fallback natif : si Angular n'accroche pas le click, le href garde /teacher/:token + #section. -->
-        <a [attr.href]="echangeAnchorHref()"
+        <a data-tour="teacher-exchanges"
+          [attr.href]="echangeAnchorHref()"
           (click)="scrollToEchangeSection($event)"
           class="relative z-40 text-xs font-semibold text-brick border border-brick/30 rounded-lg px-3 py-1.5 hover:bg-brick/10 transition-colors cursor-pointer inline-block no-underline text-center font-sans">
           Échanges
@@ -71,6 +78,52 @@
     </div>
   </div>
 
+  @if (showConflictGuide()) {
+    <div class="max-w-6xl mx-auto px-4 pt-4">
+      <div class="bg-white border border-brick/20 rounded-2xl p-5 shadow-sm fade-in">
+        <div class="flex items-start justify-between gap-3 mb-4">
+          <div>
+            <h3 class="font-display font-bold text-navy text-base">Comprendre la gestion des conflits</h3>
+            <p class="text-xs text-navy/45 mt-1">Deux mécanismes complémentaires pour éviter les chevauchements.</p>
+          </div>
+          <span class="text-[10px] px-2 py-1 rounded-full bg-brick/10 border border-brick/20 text-brick font-bold uppercase tracking-wide">
+            Version enseignant
+          </span>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-3">
+          <div class="rounded-xl border border-cream/60 bg-cream/20 p-4">
+            <p class="text-xs font-bold text-navy uppercase tracking-wider mb-2">1) Demande d'échange directe</p>
+            <p class="text-sm text-navy/70 leading-relaxed mb-3">
+              Vous cliquez un créneau déjà pris, puis vous envoyez une demande au collègue concerné. S'il accepte, le créneau vous est transféré.
+            </p>
+            <div class="text-xs text-navy/60 font-medium flex items-center gap-2 flex-wrap">
+              <span class="px-2 py-1 rounded-lg bg-white border border-steel/50">Créneau pris</span>
+              <span>→</span>
+              <span class="px-2 py-1 rounded-lg bg-white border border-steel/50">Demande envoyée</span>
+              <span>→</span>
+              <span class="px-2 py-1 rounded-lg bg-brick/10 border border-brick/30 text-brick">Accepté / refusé</span>
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-cream/60 bg-cream/20 p-4">
+            <p class="text-xs font-bold text-navy uppercase tracking-wider mb-2">2) Négociation collaborative</p>
+            <p class="text-sm text-navy/70 leading-relaxed mb-3">
+              Lorsqu'un conflit existe, les participants choisissent un créneau libre. Une fois résolu, l'accord passe en verrouillé puis attend la validation du directeur.
+            </p>
+            <div class="text-xs text-navy/60 font-medium flex items-center gap-2 flex-wrap">
+              <span class="px-2 py-1 rounded-lg bg-white border border-steel/50">Conflit actif</span>
+              <span>→</span>
+              <span class="px-2 py-1 rounded-lg bg-white border border-steel/50">Choix collaboratif</span>
+              <span>→</span>
+              <span class="px-2 py-1 rounded-lg bg-steel/40 border border-steel/80">Verrouillé</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
   <!-- Calendar -->
   <div class="max-w-6xl mx-auto px-4 py-6">
     @if (slots().length === 0) {
@@ -82,7 +135,7 @@
       </div>
     } @else {
 
-      <div class="overflow-x-auto rounded-2xl border border-steel shadow-sm bg-white">
+      <div data-tour="teacher-grid" class="overflow-x-auto rounded-2xl border border-steel shadow-sm bg-white">
         <div class="grid"
              [style.grid-template-columns]="'80px repeat(' + days().length + ', minmax(110px, 1fr))'">
 
@@ -152,9 +205,18 @@
     }
   </div>
 
-  <div class="max-w-6xl mx-auto px-4 pb-2 mt-2">
+  <div data-tour="teacher-global" class="max-w-6xl mx-auto px-4 pb-2 mt-2">
     <div class="bg-white border border-cream/60 rounded-2xl p-4">
-      <h3 class="font-display font-bold text-navy mb-3">Calendrier global (toutes vos écoles)</h3>
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-display font-bold text-navy">Calendrier global (toutes vos écoles)</h3>
+        @if (globalSchedule().length > 0) {
+          <button type="button" (click)="downloadCalendar()"
+            class="flex items-center gap-1.5 text-xs font-semibold text-navy/55 hover:text-navy border border-cream/70 hover:border-navy/20 px-3 py-1.5 rounded-lg transition-all">
+            <app-svg-icon name="download" [size]="13" iconClass="shrink-0" />
+            Télécharger .ics
+          </button>
+        }
+      </div>
       @if (globalSchedule().length === 0) {
         <p class="text-xs text-navy/40">Aucun créneau sélectionné pour le moment.</p>
       } @else {
@@ -177,70 +239,145 @@
     </div>
   </div>
 
-  <div id="echange-section" class="max-w-6xl mx-auto px-4 pb-10 mt-6 grid gap-4 lg:grid-cols-2 scroll-mt-40">
-    <div class="bg-white border border-cream/60 rounded-2xl p-4">
-      <h3 class="font-display font-bold text-navy mb-3">Négociations de créneaux</h3>
-      @if (negotiations().length === 0) {
-        <p class="text-xs text-navy/40">Aucune négociation active.</p>
+  <div id="echange-section" class="max-w-6xl mx-auto px-4 pb-10 mt-6 space-y-4 scroll-mt-40">
+
+    <!-- ─── Demandes reçues ─── -->
+    <div class="bg-white border border-cream/60 rounded-2xl p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-display font-bold text-navy">Demandes reçues</h3>
+        @if (pendingIncomingCount() > 0) {
+          <span class="bg-brick/10 text-brick text-xs font-bold px-2.5 py-1 rounded-full">
+            {{ pendingIncomingCount() }} en attente
+          </span>
+        }
+      </div>
+      @if (incomingRequests().length === 0) {
+        <p class="text-xs text-navy/40">Aucune demande reçue.</p>
       } @else {
         <div class="space-y-3">
-          @for (neg of negotiations(); track neg.id) {
-            <div class="border border-cream/50 rounded-xl p-3">
-              <div class="flex items-center justify-between gap-2">
-                <p class="text-xs text-navy/65 font-semibold">
-                  Cible: {{ neg.dayOfWeek }} {{ neg.startTime }}-{{ neg.endTime }}
-                </p>
-                <span class="text-[10px] uppercase tracking-wide"
-                  [class]="neg.status === 'locked' ? 'text-mahogany font-bold' : 'text-brick/70 font-semibold'">
-                  {{ neg.status === 'locked' ? 'verrouillé' : 'actif' }}
-                </span>
-              </div>
-              <p class="text-[11px] text-navy/40 mt-1">
-                Propriétaire actuel: {{ neg.ownerName || '—' }} · Participants: {{ participantsForNegotiation(neg.id).length }}
-              </p>
-              @if (neg.status === 'active') {
-                <div class="mt-3 grid gap-2 sm:grid-cols-2">
-                  @for (free of negotiationFreeSlots(); track free.id) {
-                    <button type="button"
-                      class="text-left border border-cream/50 rounded-lg px-2.5 py-2 hover:border-emerald/40 hover:bg-emerald/8 transition-all"
-                      [disabled]="isChoosing(neg.id, free.id)"
-                      (click)="chooseFreeSlot(neg.id, free.id)">
-                      <div class="text-[11px] font-semibold text-navy">{{ free.dayOfWeek }} {{ free.startTime }}–{{ free.endTime }}</div>
-                      @if (free.room) { <div class="text-[10px] text-navy/40 mt-0.5">Salle {{ free.room }}</div> }
-                    </button>
+          @for (req of incomingRequests(); track req.id) {
+            <div class="border rounded-xl p-3.5 transition-all"
+              [class]="req.status === 'pending' ? 'border-brick/25 bg-brick/3' : 'border-cream/50'">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-navy truncate">{{ req.requesterName }}</p>
+                  <p class="text-xs text-navy/50 font-mono mt-0.5">
+                    {{ req.dayOfWeek }} {{ req.startTime.slice(0,5) }} – {{ req.endTime.slice(0,5) }}
+                  </p>
+                  @if (req.message) {
+                    <p class="text-xs text-navy/40 mt-2 italic line-clamp-2">"{{ req.message }}"</p>
                   }
                 </div>
-              } @else {
-                <p class="text-[11px] text-navy/45 mt-2">Conflit résolu : en attente de validation finale du directeur.</p>
-              }
+                <div class="shrink-0">
+                  @if (req.status === 'pending') {
+                    <div class="flex flex-col gap-1.5">
+                      <button type="button" (click)="acceptRequest(req.id)"
+                        [disabled]="actionLoading() !== ''"
+                        class="text-xs font-bold text-white bg-emerald px-3 py-1.5 rounded-lg hover:bg-emerald/85 transition-all disabled:opacity-40">
+                        Accepter
+                      </button>
+                      <button type="button" (click)="rejectRequest(req.id)"
+                        [disabled]="actionLoading() !== ''"
+                        class="text-xs font-semibold text-navy/50 hover:text-navy border border-cream/70 hover:border-navy/20 px-3 py-1.5 rounded-lg transition-all disabled:opacity-40">
+                        Refuser
+                      </button>
+                    </div>
+                  } @else {
+                    <span class="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-lg"
+                      [class]="requestStatusClass(req.status)">
+                      {{ requestStatusLabel(req.status) }}
+                    </span>
+                  }
+                </div>
+              </div>
             </div>
           }
         </div>
       }
     </div>
 
-    <div class="bg-white border border-cream/60 rounded-2xl p-4">
-      <h3 class="font-display font-bold text-navy mb-3">Historique des demandes</h3>
-      @if (incomingRequests().length === 0 && outgoingRequests().length === 0) {
-        <p class="text-xs text-navy/40">Aucune demande d'échange.</p>
-      } @else {
+    <!-- ─── Résolution de conflits (négociations) ─── -->
+    @if (negotiations().length > 0) {
+      <div class="bg-white border border-cream/60 rounded-2xl p-5">
+        <div class="flex items-center gap-3 mb-4">
+          <h3 class="font-display font-bold text-navy">Résolution de conflits</h3>
+          <span class="text-xs text-navy/40">Choisissez un créneau libre pour vous libérer du conflit</span>
+        </div>
         <div class="space-y-3">
-          @for (request of incomingRequests(); track request.id) {
-            <div class="border border-cream/50 rounded-xl p-3">
-              <p class="text-xs text-navy/65 font-semibold">{{ request.requesterName }} · {{ request.dayOfWeek }} {{ request.startTime.slice(0,5) }}-{{ request.endTime.slice(0,5) }}</p>
-              <p class="text-[11px] text-navy/35 mt-1">Statut: {{ request.status }}</p>
-            </div>
-          }
-          @for (request of outgoingRequests(); track request.id) {
-            <div class="border border-cream/50 rounded-xl p-3">
-              <p class="text-xs text-navy/65 font-semibold">{{ request.targetName }} · {{ request.dayOfWeek }} {{ request.startTime.slice(0,5) }}-{{ request.endTime.slice(0,5) }}</p>
-              <p class="text-[11px] text-navy/35 mt-1">Statut: {{ request.status }}</p>
+          @for (neg of negotiations(); track neg.id) {
+            <div class="border border-cream/50 rounded-xl p-3.5">
+              <div class="flex items-start justify-between gap-3 mb-2">
+                <div>
+                  <p class="text-sm font-semibold text-navy">
+                    Créneau disputé : {{ neg.dayOfWeek }} {{ neg.startTime }}–{{ neg.endTime }}
+                  </p>
+                  @if (neg.ownerName) {
+                    <p class="text-[11px] text-navy/40 mt-0.5">Propriétaire actuel : {{ neg.ownerName }}</p>
+                  }
+                </div>
+                <span class="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-lg shrink-0"
+                  [class]="neg.status === 'locked' ? 'bg-emerald/15 text-emerald' : 'bg-jasmine/20 text-navy/60'">
+                  {{ neg.status === 'locked' ? 'Résolu' : 'En cours' }}
+                </span>
+              </div>
+              @if (neg.status === 'active') {
+                @if (negotiationFreeSlots().length > 0) {
+                  <p class="text-[11px] text-navy/50 mb-2 font-medium">Choisissez votre nouveau créneau :</p>
+                  <div class="grid gap-2 sm:grid-cols-3">
+                    @for (free of negotiationFreeSlots(); track free.id) {
+                      <button type="button"
+                        class="text-left border border-cream/50 rounded-lg px-2.5 py-2 hover:border-emerald/40 hover:bg-emerald/8 transition-all disabled:opacity-40"
+                        [disabled]="actionLoading() !== ''"
+                        (click)="chooseFreeSlot(neg.id, free.id)">
+                        @if (isChoosing(neg.id, free.id)) {
+                          <span class="text-[10px] text-navy/40 italic">Enregistrement...</span>
+                        } @else {
+                          <div class="text-[11px] font-semibold text-navy">{{ free.dayOfWeek }} {{ free.startTime }}–{{ free.endTime }}</div>
+                          @if (free.room) { <div class="text-[10px] text-navy/40 mt-0.5">Salle {{ free.room }}</div> }
+                        }
+                      </button>
+                    }
+                  </div>
+                } @else {
+                  <p class="text-[11px] text-navy/40 italic">Aucun créneau libre disponible pour le moment.</p>
+                }
+              } @else {
+                <p class="text-[11px] text-emerald/70 font-medium">✓ Conflit résolu — en attente de validation par le directeur.</p>
+              }
             </div>
           }
         </div>
-      }
-    </div>
+      </div>
+    }
+
+    <!-- ─── Mes demandes envoyées ─── -->
+    @if (outgoingRequests().length > 0) {
+      <div class="bg-white border border-cream/60 rounded-2xl p-5">
+        <h3 class="font-display font-bold text-navy mb-4">Mes demandes envoyées</h3>
+        <div class="space-y-3">
+          @for (req of outgoingRequests(); track req.id) {
+            <div class="border border-cream/50 rounded-xl p-3.5 flex items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold text-navy">{{ req.targetName }}</p>
+                <p class="text-xs text-navy/50 font-mono mt-0.5">
+                  {{ req.dayOfWeek }} {{ req.startTime.slice(0,5) }} – {{ req.endTime.slice(0,5) }}
+                </p>
+              </div>
+              <span class="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-lg shrink-0"
+                [class]="requestStatusClass(req.status)">
+                {{ requestStatusLabel(req.status) }}
+              </span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
   </div>
+}
+
+@if (showOnboarding()) {
+  <app-onboarding-overlay [steps]="onboardingSteps" (dismiss)="dismissOnboarding()" />
 }
 
 <!-- Exchange request modal -->
@@ -261,6 +398,14 @@
         </div>
       </div>
 
+      <div class="flex items-center gap-2 mb-3 bg-navy/5 border border-navy/10 rounded-xl px-3 py-2">
+        <app-svg-icon name="calendar" [size]="13" iconClass="text-navy/45 shrink-0" />
+        <span class="text-xs text-navy/55 flex-1 font-medium truncate">{{ session()?.name }}</span>
+        <button type="button" (click)="copySessionLink()"
+          class="text-xs text-brick/65 hover:text-brick font-semibold shrink-0 transition-colors">
+          Copier le lien
+        </button>
+      </div>
       <div class="bg-brick/5 border border-brick/15 rounded-xl px-4 py-3 mb-5 text-xs text-navy/65 leading-relaxed">
         Votre demande sera envoyée directement au professeur concerné par email.
         Il pourra l'accepter ou la refuser depuis son interface — vous serez notifié(e) dans les deux cas.
