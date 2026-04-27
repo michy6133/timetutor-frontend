@@ -113,7 +113,7 @@
     @if ($any(subscription())['usageAlerts']?.length) {
       <div class="mt-6 space-y-2">
         @for (a of $any(subscription())['usageAlerts']; track a) {
-          <div class="rounded-xl border border-amber-400/40 bg-amber-50/90 text-amber-950 px-4 py-3 text-sm">{{ a }}</div>
+          <div class="rounded-xl border border-brick/20 bg-brick/6 text-navy px-4 py-3 text-sm">{{ a }}</div>
         }
       </div>
     }

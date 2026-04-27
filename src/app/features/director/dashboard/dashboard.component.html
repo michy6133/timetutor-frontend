@@ -37,10 +37,10 @@
   }
 
   @for (alert of subscription()?.usageAlerts ?? []; track alert) {
-    <div class="mb-4 rounded-xl border border-amber-400/45 bg-amber-50/95 text-amber-950 px-4 py-3 text-sm flex items-start gap-2">
-      <app-svg-icon name="exclamation-triangle" [size]="18" iconClass="text-amber-700 shrink-0 mt-0.5" />
+    <div class="mb-4 rounded-xl border border-brick/20 bg-brick/6 text-navy px-4 py-3 text-sm flex items-start gap-2">
+      <app-svg-icon name="exclamation-triangle" [size]="18" iconClass="text-brick/70 shrink-0 mt-0.5" />
       <div class="flex-1">{{ alert }}</div>
-      <a routerLink="/director/billing" class="text-amber-900 font-semibold text-xs whitespace-nowrap underline">Abonnement</a>
+      <a routerLink="/director/billing" class="text-brick font-semibold text-xs whitespace-nowrap underline">Abonnement</a>
     </div>
   }
   @if (subscription()?.usage; as u) {
@@ -84,7 +84,7 @@
     <div class="lg:col-span-2">
       <div class="flex items-center justify-between mb-4">
         <h2 class="font-display font-bold text-navy">Sessions récentes</h2>
-        <a routerLink="/director/sessions" class="text-brick text-sm font-semibold hover:text-molten transition-colors">Voir tout →</a>
+        <a routerLink="/director/sessions" class="text-brick text-sm font-semibold hover:text-navy/70 transition-colors">Voir tout →</a>
       </div>
 
       @if (loading()) {
@@ -99,7 +99,7 @@
             <app-svg-icon name="calendar" [size]="40" />
           </div>
           <p class="text-navy/45 mb-4 font-medium">Aucune session créée</p>
-          <a routerLink="/director/sessions/new" class="text-brick text-sm font-semibold hover:text-molten">
+          <a routerLink="/director/sessions/new" class="text-brick text-sm font-semibold hover:text-navy/70">
             Créer ma première session →
           </a>
         </div>

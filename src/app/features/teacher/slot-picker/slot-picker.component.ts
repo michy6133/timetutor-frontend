@@ -63,6 +63,7 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
 
   private token = '';
   private sessionId = '';
+  private myTeacherId = '';
 
   ngOnInit(): void {
     this.token = this.route.snapshot.params['token'];
@@ -71,6 +72,7 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
         this.teacher.set(res.teacher);
         this.session.set(res.session);
         this.sessionId = res.sessionId;
+        this.myTeacherId = res.teacherId;
         this.loadSlots();
         this.loadContactRequests();
         this.socket.connect();
@@ -94,9 +96,8 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
     this.api.get<TimeSlot[]>(`/sessions/${this.sessionId}/slots/teacher/${this.token}`).subscribe({
       next: (slots) => {
         this.slots.set(slots);
-        // Mark own selections
         const myIds = new Set(
-          slots.filter(s => s.status !== 'free').map(s => s.id)
+          slots.filter(s => s.selectedByTeacherId === this.myTeacherId).map(s => s.id)
         );
         this.selectedSlotIds.set(myIds);
         this.loading.set(false);
@@ -243,10 +244,14 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
 
   cardClass(slot: TimeSlot): string {
     const isOwn = this.selectedSlotIds().has(slot.id);
-    if (slot.status === 'validated') return 'bg-steel/60 border-steel/80 text-navy/40 cursor-not-allowed';
-    if (isOwn) return 'bg-molten/18 border-molten/45 text-navy cursor-pointer hover:bg-molten/25';
-    if (slot.status === 'taken') return 'bg-mahogany/12 border-mahogany/35 text-mahogany cursor-pointer hover:bg-mahogany/20';
-    return 'bg-white border-amber/30 text-navy cursor-pointer hover:border-molten/60 hover:bg-molten/8';
+    if (slot.status === 'validated') return 'bg-steel/50 border-steel/70 text-navy/35 cursor-not-allowed';
+    if (isOwn) return 'bg-brick/10 border-brick/35 text-brick cursor-pointer hover:bg-brick/15';
+    if (slot.status === 'taken') return 'bg-navy/8 border-navy/20 text-navy/60 cursor-pointer hover:bg-navy/12';
+    return 'bg-white border-steel text-navy cursor-pointer hover:border-brick/40 hover:bg-brick/5';
+  }
+
+  pendingIncomingCount(): number {
+    return this.incomingRequests().filter(r => r.status === 'pending').length;
   }
 
   slotLabel(slot: TimeSlot): string {

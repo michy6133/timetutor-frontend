@@ -117,7 +117,7 @@
                        [class]="cell === 'taken' ? 'bg-brick/20 border border-brick/30 text-brick/80' :
                                 cell === 'free'   ? 'bg-white/5 border border-white/8 text-white/15' :
                                 cell === 'ok'     ? 'bg-emerald/15 border border-emerald/25 text-emerald/80' :
-                                                    'bg-molten/10 border border-molten/20 text-molten/70'">
+                                                    'bg-navy/8 border border-navy/15 text-navy/40'">
                     {{ cell === 'taken' ? '●' : cell === 'ok' ? '✓' : cell === 'warn' ? '—' : '' }}
                   </div>
                 }
@@ -142,7 +142,7 @@
                   <div class="text-white/70 text-[10px] font-semibold truncate">{{t.name}}</div>
                   <div class="text-white/30 text-[9px]">{{t.slots}} créneaux</div>
                 </div>
-                <div [class]="t.status === 'ok' ? 'text-emerald/80 bg-emerald/10 border border-emerald/20' : 'text-molten/80 bg-molten/10 border border-molten/20'"
+                <div [class]="t.status === 'ok' ? 'text-emerald/80 bg-emerald/10 border border-emerald/20' : 'text-navy/50 bg-navy/8 border border-navy/15'"
                      class="text-[9px] px-1.5 py-0.5 rounded-md">
                   {{t.status === 'ok' ? 'Validé' : 'En attente'}}
                 </div>
