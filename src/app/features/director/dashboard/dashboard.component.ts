@@ -48,11 +48,11 @@ export class DashboardComponent implements OnInit {
 
   statusClass(status: string): string {
     return {
-      draft: 'bg-gray-100 text-gray-600',
-      open: 'bg-green-100 text-green-700',
-      closed: 'bg-yellow-100 text-yellow-700',
-      published: 'bg-blue-100 text-blue-700',
-    }[status] ?? 'bg-gray-100 text-gray-600';
+      draft: 'bg-steel/60 text-navy/50',
+      open: 'bg-emerald/15 text-emerald',
+      closed: 'bg-jasmine/25 text-navy/70',
+      published: 'bg-navy/12 text-navy/75',
+    }[status] ?? 'bg-steel/60 text-navy/50';
   }
 
   statusLabel(status: string): string {

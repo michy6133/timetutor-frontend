@@ -1,4 +1,4 @@
-@if (error()) {
+﻿@if (error()) {
   <div class="min-h-screen flex items-center justify-center px-4 bg-cream">
     <div class="text-center max-w-sm">
       <div class="w-16 h-16 rounded-2xl bg-error/10 border border-error/20 flex items-center justify-center mx-auto mb-5">
@@ -27,14 +27,14 @@
         @if (pendingIncomingCount() > 0) {
           <a href="#echange-section" class="flex items-center gap-1.5 bg-error/8 border border-error/25 text-error px-3 py-1.5 rounded-xl text-xs font-semibold hover:bg-error/15 transition-colors">
             <span class="w-2 h-2 rounded-full bg-error animate-pulse shrink-0"></span>
-            {{ pendingIncomingCount() }} demande{{ pendingIncomingCount() > 1 ? ‘s’ : ‘’ }}
+            {{ pendingIncomingCount() }} demande{{ pendingIncomingCount() > 1 ? 's' : '' }}
           </a>
         }
         <div class="text-right">
           <div class="font-display text-3xl font-extrabold text-brick">{{ myCount() }}</div>
           <div class="text-xs text-navy/40 uppercase tracking-wide mt-0.5">créneau(x)</div>
         </div>
-        <!-- Fallback natif : si Angular n’accroche pas le click, le href garde /teacher/:token + #section. -->
+        <!-- Fallback natif : si Angular n'accroche pas le click, le href garde /teacher/:token + #section. -->
         <a [attr.href]="echangeAnchorHref()"
           (click)="scrollToEchangeSection($event)"
           class="relative z-40 text-xs font-semibold text-brick border border-brick/30 rounded-lg px-3 py-1.5 hover:bg-brick/10 transition-colors cursor-pointer inline-block no-underline text-center font-sans">
@@ -55,9 +55,10 @@
         <div class="w-3.5 h-3.5 rounded-md bg-brick/10 border-[1.5px] border-brick/35"></div>
         <span>Sélectionné par vous</span>
       </div>
+
       <div class="flex items-center gap-1.5">
         <div class="w-3.5 h-3.5 rounded-md bg-mahogany/12 border-[1.5px] border-mahogany/35"></div>
-        <span>Pris par un collègue — cliquez pour ouvrir une demande d’échange</span>
+        <span>Pris par un collègue — cliquez pour ouvrir une demande d'échange</span>
       </div>
       <div class="flex items-center gap-1.5">
         <div class="w-3.5 h-3.5 rounded-md bg-steel/50 border-[1.5px] border-steel/70"></div>
@@ -201,7 +202,7 @@
                 <div class="mt-3 grid gap-2 sm:grid-cols-2">
                   @for (free of negotiationFreeSlots(); track free.id) {
                     <button type="button"
-                      class="text-left border border-cream/50 rounded-lg px-2.5 py-2 hover:border-molten/50 hover:bg-molten/10 transition-all"
+                      class="text-left border border-cream/50 rounded-lg px-2.5 py-2 hover:border-emerald/40 hover:bg-emerald/8 transition-all"
                       [disabled]="isChoosing(neg.id, free.id)"
                       (click)="chooseFreeSlot(neg.id, free.id)">
                       <div class="text-[11px] font-semibold text-navy">{{ free.dayOfWeek }} {{ free.startTime }}–{{ free.endTime }}</div>
@@ -221,7 +222,7 @@
     <div class="bg-white border border-cream/60 rounded-2xl p-4">
       <h3 class="font-display font-bold text-navy mb-3">Historique des demandes</h3>
       @if (incomingRequests().length === 0 && outgoingRequests().length === 0) {
-        <p class="text-xs text-navy/40">Aucune demande d’échange.</p>
+        <p class="text-xs text-navy/40">Aucune demande d'échange.</p>
       } @else {
         <div class="space-y-3">
           @for (request of incomingRequests(); track request.id) {

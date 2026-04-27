@@ -2,6 +2,7 @@ import {
   Component,
   inject,
   signal,
+  computed,
   OnInit,
   OnDestroy,
   DestroyRef,
@@ -124,6 +125,7 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
   readonly contactMessage = signal('');
   readonly incomingRequests = signal<ContactIncomingRequest[]>([]);
   readonly outgoingRequests = signal<ContactOutgoingRequest[]>([]);
+  readonly pendingIncomingCount = computed(() => this.incomingRequests().filter(r => r.status === 'pending').length);
   readonly negotiations = signal<NegotiationItem[]>([]);
   readonly negotiationParticipants = signal<NegotiationParticipant[]>([]);
   readonly negotiationFreeSlots = signal<NegotiationFreeSlot[]>([]);
@@ -456,9 +458,9 @@ export class SlotPickerComponent implements OnInit, OnDestroy {
   cardClass(slot: TimeSlot): string {
     if (slot.status === 'validated') return 'bg-steel/60 border-steel/80 text-navy/40 cursor-not-allowed';
     if (slot.status === 'locked') return 'bg-steel/70 border-steel/90 text-navy/45 cursor-not-allowed';
-    if (this.ownsSlot(slot)) return 'bg-molten/18 border-molten/45 text-navy cursor-pointer hover:bg-molten/25';
+    if (this.ownsSlot(slot)) return 'bg-brick/10 border-brick/35 text-navy cursor-pointer hover:bg-brick/18';
     if (slot.status === 'taken') return 'bg-mahogany/12 border-mahogany/35 text-mahogany cursor-pointer hover:bg-mahogany/20';
-    return 'bg-white border-amber/30 text-navy cursor-pointer hover:border-molten/60 hover:bg-molten/8';
+    return 'bg-white border-steel/50 text-navy cursor-pointer hover:border-emerald/40 hover:bg-emerald/6';
   }
 
   slotLabel(slot: TimeSlot): string {

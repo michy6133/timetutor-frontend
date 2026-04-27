@@ -549,55 +549,72 @@
 <!-- Generator Modal -->
 @if (showGeneratorModal()) {
   <div class="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] flex items-center justify-center p-4">
-    <div class="w-full max-w-lg bg-white rounded-3xl border border-steel shadow-2xl p-7 fade-in">
-      <div class="flex items-center gap-3 mb-5">
-        <div class="w-10 h-10 rounded-xl bg-brick/10 border border-brick/20 flex items-center justify-center shrink-0 text-lg">✦</div>
-        <div>
-          <h3 class="font-display text-lg font-bold text-navy">Générateur de grille</h3>
-          <p class="text-xs text-navy/40 mt-0.5">Crée automatiquement les créneaux selon vos paramètres</p>
-        </div>
-      </div>
+    <div class="w-full max-w-lg bg-white rounded-3xl border border-steel/40 shadow-2xl p-7 fade-in">
 
-      <div class="space-y-4">
+      <h3 class="font-display text-xl font-bold text-navy mb-1">Générateur de grille</h3>
+      <p class="text-sm text-navy/45 mb-6">Saisissez vos paramètres — les créneaux seront créés automatiquement.</p>
+
+      <div class="space-y-5">
+        <!-- Jours -->
         <div>
-          <label class="tt-label">Jours</label>
+          <label class="text-[11px] font-bold uppercase tracking-widest text-navy/50 mb-2 block">Jours</label>
           <div class="flex flex-wrap gap-2">
             @for (d of ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi']; track d) {
               <button type="button"
                 (click)="toggleGeneratorDay(d)"
-                [class]="generatorDays().includes(d) ? 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-brick text-white' : 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-cream/60 text-navy/60 hover:bg-cream border border-steel/50'">
+                [class]="generatorDays().includes(d)
+                  ? 'px-4 py-2 rounded-xl text-xs font-bold bg-navy text-white shadow-sm'
+                  : 'px-4 py-2 rounded-xl text-xs font-semibold bg-cream/60 text-navy/50 hover:bg-steel/40 border border-steel/50 transition-colors'">
                 {{ d.slice(0,3) }}
               </button>
             }
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-3">
+
+        <!-- Heures -->
+        <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="tt-label">Début</label>
+            <label class="text-[11px] font-bold uppercase tracking-widest text-navy/50 mb-2 block">Heure de début</label>
             <input type="time" class="tt-input" [value]="generatorStartTime()" (change)="generatorStartTime.set($any($event.target).value)">
           </div>
           <div>
-            <label class="tt-label">Fin</label>
+            <label class="text-[11px] font-bold uppercase tracking-widest text-navy/50 mb-2 block">Heure de fin</label>
             <input type="time" class="tt-input" [value]="generatorEndTime()" (change)="generatorEndTime.set($any($event.target).value)">
           </div>
+        </div>
+
+        <!-- Durée & Pause -->
+        <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="tt-label">Durée (min)</label>
+            <label class="text-[11px] font-bold uppercase tracking-widest text-navy/50 mb-2 block">Durée par créneau (min)</label>
             <input type="number" class="tt-input" min="15" max="480" [value]="generatorDuration()" (change)="generatorDuration.set(+$any($event.target).value)">
           </div>
           <div>
-            <label class="tt-label">Pause (min)</label>
+            <label class="text-[11px] font-bold uppercase tracking-widest text-navy/50 mb-2 block">Pause entre créneaux (min)</label>
             <input type="number" class="tt-input" min="0" max="120" [value]="generatorBreak()" (change)="generatorBreak.set(+$any($event.target).value)">
           </div>
         </div>
+
+        <!-- Live summary -->
+        <div class="bg-cream/50 border border-steel/40 rounded-xl px-4 py-3 text-sm text-navy/55 italic">
+          Génère des créneaux de <strong class="text-navy/80 not-italic">{{ generatorDuration() }}min</strong>
+          de <strong class="text-navy/80 not-italic">{{ generatorStartTime() }}</strong>
+          à <strong class="text-navy/80 not-italic">{{ generatorEndTime() }}</strong>
+          avec <strong class="text-navy/80 not-italic">{{ generatorBreak() }}min</strong> de pause,
+          sur <strong class="text-navy/80 not-italic">{{ generatorDays().length }} jour(s)</strong>.
+        </div>
       </div>
 
-      <div class="flex justify-end gap-2 mt-6">
+      <div class="flex justify-end gap-3 mt-6">
         <button class="btn-ghost-navy px-5 py-2.5 text-sm" type="button" (click)="showGeneratorModal.set(false)">Annuler</button>
-        <button class="btn-brick px-5 py-2.5 text-sm" type="button"
+        <button class="btn-brick px-6 py-2.5 text-sm" type="button"
           [disabled]="generatorGenerating() || generatorDays().length === 0"
           (click)="generateSlots()">
-          @if (generatorGenerating()) { <span class="spinner"></span> Génération... }
-          @else { ✦ Générer }
+          @if (generatorGenerating()) {
+            <span class="spinner"></span> Génération...
+          } @else {
+            ✦ Générer la grille
+          }
         </button>
       </div>
     </div>

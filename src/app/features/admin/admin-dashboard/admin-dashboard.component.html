@@ -1,4 +1,4 @@
-<!-- Navbar -->
+﻿<!-- Navbar -->
 <nav class="bg-white sticky top-0 z-50 border-b border-steel/25 shadow-sm">
   <div class="max-w-6xl mx-auto px-6 flex items-center justify-between h-14">
     <div class="font-display font-extrabold text-lg text-navy">
@@ -21,22 +21,27 @@
 
   <!-- KPIs -->
   @if (stats()) {
-    <div class="grid grid-cols-2 gap-4 mb-7 sm:grid-cols-4">
-      <div class="bg-gradient-to-br from-brick/8 to-cream/20 border border-brick/15 rounded-2xl p-5 slide-up">
+    <div class="grid grid-cols-2 gap-3 mb-7 sm:grid-cols-4 lg:grid-cols-8">
+      <div class="bg-gradient-to-br from-brick/8 to-cream/20 border border-brick/15 rounded-2xl p-5 col-span-2">
         <div class="font-display text-3xl font-extrabold text-navy mb-1">{{ stats()!.activeSchools }}</div>
         <div class="text-navy/45 text-xs font-medium uppercase tracking-wide">Écoles actives</div>
       </div>
-      <div class="bg-white border border-cream/50 rounded-2xl p-5 slide-up-1">
+      <div class="bg-white border border-cream/50 rounded-2xl p-5 col-span-2">
         <div class="font-display text-3xl font-extrabold text-navy mb-1">{{ stats()!.openSessions }}</div>
         <div class="text-navy/40 text-xs font-medium uppercase tracking-wide">Sessions ouvertes</div>
       </div>
-      <div class="bg-white border border-cream/50 rounded-2xl p-5 slide-up-2">
-        <div class="font-display text-3xl font-extrabold text-navy mb-1">{{ stats()!.totalTeachers }}</div>
-        <div class="text-navy/40 text-xs font-medium uppercase tracking-wide">Enseignants inscrits</div>
-      </div>
-      <div class="bg-white border border-cream/50 rounded-2xl p-5 slide-up-3">
+      <div class="bg-white border border-cream/50 rounded-2xl p-5 col-span-2">
         <div class="font-display text-3xl font-extrabold text-navy mb-1">{{ stats()!.validatedSlots }}</div>
         <div class="text-navy/40 text-xs font-medium uppercase tracking-wide">Créneaux validés</div>
+      </div>
+      <div class="bg-navy/5 border border-navy/12 rounded-2xl p-5 col-span-2">
+        <div class="font-display text-3xl font-extrabold text-navy mb-1">{{ stats()!.totalUsers }}</div>
+        <div class="text-navy/45 text-xs font-medium uppercase tracking-wide">Utilisateurs total</div>
+        <div class="flex gap-2 mt-2 flex-wrap">
+          <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-brick/10 text-brick font-bold">{{ stats()!.adminCount }} admins</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-navy/10 text-navy font-bold">{{ stats()!.directorCount }} dir.</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald/15 text-emerald font-bold">{{ stats()!.teacherCount }} ens.</span>
+        </div>
       </div>
     </div>
   }
@@ -51,7 +56,15 @@
     <button (click)="activeTab.set('plans')"
       [class]="activeTab() === 'plans' ? 'bg-white shadow-sm text-navy font-bold' : 'text-navy/45 hover:text-navy'"
       class="px-4 py-2 rounded-lg text-sm transition-all">
-      Plans d'abonnement
+      Plans
+    </button>
+    <button (click)="activeTab.set('users')"
+      [class]="activeTab() === 'users' ? 'bg-white shadow-sm text-navy font-bold' : 'text-navy/45 hover:text-navy'"
+      class="px-4 py-2 rounded-lg text-sm transition-all">
+      Utilisateurs
+      @if (stats()) {
+        <span class="ml-1.5 text-[10px] bg-navy/10 text-navy px-1.5 py-0.5 rounded-full font-bold">{{ stats()!.totalUsers }}</span>
+      }
     </button>
   </div>
 
@@ -77,38 +90,38 @@
             <tr class="border-b border-cream/35 last:border-0 hover:bg-cream/15 transition-colors">
               <td class="px-5 py-4">
                 <div class="font-semibold text-navy font-display">{{ school.name }}</div>
-                <div class="text-navy/30 text-xs mt-0.5">{{ school.directors_count }} directeur(s)</div>
+                <div class="text-navy/30 text-xs mt-0.5">{{ school.directorsCount }} directeur(s)</div>
               </td>
               <td class="px-5 py-4">
                 <div class="flex items-center gap-2 flex-wrap">
-                  <span class="text-[11px] font-bold px-2 py-0.5 rounded-full" [class]="planBadgeClass(school.subscription_plan)">
-                    {{ school.subscription_plan }}
+                  <span class="text-[11px] font-bold px-2 py-0.5 rounded-full" [class]="planBadgeClass(school.subscriptionPlan)">
+                    {{ school.subscriptionPlan }}
                   </span>
                   <select #planSel
                     class="text-xs border border-cream text-navy/55 rounded-lg px-2 py-1 bg-white focus:outline-none focus:border-brick transition-colors"
                     (change)="updateSubscription(school.id, planSel.value)">
                     <option value="">Changer…</option>
                     @for (plan of plans(); track plan.code) {
-                      <option [value]="plan.code">{{ plan.display_name }}</option>
+                      <option [value]="plan.code">{{ plan.displayName }}</option>
                     }
                   </select>
                 </div>
               </td>
-              <td class="px-5 py-4 text-navy/55 font-mono">{{ school.sessions_count }}</td>
+              <td class="px-5 py-4 text-navy/55 font-mono">{{ school.sessionsCount }}</td>
               <td class="px-5 py-4">
                 <span class="text-[11px] font-bold px-2 py-0.5 rounded-full"
-                  [class]="school.is_active ? 'bg-emerald/15 text-emerald' : 'bg-error/10 text-error'">
-                  {{ school.is_active ? 'Active' : 'Inactive' }}
+                  [class]="school.isActive ? 'bg-emerald/15 text-emerald' : 'bg-error/10 text-error'">
+                  {{ school.isActive ? 'Active' : 'Inactive' }}
                 </span>
               </td>
               <td class="px-5 py-4 text-right">
                 <button (click)="toggleSchool(school)"
                   [disabled]="togglingId() === school.id"
                   class="text-xs border px-3 py-1.5 rounded-lg transition-all disabled:opacity-40"
-                  [class]="school.is_active
+                  [class]="school.isActive
                     ? 'border-brick/22 text-brick/65 hover:bg-brick/5'
                     : 'border-navy/20 text-navy/55 hover:bg-navy/5'">
-                  {{ togglingId() === school.id ? '...' : (school.is_active ? 'Désactiver' : 'Activer') }}
+                  {{ togglingId() === school.id ? '...' : (school.isActive ? 'Désactiver' : 'Activer') }}
                 </button>
               </td>
             </tr>
@@ -123,6 +136,136 @@
           }
         </tbody>
       </table>
+    </div>
+  }
+
+  <!-- Users Tab -->
+  @if (activeTab() === 'users') {
+    <div class="space-y-6">
+
+      <!-- Create admin form -->
+      <div class="bg-white border border-cream/50 rounded-2xl shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-cream/40">
+          <div>
+            <h2 class="font-display font-bold text-navy">Administrateurs</h2>
+            <p class="text-xs text-navy/40 mt-0.5">Super admins ayant accès au back-office</p>
+          </div>
+          <button (click)="showCreateAdmin.set(!showCreateAdmin())"
+            class="btn-brick px-4 py-2 text-xs">
+            + Nouvel admin
+          </button>
+        </div>
+
+        @if (showCreateAdmin()) {
+          <div class="px-6 py-5 bg-cream/20 border-b border-cream/40 fade-in">
+            <h3 class="font-semibold text-navy text-sm mb-4">Créer un compte super admin</h3>
+            <div class="grid sm:grid-cols-3 gap-3">
+              <div>
+                <label class="tt-label">Nom complet</label>
+                <input type="text" class="tt-input" placeholder="Jean Admin"
+                  [value]="createAdminName()" (input)="createAdminName.set($any($event.target).value)">
+              </div>
+              <div>
+                <label class="tt-label">Email</label>
+                <input type="email" class="tt-input" placeholder="admin@timetutor.app"
+                  [value]="createAdminEmail()" (input)="createAdminEmail.set($any($event.target).value)">
+              </div>
+              <div>
+                <label class="tt-label">Mot de passe <span class="font-normal text-navy/35">(≥ 8 car.)</span></label>
+                <input type="password" class="tt-input" placeholder="••••••••"
+                  [value]="createAdminPassword()" (input)="createAdminPassword.set($any($event.target).value)">
+              </div>
+            </div>
+            <div class="flex gap-2 mt-4">
+              <button (click)="submitCreateAdmin()" [disabled]="creatingAdmin()"
+                class="btn-brick px-5 py-2 text-xs disabled:opacity-50">
+                @if (creatingAdmin()) { <span class="spinner"></span> Création... } @else { Créer l'admin }
+              </button>
+              <button (click)="showCreateAdmin.set(false)" class="btn-ghost-navy px-5 py-2 text-xs">Annuler</button>
+            </div>
+          </div>
+        }
+
+        <table class="w-full text-sm">
+          <tbody>
+            @for (u of filteredUsers(); track u.id) {
+              @if (u.role === 'super_admin') {
+                <tr class="border-b border-cream/35 last:border-0 hover:bg-cream/10 transition-colors">
+                  <td class="px-5 py-3.5">
+                    <div class="font-semibold text-navy">{{ u.fullName }}</div>
+                    <div class="text-xs text-navy/40 font-mono">{{ u.email }}</div>
+                  </td>
+                  <td class="px-5 py-3.5">
+                    <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-brick/12 text-brick">Super Admin</span>
+                  </td>
+                  <td class="px-5 py-3.5 text-xs text-navy/35 font-mono">{{ u.createdAt | date:'dd/MM/yyyy' }}</td>
+                  <td class="px-5 py-3.5 text-right">
+                    <button (click)="deleteUser(u)" [disabled]="deletingUserId() === u.id"
+                      class="text-xs px-3 py-1.5 rounded-lg border border-mahogany/20 text-mahogany hover:bg-mahogany/5 transition-all disabled:opacity-40">
+                      @if (deletingUserId() === u.id) { ... } @else { Supprimer }
+                    </button>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Directors & Teachers -->
+      <div class="bg-white border border-cream/50 rounded-2xl shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-cream/40 flex-wrap gap-3">
+          <h2 class="font-display font-bold text-navy">Tous les utilisateurs</h2>
+          <div class="flex items-center gap-1 bg-cream/40 rounded-xl p-1">
+            @for (opt of [{v:'all',l:'Tous'},{v:'director',l:'Directeurs'},{v:'teacher',l:'Enseignants'}]; track opt.v) {
+              <button (click)="userRoleFilter.set(opt.v)"
+                [class]="userRoleFilter() === opt.v ? 'bg-white shadow-sm text-navy font-bold' : 'text-navy/45 hover:text-navy'"
+                class="px-3 py-1.5 rounded-lg text-xs transition-all">
+                {{ opt.l }}
+              </button>
+            }
+          </div>
+        </div>
+        <table class="w-full text-sm">
+          <thead class="bg-cream/20 border-b border-cream/40">
+            <tr>
+              <th class="text-left px-5 py-3 text-[11px] font-bold text-navy/40 uppercase tracking-wider">Utilisateur</th>
+              <th class="text-left px-5 py-3 text-[11px] font-bold text-navy/40 uppercase tracking-wider">Rôle</th>
+              <th class="text-left px-5 py-3 text-[11px] font-bold text-navy/40 uppercase tracking-wider">École</th>
+              <th class="text-left px-5 py-3 text-[11px] font-bold text-navy/40 uppercase tracking-wider">Inscription</th>
+              <th class="text-right px-5 py-3 text-[11px] font-bold text-navy/40 uppercase tracking-wider">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (u of filteredUsers(); track u.id) {
+              @if (u.role !== 'super_admin') {
+                <tr class="border-b border-cream/30 last:border-0 hover:bg-cream/10 transition-colors">
+                  <td class="px-5 py-3.5">
+                    <div class="font-semibold text-navy">{{ u.fullName }}</div>
+                    <div class="text-xs text-navy/40 font-mono">{{ u.email }}</div>
+                  </td>
+                  <td class="px-5 py-3.5">
+                    <span class="text-[11px] font-bold px-2 py-0.5 rounded-full" [class]="roleBadgeClass(u.role)">
+                      {{ roleLabel(u.role) }}
+                    </span>
+                  </td>
+                  <td class="px-5 py-3.5 text-xs text-navy/55">{{ u.schoolName ?? '—' }}</td>
+                  <td class="px-5 py-3.5 text-xs text-navy/35 font-mono">{{ u.createdAt | date:'dd/MM/yyyy' }}</td>
+                  <td class="px-5 py-3.5 text-right">
+                    <button (click)="deleteUser(u)" [disabled]="deletingUserId() === u.id"
+                      class="text-xs px-3 py-1.5 rounded-lg border border-mahogany/20 text-mahogany hover:bg-mahogany/5 transition-all disabled:opacity-40">
+                      @if (deletingUserId() === u.id) { ... } @else { Supprimer }
+                    </button>
+                  </td>
+                </tr>
+              }
+            }
+            @empty {
+              <tr><td colspan="5" class="text-center py-10 text-navy/30 text-sm">Aucun utilisateur</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </div>
   }
 
@@ -142,21 +285,21 @@
             <div class="p-5">
               <div class="flex items-center justify-between mb-3">
                 <div>
-                  <div class="font-display font-bold text-navy">{{ plan.display_name }}</div>
+                  <div class="font-display font-bold text-navy">{{ plan.displayName }}</div>
                   <div class="text-xs font-mono text-navy/35">{{ plan.code }}</div>
                 </div>
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" [class]="planBadgeClass(plan.code)">
-                  {{ plan.validity_days }}j
+                  {{ plan.validityDays }}j
                 </span>
               </div>
               <div class="space-y-1 mb-4">
                 @for (key of featureKeys; track key) {
                   <div class="flex items-center gap-2 text-xs">
                     <div class="w-4 h-4 rounded flex items-center justify-center shrink-0"
-                      [class]="plan.features_json[key] ? 'bg-emerald/15 text-emerald' : 'bg-steel/40 text-navy/30'">
-                      {{ plan.features_json[key] ? '✓' : '✗' }}
+                      [class]="plan.featuresJson[key] ? 'bg-emerald/15 text-emerald' : 'bg-steel/40 text-navy/30'">
+                      {{ plan.featuresJson[key] ? '✓' : '✗' }}
                     </div>
-                    <span [class]="plan.features_json[key] ? 'text-navy/70' : 'text-navy/35'">{{ featureLabels[key] }}</span>
+                    <span [class]="plan.featuresJson[key] ? 'text-navy/70' : 'text-navy/35'">{{ featureLabels[key] }}</span>
                   </div>
                 }
               </div>
@@ -164,7 +307,7 @@
                 @for (key of limitKeys(plan); track key) {
                   <div class="flex items-center justify-between text-xs">
                     <span class="text-navy/50">{{ limitLabel(key) }}</span>
-                    <span class="font-mono font-semibold text-navy">{{ plan.limits_json[key] ?? '∞' }}</span>
+                    <span class="font-mono font-semibold text-navy">{{ plan.limitsJson[key] ?? '∞' }}</span>
                   </div>
                 }
               </div>
@@ -178,21 +321,21 @@
             <!-- Edit mode -->
             <div class="p-5">
               <div class="flex items-center justify-between mb-4">
-                <div class="font-display font-bold text-navy text-sm">Édition — {{ plan.display_name }}</div>
+                <div class="font-display font-bold text-navy text-sm">Édition — {{ plan.displayName }}</div>
                 <button (click)="cancelEditPlan()" class="text-navy/35 hover:text-navy text-xs">✕</button>
               </div>
               <div class="space-y-3">
                 <div>
                   <label class="tt-label">Nom affiché</label>
                   <input type="text" class="tt-input"
-                    [ngModel]="planEditBuffer()!.display_name"
-                    (ngModelChange)="planEditBuffer.update(b => b ? {...b, display_name: $event} : b)">
+                    [ngModel]="planEditBuffer()!.displayName"
+                    (ngModelChange)="planEditBuffer.update(b => b ? {...b, displayName: $event} : b)">
                 </div>
                 <div>
                   <label class="tt-label">Validité (jours)</label>
                   <input type="number" min="1" class="tt-input"
-                    [ngModel]="planEditBuffer()!.validity_days"
-                    (ngModelChange)="planEditBuffer.update(b => b ? {...b, validity_days: +$event} : b)">
+                    [ngModel]="planEditBuffer()!.validityDays"
+                    (ngModelChange)="planEditBuffer.update(b => b ? {...b, validityDays: +$event} : b)">
                 </div>
                 <div>
                   <label class="tt-label">Fonctionnalités</label>
@@ -200,7 +343,7 @@
                     @for (key of featureKeys; track key) {
                       <label class="flex items-center gap-2 cursor-pointer text-xs">
                         <input type="checkbox"
-                          [checked]="planEditBuffer()!.features_json[key]"
+                          [checked]="planEditBuffer()!.featuresJson[key]"
                           (change)="toggleFeature(key)"
                           class="rounded">
                         <span class="text-navy/70">{{ featureLabels[key] }}</span>
@@ -215,7 +358,7 @@
                       <div>
                         <label class="text-[10px] text-navy/45 mb-0.5 block">{{ limitLabel(key) }} (0 = illimité)</label>
                         <input type="number" min="0" class="tt-input"
-                          [value]="planEditBuffer()!.limits_json[key] ?? 0"
+                          [value]="planEditBuffer()!.limitsJson[key] ?? 0"
                           (change)="updateLimit(key, $any($event.target).value)">
                       </div>
                     }

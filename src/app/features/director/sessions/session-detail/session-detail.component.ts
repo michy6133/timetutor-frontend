@@ -425,7 +425,7 @@ export class SessionDetailComponent implements OnInit {
   }
 
   async exportPdf(): Promise<void> {
-    const url = `http://localhost:3000/api/v1/sessions/${this.sessionId}/export/pdf?includeTeacherName=true&includeContact=true&includeEmail=true&includeSubject=true&includeRoom=true`;
+    const url = `http://localhost:3001/api/v1/sessions/${this.sessionId}/export/pdf?includeTeacherName=true&includeContact=true&includeEmail=true&includeSubject=true&includeRoom=true`;
     const token = localStorage.getItem('tt_token');
     try {
       const response = await fetch(url, {

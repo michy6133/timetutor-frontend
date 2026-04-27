@@ -26,6 +26,7 @@ import { SettingsComponent } from './features/director/settings/settings.compone
 import { PricingComponent } from './features/pricing/pricing.component';
 import { authGuard } from './core/guards/auth.guard';
 import { teacherGuard } from './core/guards/teacher.guard';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   { path: '', component: LandingComponent },
@@ -68,7 +69,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
-    canActivate: [authGuard],
+    canActivate: [adminGuard],
     children: [
       { path: '', component: AdminDashboardComponent },
     ],

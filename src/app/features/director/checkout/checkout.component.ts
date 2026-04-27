@@ -32,9 +32,9 @@ const PLANS: Record<string, { label: string; monthly: number }> = {
 
           <div class="p-8">
             <!-- Plan summary -->
-            <div class="flex items-center justify-between p-6 bg-molten/8 rounded-2xl mb-8 border border-molten/20">
+            <div class="flex items-center justify-between p-6 bg-emerald/8 rounded-2xl mb-8 border border-emerald/20">
               <div>
-                <p class="text-xs text-amber-700 font-bold uppercase tracking-wider mb-1">Plan sélectionné</p>
+                <p class="text-xs text-emerald font-bold uppercase tracking-wider mb-1">Plan sélectionné</p>
                 <h2 class="text-2xl font-display font-bold text-navy">{{ planLabel() }} {{ isAnnual() ? '(Annuel)' : '(Mensuel)' }}</h2>
               </div>
               <div class="text-right">
@@ -70,8 +70,8 @@ const PLANS: Record<string, { label: string; monthly: number }> = {
                   Mode de paiement — FedaPay
                 </h3>
                 <div class="grid grid-cols-3 gap-3">
-                  <div class="border-2 border-molten/40 bg-molten/8 rounded-xl p-4 flex flex-col items-center gap-2">
-                    <div class="w-10 h-10 bg-yellow-400 text-white rounded-full flex items-center justify-center font-bold text-sm">MTN</div>
+                  <div class="border-2 border-navy/20 bg-navy/5 rounded-xl p-4 flex flex-col items-center gap-2">
+                    <div class="w-10 h-10 bg-jasmine text-navy rounded-full flex items-center justify-center font-bold text-sm">MTN</div>
                     <span class="font-semibold text-xs text-navy">MTN MoMo</span>
                   </div>
                   <div class="border border-cream/80 bg-cream/30 rounded-xl p-4 flex flex-col items-center gap-2">

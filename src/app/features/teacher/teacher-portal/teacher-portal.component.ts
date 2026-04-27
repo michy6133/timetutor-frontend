@@ -103,10 +103,10 @@ export class TeacherPortalComponent implements OnInit {
 
   statusClass(status: string): string {
     return {
-      pending: 'bg-gray-100 text-gray-600',
-      active: 'bg-blue-100 text-blue-700',
-      done: 'bg-green-100 text-green-700',
-    }[status] ?? 'bg-gray-100 text-gray-600';
+      pending: 'bg-steel/60 text-navy/50',
+      active: 'bg-emerald/15 text-emerald',
+      done: 'bg-navy/8 text-navy/55',
+    }[status] ?? 'bg-steel/60 text-navy/50';
   }
 
   sessionStatusBadge(status: string): string {
@@ -115,11 +115,11 @@ export class TeacherPortalComponent implements OnInit {
 
   sessionStatusClass(status: string): string {
     return {
-      draft: 'bg-gray-100 text-gray-500',
-      open: 'bg-green-100 text-green-700',
-      closed: 'bg-yellow-100 text-yellow-700',
-      published: 'bg-blue-100 text-blue-700',
-    }[status] ?? 'bg-gray-100 text-gray-500';
+      draft: 'bg-steel/60 text-navy/50',
+      open: 'bg-emerald/15 text-emerald',
+      closed: 'bg-jasmine/25 text-navy/70',
+      published: 'bg-navy/12 text-navy/75',
+    }[status] ?? 'bg-steel/60 text-navy/50';
   }
 
   groupedBySchool(): Array<{ schoolName: string; sessions: TeacherSession[] }> {

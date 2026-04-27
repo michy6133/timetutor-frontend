@@ -5,16 +5,23 @@ import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 
-interface AdminStats { activeSchools: number; openSessions: number; totalTeachers: number; validatedSlots: number; }
+interface AdminStats {
+  activeSchools: number; openSessions: number; totalTeachers: number; validatedSlots: number;
+  totalUsers: number; directorCount: number; teacherCount: number; adminCount: number;
+}
 interface SchoolRow {
-  id: string; name: string; subscription_plan: string; is_active: boolean;
-  directors_count: number; sessions_count: number;
+  id: string; name: string; subscriptionPlan: string; isActive: boolean;
+  directorsCount: number; sessionsCount: number;
 }
 interface PlanRow {
-  code: string; display_name: string; is_active: boolean;
-  limits_json: Record<string, number | null>;
-  features_json: Record<string, boolean>;
-  validity_days: number;
+  code: string; displayName: string; isActive: boolean;
+  limitsJson: Record<string, number | null>;
+  featuresJson: Record<string, boolean>;
+  validityDays: number;
+}
+interface UserRow {
+  id: string; email: string; fullName: string; role: string;
+  isActive: boolean; createdAt: string; schoolName: string | null;
 }
 
 @Component({
@@ -31,12 +38,22 @@ export class AdminDashboardComponent implements OnInit {
   readonly stats = signal<AdminStats | null>(null);
   readonly schools = signal<SchoolRow[]>([]);
   readonly plans = signal<PlanRow[]>([]);
+  readonly users = signal<UserRow[]>([]);
   readonly togglingId = signal('');
-  readonly activeTab = signal<'schools' | 'plans'>('schools');
+  readonly deletingUserId = signal('');
+  readonly activeTab = signal<'schools' | 'plans' | 'users'>('schools');
   readonly editingPlan = signal<string | null>(null);
   readonly planEditBuffer = signal<PlanRow | null>(null);
   readonly savingPlan = signal(false);
   readonly selectedSchoolId = signal<string | null>(null);
+  readonly userRoleFilter = signal<string>('all');
+
+  // Create admin form
+  readonly showCreateAdmin = signal(false);
+  readonly createAdminEmail = signal('');
+  readonly createAdminName = signal('');
+  readonly createAdminPassword = signal('');
+  readonly creatingAdmin = signal(false);
 
   readonly featureKeys = [
     'pdfExport', 'jpgExport', 'csvImport',
@@ -61,6 +78,49 @@ export class AdminDashboardComponent implements OnInit {
     this.api.get<AdminStats>('/admin/stats').subscribe(s => this.stats.set(s));
     this.api.get<SchoolRow[]>('/admin/schools').subscribe(s => this.schools.set(s));
     this.api.get<PlanRow[]>('/admin/plans').subscribe(p => this.plans.set(p));
+    this.api.get<UserRow[]>('/admin/users').subscribe(u => this.users.set(u));
+  }
+
+  filteredUsers(): UserRow[] {
+    const f = this.userRoleFilter();
+    return f === 'all' ? this.users() : this.users().filter(u => u.role === f);
+  }
+
+  roleBadgeClass(role: string): string {
+    return { super_admin: 'bg-brick/12 text-brick', director: 'bg-navy/10 text-navy', teacher: 'bg-emerald/15 text-emerald' }[role] ?? 'bg-steel/50 text-navy/50';
+  }
+
+  roleLabel(role: string): string {
+    return { super_admin: 'Admin', director: 'Directeur', teacher: 'Enseignant' }[role] ?? role;
+  }
+
+  deleteUser(user: UserRow): void {
+    if (this.deletingUserId()) return;
+    if (!confirm(`Supprimer ${user.email} ?`)) return;
+    this.deletingUserId.set(user.id);
+    this.api.delete(`/admin/users/${user.id}`).subscribe({
+      next: () => { this.users.update(list => list.filter(u => u.id !== user.id)); this.deletingUserId.set(''); this.toast.success('Utilisateur supprimé.'); },
+      error: (e) => { this.deletingUserId.set(''); this.toast.error(e.error?.error ?? 'Erreur'); },
+    });
+  }
+
+  submitCreateAdmin(): void {
+    if (this.creatingAdmin()) return;
+    const email = this.createAdminEmail().trim();
+    const fullName = this.createAdminName().trim();
+    const password = this.createAdminPassword();
+    if (!email || !fullName || password.length < 8) { this.toast.error('Remplissez tous les champs (mot de passe ≥ 8 car.).'); return; }
+    this.creatingAdmin.set(true);
+    this.api.post<UserRow>('/admin/users', { email, fullName, password }).subscribe({
+      next: (u) => {
+        this.creatingAdmin.set(false);
+        this.showCreateAdmin.set(false);
+        this.createAdminEmail.set(''); this.createAdminName.set(''); this.createAdminPassword.set('');
+        this.users.update(list => [u, ...list]);
+        this.toast.success(`Admin "${u.fullName}" créé.`);
+      },
+      error: (e) => { this.creatingAdmin.set(false); this.toast.error(e.error?.error ?? 'Erreur'); },
+    });
   }
 
   toggleSchool(school: SchoolRow): void {
@@ -68,7 +128,7 @@ export class AdminDashboardComponent implements OnInit {
     this.togglingId.set(school.id);
     this.api.put<{ isActive: boolean }>(`/admin/schools/${school.id}/toggle`, {}).subscribe({
       next: (r) => {
-        this.schools.update(list => list.map(s => s.id === school.id ? { ...s, is_active: r.isActive } : s));
+        this.schools.update(list => list.map(s => s.id === school.id ? { ...s, isActive: r.isActive } : s));
         this.togglingId.set('');
       },
       error: () => this.togglingId.set(''),
@@ -100,7 +160,7 @@ export class AdminDashboardComponent implements OnInit {
     if (!buf) return;
     this.planEditBuffer.set({
       ...buf,
-      features_json: { ...buf.features_json, [key]: !buf.features_json[key] },
+      featuresJson: { ...buf.featuresJson, [key]: !buf.featuresJson[key] },
     });
   }
 
@@ -110,7 +170,7 @@ export class AdminDashboardComponent implements OnInit {
     const num = value === '' || value === '0' ? null : Number(value);
     this.planEditBuffer.set({
       ...buf,
-      limits_json: { ...buf.limits_json, [key]: num },
+      limitsJson: { ...buf.limitsJson, [key]: num },
     });
   }
 
@@ -119,14 +179,14 @@ export class AdminDashboardComponent implements OnInit {
     if (!buf || this.savingPlan()) return;
     this.savingPlan.set(true);
     this.api.put(`/admin/plans/${buf.code}`, {
-      displayName: buf.display_name,
-      limitsJson: buf.limits_json,
-      featuresJson: buf.features_json,
-      validityDays: buf.validity_days,
+      displayName: buf.displayName,
+      limitsJson: buf.limitsJson,
+      featuresJson: buf.featuresJson,
+      validityDays: buf.validityDays,
     }).subscribe({
       next: () => {
         this.savingPlan.set(false);
-        this.toast.success(`Plan "${buf.display_name}" mis à jour.`);
+        this.toast.success(`Plan "${buf.displayName}" mis à jour.`);
         this.editingPlan.set(null);
         this.planEditBuffer.set(null);
         this.loadData();
@@ -147,7 +207,7 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   limitKeys(plan: PlanRow): string[] {
-    return Object.keys(plan.limits_json);
+    return Object.keys(plan.limitsJson ?? {});
   }
 
   limitLabel(key: string): string {

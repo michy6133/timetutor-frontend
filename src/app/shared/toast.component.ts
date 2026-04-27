@@ -19,8 +19,8 @@ import { SvgIconComponent } from './svg-icon.component';
               <app-svg-icon name="x-mark" [size]="16" iconClass="text-error" />
             </div>
           } @else if (t.type === 'warning') {
-            <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-              <app-svg-icon name="exclamation-triangle" [size]="16" iconClass="text-amber-600" />
+            <div class="w-8 h-8 rounded-full bg-jasmine/30 flex items-center justify-center shrink-0">
+              <app-svg-icon name="exclamation-triangle" [size]="16" iconClass="text-navy/70" />
             </div>
           } @else {
             <div class="w-8 h-8 rounded-full bg-brick/10 flex items-center justify-center shrink-0">

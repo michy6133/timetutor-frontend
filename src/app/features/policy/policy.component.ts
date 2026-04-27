@@ -27,7 +27,7 @@ export class PolicyComponent implements OnInit {
     this.downloading.set(true);
     const token = localStorage.getItem('tt_token');
     try {
-      const res = await fetch('http://localhost:3000/api/v1/auth/me/export', {
+      const res = await fetch('http://localhost:3001/api/v1/auth/me/export', {
         credentials: 'include',
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });

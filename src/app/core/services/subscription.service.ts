@@ -11,12 +11,12 @@ export type FeatureKey =
   | 'whatsappNotifications';
 
 interface SubscriptionData {
-  plan_code: string;
-  display_name: string;
+  planCode: string;
+  displayName: string;
   status: string;
-  features_json: Record<FeatureKey, boolean>;
-  limits_json: Record<string, number | null>;
-  limits_override_json: Record<string, number | null>;
+  featuresJson: Record<FeatureKey, boolean>;
+  limitsJson: Record<string, number | null>;
+  limitsOverrideJson: Record<string, number | null>;
   usage: {
     sessionsCount: number;
     sessionsLimit: number | null;
@@ -47,15 +47,16 @@ export class SubscriptionService {
     const sub = this.subscription();
     if (!sub) return true;
     if (!['active', 'trial'].includes(sub.status)) return false;
-    return sub.features_json[key] !== false;
+    if (!sub.featuresJson) return true;
+    return sub.featuresJson[key] !== false;
   }
 
   get planCode(): string {
-    return this.subscription()?.plan_code ?? 'standard';
+    return this.subscription()?.planCode ?? 'standard';
   }
 
   get planName(): string {
-    return this.subscription()?.display_name ?? 'Standard';
+    return this.subscription()?.displayName ?? 'Standard';
   }
 
   get status(): string {
