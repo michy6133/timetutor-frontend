@@ -70,7 +70,7 @@
       </div>
       <p class="text-navy/45 font-medium mb-2">Répertoire vide</p>
       <p class="text-navy/30 text-sm mb-6">Ajoutez des enseignants manuellement ou importez un fichier CSV.<br>
-        Format CSV : <code class="font-mono text-xs bg-cream/60 px-2 py-0.5 rounded">full_name,email,phone</code>
+        Format CSV : <code class="font-mono text-xs bg-cream/60 px-2 py-0.5 rounded">full_name,email,phone,matiere</code> <span class="text-xs text-error/70">(matiere obligatoire)</span>
       </p>
       <button (click)="showAddForm.set(true)" class="btn-brick px-6 py-3 text-sm">
         <app-svg-icon name="user-plus" [size]="16" iconClass="shrink-0" /> Ajouter le premier enseignant

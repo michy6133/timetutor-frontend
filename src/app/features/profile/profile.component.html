@@ -1,9 +1,13 @@
 <div class="max-w-2xl mx-auto px-6 py-8">
-  <div class="flex items-center gap-4 mb-7">
-    <div class="w-11 h-11 rounded-xl bg-brick/10 flex items-center justify-center">
-      <svg class="w-6 h-6 text-brick" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-      </svg>
+  <div class="mb-6">
+    <a [routerLink]="backRoute()" class="inline-flex items-center gap-1.5 text-sm text-navy/45 hover:text-navy transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+      Retour
+    </a>
+  </div>
+  <div class="flex items-center gap-5 mb-7">
+    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-brick to-navy flex items-center justify-center text-white font-bold text-lg font-display select-none">
+      {{ initials() }}
     </div>
     <div>
       <h1 class="font-display text-2xl font-extrabold text-navy">Mon Profil</h1>
@@ -49,6 +53,9 @@
       <div>
         <label class="tt-label">Nouveau mot de passe</label>
         <input formControlName="newPassword" type="password" class="tt-input" placeholder="8 caractères minimum" />
+        @if (passwordForm.get('newPassword')?.touched && passwordForm.get('newPassword')?.errors?.['minlength']) {
+          <p class="text-xs text-error mt-1">8 caractères minimum.</p>
+        }
       </div>
       <div class="pt-2">
         <button type="submit" [disabled]="passwordForm.invalid || savingPwd()"

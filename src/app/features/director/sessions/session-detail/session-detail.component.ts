@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../../../core/services/api.service';
 import { SocketService } from '../../../../core/services/socket.service';
 import { ToastService } from '../../../../core/services/toast.service';
+import { SubscriptionService } from '../../../../core/services/subscription.service';
 import type { Session, TimeSlot, Teacher, Subject } from '../../../../core/models';
 import { DatePipe, CommonModule } from '@angular/common';
 
@@ -19,6 +20,7 @@ export class SessionDetailComponent implements OnInit {
   private readonly socket = inject(SocketService);
   private readonly toast = inject(ToastService);
   private readonly fb = inject(FormBuilder);
+  readonly sub = inject(SubscriptionService);
 
   readonly session = signal<Session | null>(null);
   readonly slots = signal<TimeSlot[]>([]);
@@ -50,6 +52,15 @@ export class SessionDetailComponent implements OnInit {
   readonly schoolClasses = signal<{ id: string; name: string }[]>([]);
   readonly selectedClassId = signal('');
   readonly savingClass = signal(false);
+
+  readonly deletingSlotId = signal<string | null>(null);
+  readonly showGeneratorModal = signal(false);
+  readonly generatorGenerating = signal(false);
+  readonly generatorDays = signal<string[]>(['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi']);
+  readonly generatorStartTime = signal('07:00');
+  readonly generatorEndTime = signal('18:00');
+  readonly generatorDuration = signal(120);
+  readonly generatorBreak = signal(15);
 
   readonly teacherForm = this.fb.group({
     fullName: ['', [Validators.required, Validators.minLength(2)]],
@@ -436,6 +447,165 @@ export class SessionDetailComponent implements OnInit {
     }
   }
 
+  deleteSlot(slotId: string): void {
+    if (this.deletingSlotId()) return;
+    this.deletingSlotId.set(slotId);
+    this.api.delete(`/sessions/${this.sessionId}/slots/${slotId}`).subscribe({
+      next: () => {
+        this.slots.update(s => s.filter(x => x.id !== slotId));
+        this.deletingSlotId.set(null);
+        this.toast.success('Créneau supprimé.');
+      },
+      error: (e) => {
+        this.deletingSlotId.set(null);
+        this.toast.error(e.error?.error ?? 'Erreur lors de la suppression.');
+      },
+    });
+  }
+
+  toggleGeneratorDay(day: string): void {
+    const days = this.generatorDays();
+    if (days.includes(day)) {
+      this.generatorDays.set(days.filter(d => d !== day));
+    } else {
+      this.generatorDays.set([...days, day]);
+    }
+  }
+
+  generateSlots(): void {
+    if (this.generatorGenerating()) return;
+    this.generatorGenerating.set(true);
+    this.api.post(`/sessions/${this.sessionId}/slots/generate`, {
+      days: this.generatorDays(),
+      startTime: this.generatorStartTime(),
+      endTime: this.generatorEndTime(),
+      slotDurationMinutes: this.generatorDuration(),
+      breakMinutes: this.generatorBreak(),
+    }).subscribe({
+      next: (res: any) => {
+        this.generatorGenerating.set(false);
+        this.showGeneratorModal.set(false);
+        this.loadAll();
+        this.toast.success(`${res.created} créneau(x) créé(s), ${res.skipped} ignoré(s) (chevauchement).`);
+      },
+      error: (e) => {
+        this.generatorGenerating.set(false);
+        this.toast.error(e.error?.error ?? 'Erreur lors de la génération.');
+      },
+    });
+  }
+
+  async exportJpg(): Promise<void> {
+    const slots = this.slots();
+    const days = this.slotDays();
+    const times = this.uniqueTimes();
+    if (!days.length || !times.length) {
+      this.toast.error('Aucun créneau à exporter.');
+      return;
+    }
+    const S = 1.5;
+    const HEADER_H = 48 * S;
+    const TIME_W = 80 * S;
+    const COL_W = 140 * S;
+    const ROW_H = 80 * S;
+    const W = TIME_W + days.length * COL_W;
+    const H = HEADER_H + times.length * ROW_H;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d')!;
+
+    const truncate = (text: string, maxW: number): string => {
+      if (ctx.measureText(text).width <= maxW) return text;
+      let t = text;
+      while (t.length > 0 && ctx.measureText(t + '…').width > maxW) t = t.slice(0, -1);
+      return t + '…';
+    };
+
+    ctx.fillStyle = '#f9fafb';
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.fillStyle = '#111827';
+    ctx.font = `bold ${14 * S}px sans-serif`;
+    ctx.textBaseline = 'middle';
+    ctx.fillText(this.session()?.name ?? 'Emploi du temps', 12 * S, HEADER_H / 2);
+
+    ctx.fillStyle = '#e5e7eb';
+    ctx.fillRect(0, HEADER_H, W, 1.5);
+
+    ctx.font = `bold ${9 * S}px sans-serif`;
+    ctx.textAlign = 'center';
+    days.forEach((day, i) => {
+      const x = TIME_W + i * COL_W + COL_W / 2;
+      ctx.fillStyle = '#374151';
+      ctx.fillText(day.toUpperCase(), x, HEADER_H / 2 + HEADER_H * 0.3);
+    });
+
+    times.forEach((time, rowIdx) => {
+      const y = HEADER_H + rowIdx * ROW_H;
+      ctx.fillStyle = rowIdx % 2 === 0 ? '#ffffff' : '#f9fafb';
+      ctx.fillRect(0, y, W, ROW_H);
+
+      ctx.fillStyle = '#6b7280';
+      ctx.font = `bold ${8 * S}px monospace`;
+      ctx.textAlign = 'center';
+      ctx.fillText(time.start, TIME_W / 2, y + ROW_H / 2 - 6 * S);
+      ctx.font = `${7 * S}px monospace`;
+      ctx.fillStyle = '#9ca3af';
+      ctx.fillText(time.end, TIME_W / 2, y + ROW_H / 2 + 6 * S);
+
+      ctx.fillStyle = '#e5e7eb';
+      ctx.fillRect(0, y + ROW_H - 1, W, 1);
+
+      days.forEach((day, colIdx) => {
+        const x = TIME_W + colIdx * COL_W;
+        const slot = slots.find(s => s.dayOfWeek === day && s.startTime === time.start);
+        ctx.fillStyle = '#e5e7eb';
+        ctx.fillRect(x, y, 1, ROW_H);
+
+        if (!slot || slot.status === 'free') return;
+
+        const pad = 6 * S;
+        const cellW = COL_W - pad * 2;
+        const statusColors: Record<string, string> = {
+          taken: '#fff7ed', validated: '#f1f5f9', locked: '#f0f0f0',
+        };
+        ctx.fillStyle = statusColors[slot.status] ?? '#fff';
+        ctx.beginPath();
+        ctx.roundRect(x + 4, y + 4, COL_W - 8, ROW_H - 8, 6);
+        ctx.fill();
+
+        let ty = y + pad + 8 * S;
+        ctx.textAlign = 'left';
+        if (slot.subjectName) {
+          ctx.font = `bold ${8 * S}px sans-serif`;
+          ctx.fillStyle = '#111827';
+          ctx.fillText(truncate(slot.subjectName, cellW), x + pad, ty);
+          ty += 11 * S;
+        }
+        if (slot.teacherName) {
+          ctx.font = `${7 * S}px sans-serif`;
+          ctx.fillStyle = '#374151';
+          const initials = slot.teacherName.split(' ').map((p: string) => p[0]).join('').toUpperCase().slice(0, 3);
+          const nameText = cellW < 80 * S ? initials : truncate(slot.teacherName, cellW);
+          ctx.fillText(nameText, x + pad, ty);
+          ty += 10 * S;
+        }
+        if (slot.room) {
+          ctx.font = `${7 * S}px monospace`;
+          ctx.fillStyle = '#6b7280';
+          ctx.fillText(truncate(slot.room, cellW), x + pad, ty);
+        }
+      });
+    });
+
+    const sessionName = (this.session()?.name ?? 'session').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/jpeg', 0.95);
+    a.download = `emploi-du-temps-${sessionName}.jpg`;
+    a.click();
+  }
+
   shareWhatsApp(): void {
     const session = this.session();
     if (!session) return;
@@ -447,7 +617,7 @@ export class SessionDetailComponent implements OnInit {
   }
 
   slotClass(status: string): string {
-    return { free: 'bg-white border-amber/30', taken: 'bg-molten/12 border-molten/40', validated: 'bg-steel/50 border-steel/70' }[status] ?? '';
+    return { free: 'bg-white border-steel/40', taken: 'bg-brick/6 border-brick/25', validated: 'bg-steel/50 border-steel/70' }[status] ?? '';
   }
 
   statusBadge(status: string): string {
@@ -481,8 +651,8 @@ export class SessionDetailComponent implements OnInit {
 
   slotCardClass(status: string): string {
     return {
-      free:      'bg-white border border-amber/35 text-navy/80',
-      taken:     'bg-molten/12 border border-molten/40 text-navy',
+      free:      'bg-white border border-steel/50 text-navy/70',
+      taken:     'bg-brick/6 border border-brick/20 text-navy',
       locked:    'bg-steel/70 border border-steel/90 text-navy/50',
       validated: 'bg-steel/50 border border-steel/80 text-navy/50',
     }[status] ?? 'bg-white border border-cream/60';
@@ -491,7 +661,7 @@ export class SessionDetailComponent implements OnInit {
   badgeClass(status: string): string {
     return {
       free:      'bg-cream/60 text-navy/50',
-      taken:     'bg-molten/20 text-navy',
+      taken:     'bg-brick/15 text-navy',
       validated: 'bg-steel text-navy/50',
     }[status] ?? '';
   }

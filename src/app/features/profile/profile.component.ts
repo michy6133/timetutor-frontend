@@ -1,5 +1,6 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -8,7 +9,7 @@ import { ToastService } from '../../core/services/toast.service';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './profile.component.html',
 })
 export class ProfileComponent implements OnInit {
@@ -19,6 +20,16 @@ export class ProfileComponent implements OnInit {
 
   readonly saving = signal(false);
   readonly savingPwd = signal(false);
+
+  initials(): string {
+    const name = this.auth.currentUser()?.fullName ?? '';
+    return name.split(' ').map(p => p[0] ?? '').join('').toUpperCase().slice(0, 2);
+  }
+
+  backRoute(): string {
+    const role = this.auth.currentUser()?.role;
+    return role === 'teacher' ? '/teacher/portal' : '/director/dashboard';
+  }
 
   readonly profileForm = this.fb.group({
     fullName: ['', [Validators.required, Validators.minLength(2)]],

@@ -5,6 +5,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { SvgIconComponent } from '../../../shared/svg-icon.component';
 import { OnboardingService } from '../../../shared/onboarding.service';
 import { OnboardingTooltipComponent, OnboardingStep } from '../../../shared/onboarding-tooltip.component';
+import { SubscriptionService } from '../../../core/services/subscription.service';
 
 @Component({
   selector: 'app-director-layout',
@@ -15,6 +16,7 @@ import { OnboardingTooltipComponent, OnboardingStep } from '../../../shared/onbo
 export class DirectorLayoutComponent implements OnInit {
   readonly auth = inject(AuthService);
   private readonly onboarding = inject(OnboardingService);
+  readonly sub = inject(SubscriptionService);
   readonly mobileMenuOpen = signal(false);
   readonly showOnboarding = signal(false);
 
@@ -30,6 +32,7 @@ export class DirectorLayoutComponent implements OnInit {
     if (!this.onboarding.isDone()) {
       this.showOnboarding.set(true);
     }
+    this.sub.load();
   }
 
   dismissOnboarding(): void {

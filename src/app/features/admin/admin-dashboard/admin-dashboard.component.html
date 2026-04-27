@@ -13,7 +13,7 @@
 </nav>
 
 <div class="max-w-6xl mx-auto px-6 py-8">
-  <div class="mb-8">
+  <div class="mb-6">
     <div class="text-xs font-bold uppercase tracking-widest text-brick font-mono mb-2">Back-office</div>
     <h1 class="font-display text-2xl font-extrabold text-navy">Tableau de bord global</h1>
     <p class="text-navy/40 text-sm mt-1">Vue d'ensemble de toutes les écoles sur la plateforme.</p>
@@ -21,94 +21,218 @@
 
   <!-- KPIs -->
   @if (stats()) {
-    <div class="grid grid-cols-2 gap-4 mb-8 sm:grid-cols-4">
-      <div class="bg-gradient-to-br from-brick/8 to-cream/20 border border-brick/15 rounded-2xl p-6 slide-up">
+    <div class="grid grid-cols-2 gap-4 mb-7 sm:grid-cols-4">
+      <div class="bg-gradient-to-br from-brick/8 to-cream/20 border border-brick/15 rounded-2xl p-5 slide-up">
         <div class="font-display text-3xl font-extrabold text-navy mb-1">{{ stats()!.activeSchools }}</div>
         <div class="text-navy/45 text-xs font-medium uppercase tracking-wide">Écoles actives</div>
-        <div class="w-5 h-0.5 bg-brick/40 rounded-full mt-2"></div>
       </div>
-      <div class="bg-white border border-cream/50 rounded-2xl p-6 slide-up-1">
+      <div class="bg-white border border-cream/50 rounded-2xl p-5 slide-up-1">
         <div class="font-display text-3xl font-extrabold text-navy mb-1">{{ stats()!.openSessions }}</div>
         <div class="text-navy/40 text-xs font-medium uppercase tracking-wide">Sessions ouvertes</div>
-        <div class="w-5 h-0.5 bg-brick rounded-full mt-2"></div>
       </div>
-      <div class="bg-white border border-cream/50 rounded-2xl p-6 slide-up-2">
+      <div class="bg-white border border-cream/50 rounded-2xl p-5 slide-up-2">
         <div class="font-display text-3xl font-extrabold text-navy mb-1">{{ stats()!.totalTeachers }}</div>
         <div class="text-navy/40 text-xs font-medium uppercase tracking-wide">Enseignants inscrits</div>
-        <div class="w-5 h-0.5 bg-steel rounded-full mt-2"></div>
       </div>
-      <div class="bg-white border border-cream/50 rounded-2xl p-6 slide-up-3">
+      <div class="bg-white border border-cream/50 rounded-2xl p-5 slide-up-3">
         <div class="font-display text-3xl font-extrabold text-navy mb-1">{{ stats()!.validatedSlots }}</div>
         <div class="text-navy/40 text-xs font-medium uppercase tracking-wide">Créneaux validés</div>
-        <div class="w-5 h-0.5 bg-navy/25 rounded-full mt-2"></div>
       </div>
     </div>
   }
 
-  <!-- Schools table -->
-  <div class="flex items-center justify-between mb-4">
-    <h2 class="font-display font-bold text-navy">Écoles inscrites</h2>
-    <button (click)="loadData()" class="text-sm text-brick font-semibold hover:text-navy/70 transition-colors">Actualiser</button>
+  <!-- Tabs -->
+  <div class="flex items-center gap-1 bg-cream/40 rounded-xl p-1 mb-6 w-fit">
+    <button (click)="activeTab.set('schools')"
+      [class]="activeTab() === 'schools' ? 'bg-white shadow-sm text-navy font-bold' : 'text-navy/45 hover:text-navy'"
+      class="px-4 py-2 rounded-lg text-sm transition-all">
+      Écoles
+    </button>
+    <button (click)="activeTab.set('plans')"
+      [class]="activeTab() === 'plans' ? 'bg-white shadow-sm text-navy font-bold' : 'text-navy/45 hover:text-navy'"
+      class="px-4 py-2 rounded-lg text-sm transition-all">
+      Plans d'abonnement
+    </button>
   </div>
 
-  <div class="bg-white border border-cream/50 rounded-2xl overflow-hidden shadow-sm">
-    <table class="w-full text-sm">
-      <thead class="bg-cream/30 border-b border-cream/50">
-        <tr>
-          <th class="text-left px-5 py-3 text-[11px] font-bold text-navy/45 uppercase tracking-wider">École</th>
-          <th class="text-left px-5 py-3 text-[11px] font-bold text-navy/45 uppercase tracking-wider">Plan</th>
-          <th class="text-left px-5 py-3 text-[11px] font-bold text-navy/45 uppercase tracking-wider">Sessions</th>
-          <th class="text-left px-5 py-3 text-[11px] font-bold text-navy/45 uppercase tracking-wider">Statut</th>
-          <th class="text-right px-5 py-3 text-[11px] font-bold text-navy/45 uppercase tracking-wider">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (school of schools(); track school.id) {
-          <tr class="border-b border-cream/35 last:border-0 hover:bg-cream/15 transition-colors">
-            <td class="px-5 py-4">
-              <div class="font-semibold text-navy font-display">{{ school.name }}</div>
-              <div class="text-navy/30 text-xs mt-0.5">{{ school.directorsCount }} directeur(s)</div>
-            </td>
-            <td class="px-5 py-4">
-              <div class="flex items-center gap-2">
-                <span class="badge badge-active capitalize">{{ school.subscriptionPlan }}</span>
-                <select #planSel class="text-xs border border-cream text-navy/55 rounded-lg px-2 py-1 bg-white focus:outline-none focus:border-brick transition-colors"
-                        (change)="updateSubscription(school.id, planSel.value)">
-                  <option value="">Changer...</option>
-                  @for (plan of plans(); track plan.code) {
-                    <option [value]="plan.code">{{ plan.displayName }}</option>
-                  }
-                </select>
-              </div>
-            </td>
-            <td class="px-5 py-4 text-navy/55 font-mono">{{ school.sessionsCount }}</td>
-            <td class="px-5 py-4">
-              <span class="badge"
-                [class]="school.isActive ? 'badge-open' : 'badge-closed'">
-                {{ school.isActive ? 'Active' : 'Inactive' }}
-              </span>
-            </td>
-            <td class="px-5 py-4 text-right">
-              <button (click)="toggleSchool(school)"
-                [disabled]="togglingId() === school.id"
-                class="text-xs border px-3 py-1.5 rounded-lg transition-all disabled:opacity-40"
-                [class]="school.isActive
-                  ? 'border-brick/22 text-brick/65 hover:bg-brick/5 hover:border-brick/38'
-                  : 'border-navy/20 text-navy/55 hover:bg-navy/5 hover:border-navy/35'">
-                {{ togglingId() === school.id ? '...' : (school.isActive ? 'Désactiver' : 'Activer') }}
-              </button>
-            </td>
-          </tr>
-        }
-        @empty {
+  <!-- Schools Tab -->
+  @if (activeTab() === 'schools') {
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-display font-bold text-navy">Écoles inscrites</h2>
+      <button (click)="loadData()" class="text-sm text-brick font-semibold hover:text-navy/70 transition-colors">Actualiser</button>
+    </div>
+    <div class="bg-white border border-cream/50 rounded-2xl overflow-hidden shadow-sm">
+      <table class="w-full text-sm">
+        <thead class="bg-cream/30 border-b border-cream/50">
           <tr>
-            <td colspan="5" class="text-center py-12 text-navy/30">
-              <div class="text-2xl mb-2">🏫</div>
-              Aucune école enregistrée
-            </td>
+            <th class="text-left px-5 py-3 text-[11px] font-bold text-navy/45 uppercase tracking-wider">École</th>
+            <th class="text-left px-5 py-3 text-[11px] font-bold text-navy/45 uppercase tracking-wider">Plan</th>
+            <th class="text-left px-5 py-3 text-[11px] font-bold text-navy/45 uppercase tracking-wider">Sessions</th>
+            <th class="text-left px-5 py-3 text-[11px] font-bold text-navy/45 uppercase tracking-wider">Statut</th>
+            <th class="text-right px-5 py-3 text-[11px] font-bold text-navy/45 uppercase tracking-wider">Actions</th>
           </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody>
+          @for (school of schools(); track school.id) {
+            <tr class="border-b border-cream/35 last:border-0 hover:bg-cream/15 transition-colors">
+              <td class="px-5 py-4">
+                <div class="font-semibold text-navy font-display">{{ school.name }}</div>
+                <div class="text-navy/30 text-xs mt-0.5">{{ school.directors_count }} directeur(s)</div>
+              </td>
+              <td class="px-5 py-4">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-[11px] font-bold px-2 py-0.5 rounded-full" [class]="planBadgeClass(school.subscription_plan)">
+                    {{ school.subscription_plan }}
+                  </span>
+                  <select #planSel
+                    class="text-xs border border-cream text-navy/55 rounded-lg px-2 py-1 bg-white focus:outline-none focus:border-brick transition-colors"
+                    (change)="updateSubscription(school.id, planSel.value)">
+                    <option value="">Changer…</option>
+                    @for (plan of plans(); track plan.code) {
+                      <option [value]="plan.code">{{ plan.display_name }}</option>
+                    }
+                  </select>
+                </div>
+              </td>
+              <td class="px-5 py-4 text-navy/55 font-mono">{{ school.sessions_count }}</td>
+              <td class="px-5 py-4">
+                <span class="text-[11px] font-bold px-2 py-0.5 rounded-full"
+                  [class]="school.is_active ? 'bg-emerald/15 text-emerald' : 'bg-error/10 text-error'">
+                  {{ school.is_active ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td class="px-5 py-4 text-right">
+                <button (click)="toggleSchool(school)"
+                  [disabled]="togglingId() === school.id"
+                  class="text-xs border px-3 py-1.5 rounded-lg transition-all disabled:opacity-40"
+                  [class]="school.is_active
+                    ? 'border-brick/22 text-brick/65 hover:bg-brick/5'
+                    : 'border-navy/20 text-navy/55 hover:bg-navy/5'">
+                  {{ togglingId() === school.id ? '...' : (school.is_active ? 'Désactiver' : 'Activer') }}
+                </button>
+              </td>
+            </tr>
+          }
+          @empty {
+            <tr>
+              <td colspan="5" class="text-center py-12 text-navy/30">
+                <p class="text-2xl mb-2">🏫</p>
+                Aucune école enregistrée
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- Plans Tab -->
+  @if (activeTab() === 'plans') {
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-display font-bold text-navy">Plans d'abonnement</h2>
+      <button (click)="loadData()" class="text-sm text-brick font-semibold hover:text-navy/70 transition-colors">Actualiser</button>
+    </div>
+    <div class="grid gap-4 md:grid-cols-3">
+      @for (plan of plans(); track plan.code) {
+        <div class="bg-white border rounded-2xl overflow-hidden shadow-sm"
+          [class]="editingPlan() === plan.code ? 'border-brick/30' : 'border-cream/50'">
+
+          @if (editingPlan() !== plan.code) {
+            <!-- View mode -->
+            <div class="p-5">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <div class="font-display font-bold text-navy">{{ plan.display_name }}</div>
+                  <div class="text-xs font-mono text-navy/35">{{ plan.code }}</div>
+                </div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" [class]="planBadgeClass(plan.code)">
+                  {{ plan.validity_days }}j
+                </span>
+              </div>
+              <div class="space-y-1 mb-4">
+                @for (key of featureKeys; track key) {
+                  <div class="flex items-center gap-2 text-xs">
+                    <div class="w-4 h-4 rounded flex items-center justify-center shrink-0"
+                      [class]="plan.features_json[key] ? 'bg-emerald/15 text-emerald' : 'bg-steel/40 text-navy/30'">
+                      {{ plan.features_json[key] ? '✓' : '✗' }}
+                    </div>
+                    <span [class]="plan.features_json[key] ? 'text-navy/70' : 'text-navy/35'">{{ featureLabels[key] }}</span>
+                  </div>
+                }
+              </div>
+              <div class="border-t border-cream/50 pt-3 mb-4 space-y-1">
+                @for (key of limitKeys(plan); track key) {
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="text-navy/50">{{ limitLabel(key) }}</span>
+                    <span class="font-mono font-semibold text-navy">{{ plan.limits_json[key] ?? '∞' }}</span>
+                  </div>
+                }
+              </div>
+              <button (click)="openEditPlan(plan)"
+                class="w-full text-xs border border-brick/20 text-brick font-semibold py-2 rounded-xl hover:bg-brick/5 transition-all">
+                Modifier
+              </button>
+            </div>
+
+          } @else if (planEditBuffer()) {
+            <!-- Edit mode -->
+            <div class="p-5">
+              <div class="flex items-center justify-between mb-4">
+                <div class="font-display font-bold text-navy text-sm">Édition — {{ plan.display_name }}</div>
+                <button (click)="cancelEditPlan()" class="text-navy/35 hover:text-navy text-xs">✕</button>
+              </div>
+              <div class="space-y-3">
+                <div>
+                  <label class="tt-label">Nom affiché</label>
+                  <input type="text" class="tt-input"
+                    [ngModel]="planEditBuffer()!.display_name"
+                    (ngModelChange)="planEditBuffer.update(b => b ? {...b, display_name: $event} : b)">
+                </div>
+                <div>
+                  <label class="tt-label">Validité (jours)</label>
+                  <input type="number" min="1" class="tt-input"
+                    [ngModel]="planEditBuffer()!.validity_days"
+                    (ngModelChange)="planEditBuffer.update(b => b ? {...b, validity_days: +$event} : b)">
+                </div>
+                <div>
+                  <label class="tt-label">Fonctionnalités</label>
+                  <div class="space-y-1.5">
+                    @for (key of featureKeys; track key) {
+                      <label class="flex items-center gap-2 cursor-pointer text-xs">
+                        <input type="checkbox"
+                          [checked]="planEditBuffer()!.features_json[key]"
+                          (change)="toggleFeature(key)"
+                          class="rounded">
+                        <span class="text-navy/70">{{ featureLabels[key] }}</span>
+                      </label>
+                    }
+                  </div>
+                </div>
+                <div>
+                  <label class="tt-label">Limites</label>
+                  <div class="space-y-2">
+                    @for (key of limitKeys(planEditBuffer()!); track key) {
+                      <div>
+                        <label class="text-[10px] text-navy/45 mb-0.5 block">{{ limitLabel(key) }} (0 = illimité)</label>
+                        <input type="number" min="0" class="tt-input"
+                          [value]="planEditBuffer()!.limits_json[key] ?? 0"
+                          (change)="updateLimit(key, $any($event.target).value)">
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+              <div class="flex gap-2 mt-4">
+                <button (click)="savePlan()" [disabled]="savingPlan()"
+                  class="flex-1 btn-brick py-2 text-xs disabled:opacity-40">
+                  @if (savingPlan()) { Sauvegarde... } @else { Enregistrer }
+                </button>
+                <button (click)="cancelEditPlan()" class="btn-ghost-navy px-4 py-2 text-xs">Annuler</button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
 </div>
